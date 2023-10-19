@@ -1,0 +1,15 @@
+*.os
+*.so
+.cache
+.godot
+.mono
+.sconsign.dblite
+.vs
+assets/example.mid
+assets/example.sf2
+assets/example2.mid
+bin/csound
+bin/x11/
+build
+build-log.txt
+compile_commands.json

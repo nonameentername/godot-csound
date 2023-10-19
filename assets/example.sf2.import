@@ -1,0 +1,14 @@
+[remap]
+
+importer="soundfont"
+type="SoundFontFileReader"
+uid="uid://bnijkstv1hhr7"
+path="res://.godot/imported/example.sf2-97bbfbf7e2b2afc9bebb284e9ae034b8.sf2str"
+
+[deps]
+
+source_file="res://assets/example.sf2"
+dest_files=["res://.godot/imported/example.sf2-97bbfbf7e2b2afc9bebb284e9ae034b8.sf2str"]
+
+[params]
+

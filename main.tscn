@@ -1,0 +1,78 @@
+[gd_scene load_steps=5 format=3 uid="uid://n6csjkhxjfm2"]
+
+[ext_resource type="Script" path="res://main.cs" id="1"]
+[ext_resource type="MidiFileReader" uid="uid://bcfsoo3bbifnj" path="res://assets/example.mid" id="2_t0j6e"]
+[ext_resource type="SoundFontFileReader" uid="uid://bnijkstv1hhr7" path="res://assets/example.sf2" id="3_eufo8"]
+
+[sub_resource type="AudioStreamCsound" id="AudioStreamCsound_kiks0"]
+soundfont = ExtResource("3_eufo8")
+midi_file = ExtResource("2_t0j6e")
+
+[node name="main" type="Node2D"]
+script = ExtResource("1")
+midi_file = ExtResource("2_t0j6e")
+
+[node name="CheckButton" type="CheckButton" parent="."]
+offset_left = 229.0
+offset_top = 112.0
+offset_right = 305.0
+offset_bottom = 152.0
+
+[node name="CheckButton2" type="CheckButton" parent="."]
+offset_left = 228.0
+offset_top = 158.0
+offset_right = 304.0
+offset_bottom = 198.0
+
+[node name="CheckButton3" type="CheckButton" parent="."]
+offset_left = 230.0
+offset_top = 204.0
+offset_right = 306.0
+offset_bottom = 244.0
+
+[node name="Label" type="Label" parent="."]
+offset_left = 194.0
+offset_top = 126.0
+offset_right = 234.0
+offset_bottom = 140.0
+text = "C4"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 196.0
+offset_top = 172.0
+offset_right = 236.0
+offset_bottom = 186.0
+text = "E4"
+
+[node name="Label3" type="Label" parent="."]
+offset_left = 195.0
+offset_top = 217.0
+offset_right = 235.0
+offset_bottom = 231.0
+text = "G4"
+
+[node name="Button" type="Button" parent="."]
+offset_left = 600.0
+offset_top = 159.0
+offset_right = 737.0
+offset_bottom = 209.0
+text = "PLAY MIDI"
+
+[node name="VSlider" type="VSlider" parent="."]
+offset_left = 378.0
+offset_top = 115.0
+offset_right = 413.0
+offset_bottom = 241.0
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="CsoundPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamCsound_kiks0")
+autoplay = true
+
+[connection signal="toggled" from="CheckButton" to="." method="_on_CheckButton_toggled"]
+[connection signal="toggled" from="CheckButton2" to="." method="_on_CheckButton2_toggled"]
+[connection signal="toggled" from="CheckButton3" to="." method="_on_CheckButton3_toggled"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="value_changed" from="VSlider" to="." method="_on_v_slider_value_changed"]

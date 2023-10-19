@@ -1,0 +1,4 @@
+BasedOnStyle: microsoft
+IndentWidth: 4
+AccessModifierOffset: -4
+BreakBeforeBraces: Attach

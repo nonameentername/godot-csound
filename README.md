@@ -9,15 +9,12 @@ How to Install
 The first thing to do is make sure you have all of the required dependencies for
 building Csound. In a terminal, do the following:
 
-Edit, as root, `/etc/apt/sources.list` and ensure that each line beginning with `deb` has another line below it that is identical except that `deb` is replaced with `deb-src`. Then run:
+Edit, as root, `/etc/apt/sources.list` and ensure that each line beginning with `deb` has another line below it that is identical except that `deb` is replaced with `deb-src`. Then run to install system dependencies for Ubuntu:
 
     sudo apt update
     sudo apt build-dep csound
     sudo apt install cmake
     sudo apt install git
-
-Install system dependencies for Ubuntu:
-
     sudo apt install abcmidi
 
 Build

@@ -24,7 +24,13 @@
       "additionalSOLibSearchPath": "bin",
       "args": [],
       "cwd": "${workspaceFolder}",
-      "stopAtEntry": false
+      "stopAtEntry": false,
+      "environment" : [
+          {
+              "name": "LD_PRELOAD",
+              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+          }
+      ]
     },
     {
       "name": "🕹 Native Debug Game in Editor",
@@ -35,7 +41,13 @@
       "additionalSOLibSearchPath": "bin",
       "args": ["--editor"],
       "cwd": "${workspaceFolder}",
-      "stopAtEntry": false
+      "stopAtEntry": false,
+      "environment" : [
+          {
+              "name": "LD_PRELOAD",
+              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+          }
+      ]
     },
     // Debug the scene that matches the name of the currently open *.cs file
     // (if there's a scene with the same name in the same directory).

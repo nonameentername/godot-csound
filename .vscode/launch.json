@@ -14,6 +14,12 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
+      "environment" : [
+          {
+              "name": "LD_PRELOAD",
+              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+          }
+      ]
     },
     {
       "name": "🕹 Native Debug Game",
@@ -40,6 +46,23 @@
       "program": "${env:GODOT4}",
       "additionalSOLibSearchPath": "bin",
       "args": ["--editor"],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "environment" : [
+          {
+              "name": "LD_PRELOAD",
+              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+          }
+      ]
+    },
+    {
+      "name": "🕹 Native Attach Game",
+      "type": "cppdbg",
+      "program": "${env:GODOT4}",
+      "request": "attach",
+      "processId": "${command:pickProcess}", 
+      "additionalSOLibSearchPath": "bin",
+      "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
       "environment" : [

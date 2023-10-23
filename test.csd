@@ -44,6 +44,8 @@ kamp	= kamp/2000						;scale amplitude
 kfreq	init	1						;do not change freq from sf
 kCutoff chnget "cutoff"
 a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 3			;preset index = 1
+    chnset a1, "sound1"
+    chnset a2, "sound2"
 	outs	a1, a2
 	
 endin

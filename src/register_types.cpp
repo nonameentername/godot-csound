@@ -9,7 +9,8 @@
 
 #include "audio_stream_csound.h"
 #include "audio_stream_player_csound.h"
-#include "csound_gdextension.h"
+#include "csound_engine.h"
+#include "csound_godot.h"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 
@@ -26,6 +27,7 @@ void initialize_gdmidiplayer_module(ModuleInitializationLevel p_level) {
         return;
     }
 
+    ClassDB::register_class<CsoundGodot>();
     ClassDB::register_class<CsoundEngine>();
     csound_module = memnew(CsoundEngine);
     Engine::get_singleton()->register_singleton("Csound", CsoundEngine::get_singleton());

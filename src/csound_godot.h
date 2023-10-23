@@ -1,5 +1,5 @@
-#ifndef CSOUNDGDEXTENTION_H
-#define CSOUNDGDEXTENTION_H
+#ifndef CSOUNDGODOT_H
+#define CSOUNDGODOT_H
 
 #include <csound.hpp>
 
@@ -18,8 +18,8 @@
 
 namespace godot {
 
-class CsoundEngine : public Node {
-    GDCLASS(CsoundEngine, Node);
+class CsoundGodot : public Node {
+    GDCLASS(CsoundGodot, Node);
 
 private:
     int sfont_id;
@@ -33,12 +33,10 @@ private:
 
 protected:
     static void _bind_methods();
-    static CsoundEngine *singleton;
 
 public:
-    CsoundEngine();
-    ~CsoundEngine();
-    static CsoundEngine *get_singleton();
+    CsoundGodot();
+    ~CsoundGodot();
     void set_soundfont(String node_path);
     Ref<SoundFontFileReader> get_soundfont();
     void set_midi_file(Ref<MidiFileReader> p_midi_file);
@@ -51,7 +49,6 @@ public:
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);
     int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
-    void initialize();
     void process(double delta);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);

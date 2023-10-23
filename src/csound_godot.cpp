@@ -1,10 +1,8 @@
-#include "csound_gdextension.h"
+#include "csound_godot.h"
 
 using namespace godot;
 
-CsoundEngine *CsoundEngine::singleton = NULL;
-
-CsoundEngine::CsoundEngine() {
+CsoundGodot::CsoundGodot() {
     buffer = new float[44100 * 2];
 
     csound = new Csound();
@@ -25,22 +23,13 @@ CsoundEngine::CsoundEngine() {
     scale = csound->Get0dBFS();
 
     set_process_internal(true);
-
-    singleton = this;
-
-    call_deferred("initialize");
 }
 
-CsoundEngine::~CsoundEngine() {
+CsoundGodot::~CsoundGodot() {
     delete csound;
-    singleton = NULL;
 }
 
-CsoundEngine *CsoundEngine::get_singleton() {
-    return singleton;
-}
-
-void CsoundEngine::set_soundfont(String node_path) {
+void CsoundGodot::set_soundfont(String node_path) {
     if (ResourceLoader::get_singleton()->exists(node_path)) {
         Variant resource = ResourceLoader::get_singleton()->load(node_path);
         Ref<SoundFontFileReader> soundfont = resource;
@@ -49,19 +38,19 @@ void CsoundEngine::set_soundfont(String node_path) {
     }
 }
 
-Ref<SoundFontFileReader> CsoundEngine::get_soundfont() {
+Ref<SoundFontFileReader> CsoundGodot::get_soundfont() {
     return soundfont;
 }
 
-void CsoundEngine::set_midi_file(Ref<MidiFileReader> p_midi_file) {
+void CsoundGodot::set_midi_file(Ref<MidiFileReader> p_midi_file) {
     midi_file = p_midi_file;
 }
 
-Ref<MidiFileReader> CsoundEngine::get_midi_file() {
+Ref<MidiFileReader> CsoundGodot::get_midi_file() {
     return midi_file;
 }
 
-int CsoundEngine::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
+int CsoundGodot::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
     int64_t to_fill = p_frames;
 
     int mix_rate = 44100;
@@ -97,29 +86,29 @@ int CsoundEngine::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
     return p_frames;
 }
 
-void CsoundEngine::program_select(int chan, int bank_num, int preset_num) {
+void CsoundGodot::program_select(int chan, int bank_num, int preset_num) {
 }
 
-void CsoundEngine::note_on(int chan, int key, int vel) {
+void CsoundGodot::note_on(int chan, int key, int vel) {
     char buffer[100];
     sprintf(buffer, "i1 0 -1 %d %d", key, vel);
     csound->InputMessage(buffer);
 }
 
-void CsoundEngine::note_off(int chan, int key) {
+void CsoundGodot::note_off(int chan, int key) {
     char buffer[100];
     sprintf(buffer, "i-1 0 0 %d", key);
     csound->InputMessage(buffer);
 }
 
-void CsoundEngine::send_control_channel(String channel, float value) {
+void CsoundGodot::send_control_channel(String channel, float value) {
     csound->SetControlChannel(channel.ascii().get_data(), value);
 }
 
-void CsoundEngine::pitch_bend(int chan, int val) {
+void CsoundGodot::pitch_bend(int chan, int val) {
 }
 
-void CsoundEngine::play_midi(Ref<MidiFileReader> p_midi_file) {
+void CsoundGodot::play_midi(Ref<MidiFileReader> p_midi_file) {
     Ref<MidiFileReader> local_midi_file;
 
     if (p_midi_file != NULL) {
@@ -138,11 +127,7 @@ void CsoundEngine::play_midi(Ref<MidiFileReader> p_midi_file) {
     }
 }
 
-void CsoundEngine::initialize() {
-    Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop())->get_root()->add_child(this);
-}
-
-void CsoundEngine::_notification(int p_what) {
+void CsoundGodot::_notification(int p_what) {
     switch (p_what) {
     case NOTIFICATION_INTERNAL_PROCESS: {
         process(get_process_delta_time());
@@ -150,34 +135,39 @@ void CsoundEngine::_notification(int p_what) {
     }
 }
 
-void CsoundEngine::process(double delta) {
+void CsoundGodot::process(double delta) {
+    controlChannelInfo_t *tmp;
+    int num_channels = csound->ListChannels(tmp);
+
+    for (int i = 0; i < num_channels; i++) {
+        godot::UtilityFunctions::print("name = ", tmp[i].name, " type = ", tmp[i].type);
+    }
 }
 
-int CsoundEngine::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
+int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
     return 0;
 }
 
-int CsoundEngine::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
+int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
     return 0;
 }
 
-void CsoundEngine::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("initialize"), &CsoundEngine::initialize);
-    ClassDB::bind_method(D_METHOD("process", "delta"), &CsoundEngine::process);
-    ClassDB::bind_method(D_METHOD("program_select"), &CsoundEngine::program_select);
-    ClassDB::bind_method(D_METHOD("note_on"), &CsoundEngine::note_on);
-    ClassDB::bind_method(D_METHOD("note_off"), &CsoundEngine::note_off);
-    ClassDB::bind_method(D_METHOD("send_control_channel"), &CsoundEngine::send_control_channel);
-    ClassDB::bind_method(D_METHOD("pitch_bend"), &CsoundEngine::pitch_bend);
-    ClassDB::bind_method(D_METHOD("play_midi"), &CsoundEngine::play_midi, DEFVAL(NULL));
-    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundEngine::set_soundfont);
-    ClassDB::bind_method(D_METHOD("get_soundfont"), &CsoundEngine::get_soundfont);
+void CsoundGodot::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("process", "delta"), &CsoundGodot::process);
+    ClassDB::bind_method(D_METHOD("program_select"), &CsoundGodot::program_select);
+    ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);
+    ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);
+    ClassDB::bind_method(D_METHOD("send_control_channel"), &CsoundGodot::send_control_channel);
+    ClassDB::bind_method(D_METHOD("pitch_bend"), &CsoundGodot::pitch_bend);
+    ClassDB::bind_method(D_METHOD("play_midi"), &CsoundGodot::play_midi, DEFVAL(NULL));
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundGodot::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &CsoundGodot::get_soundfont);
     ClassDB::add_property(
-        "CsoundEngine", PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFontFileReader"),
+        "CsoundGodot", PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFontFileReader"),
         "set_soundfont", "get_soundfont");
-    ClassDB::bind_method(D_METHOD("set_midi_file", "midi_file"), &CsoundEngine::set_midi_file);
-    ClassDB::bind_method(D_METHOD("get_midi_file"), &CsoundEngine::get_midi_file);
-    ClassDB::add_property("CsoundEngine",
+    ClassDB::bind_method(D_METHOD("set_midi_file", "midi_file"), &CsoundGodot::set_midi_file);
+    ClassDB::bind_method(D_METHOD("get_midi_file"), &CsoundGodot::get_midi_file);
+    ClassDB::add_property("CsoundGodot",
                           PropertyInfo(Variant::OBJECT, "midi_file", PROPERTY_HINT_RESOURCE_TYPE, "MidiFileReader"),
                           "set_midi_file", "get_midi_file");
 }

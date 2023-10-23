@@ -10,7 +10,8 @@ public partial class main : Node2D
 
     public override void _Ready()
     {
-        csound = (Node)Engine.GetSingleton("Csound");
+        Node csound_engine = (Node)Engine.GetSingleton("Csound");
+        csound = (Node)csound_engine.Call("get", "main");
         csound.Call("send_control_channel", "cutoff", 1);
         csound.Call("play_midi");
     }

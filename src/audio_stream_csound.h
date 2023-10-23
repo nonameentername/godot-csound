@@ -7,6 +7,7 @@
 #include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "csound_godot.h"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 
@@ -23,6 +24,7 @@ private:
     int hz;
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
+    String csound_name;
 
 public:
     void reset();
@@ -39,6 +41,8 @@ public:
     Ref<SoundFontFileReader> get_soundfont();
     void set_midi_file(Ref<MidiFileReader> p_midi_file);
     Ref<MidiFileReader> get_midi_file();
+    void set_csound_name(const String &name);
+    String get_csound_name();
 
 protected:
     static void _bind_methods();

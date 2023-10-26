@@ -31,24 +31,18 @@ void CsoundEngine::_notification(int p_what) {
 }
 
 void CsoundEngine::process(double delta) {
-    /*
-    controlChannelInfo_t  *tmp;
-    int num_channels = csound->ListChannels(tmp);
-
-    for (int i = 0; i < num_channels; i++) {
-        godot::UtilityFunctions::print("name = ", tmp[i].name, " type = ", tmp[i].type);
-    }
-    */
 }
 
 CsoundGodot *CsoundEngine::create(String name) {
-    ERR_FAIL_COND_V_MSG(csound_instances.has(name), NULL, "Can't create csound that already exists: " + name);
+    if (!csound_instances.has(name)) {
+        CsoundGodot *csound = memnew(CsoundGodot);
+        csound_instances.insert(name, csound);
+        call_deferred("add_child", csound);
 
-    CsoundGodot *csound = memnew(CsoundGodot);
-    csound_instances.insert(name, csound);
-    call_deferred("add_child", csound);
-
-    return csound;
+        return csound;
+    } else {
+        return csound_instances.get(name);
+    }
 }
 
 CsoundGodot *CsoundEngine::get(String name) {
@@ -56,7 +50,7 @@ CsoundGodot *CsoundEngine::get(String name) {
         return csound_instances.get(name);
     }
 
-    ERR_FAIL_V_MSG(nullptr, "Failed to retrieve non-existent csound '" + name + "'.");
+    return NULL;
 }
 
 bool CsoundEngine::has(String name) {
@@ -64,8 +58,6 @@ bool CsoundEngine::has(String name) {
 }
 
 void CsoundEngine::erase(String name) {
-    ERR_FAIL_COND_MSG(!csound_instances.has(name), "Failed to erase non-existent csound '" + name + "'.");
-
     if (csound_instances.has(name)) {
         CsoundGodot *csound = csound_instances.get(name);
         csound_instances.erase(name);
@@ -74,11 +66,21 @@ void CsoundEngine::erase(String name) {
 }
 
 void CsoundEngine::rename(String prev_name, String name) {
-    ERR_FAIL_COND_MSG(!csound_instances.has(prev_name), "Failed to rename non-existent csound '" + prev_name + "'.");
+    if (csound_instances.has(prev_name)) {
+        CsoundGodot *csound = csound_instances.get(prev_name);
+        csound_instances.erase(prev_name);
+        csound_instances.insert(name, csound);
+    }
+}
 
-    CsoundGodot *csound = csound_instances.get(prev_name);
-    csound_instances.erase(prev_name);
+void CsoundEngine::add(const String &name, CsoundGodot *csound) {
     csound_instances.insert(name, csound);
+}
+
+void CsoundEngine::remove(const String &name) {
+    if (csound_instances.has(name)) {
+        csound_instances.erase(name);
+    }
 }
 
 void CsoundEngine::_bind_methods() {

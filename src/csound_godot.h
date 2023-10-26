@@ -26,10 +26,16 @@ private:
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
     float *buffer;
+    int buffer_size;
+    int buffer_index;
+    int read_buffer_index;
     Csound *csound;
     MYFLT *spin;
     MYFLT *spout;
     MYFLT scale;
+    int ksmps_index;
+    bool finished;
+    String csound_name;
 
 protected:
     static void _bind_methods();
@@ -37,7 +43,8 @@ protected:
 public:
     CsoundGodot();
     ~CsoundGodot();
-    void set_soundfont(String node_path);
+    virtual void _ready() override;
+    void set_soundfont(Ref<SoundFontFileReader> p_soundfont);
     Ref<SoundFontFileReader> get_soundfont();
     void set_midi_file(Ref<MidiFileReader> p_midi_file);
     Ref<MidiFileReader> get_midi_file();
@@ -49,10 +56,13 @@ public:
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);
     int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
+    int get_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
     void process(double delta);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
     void _notification(int p_what);
+    void set_csound_name(const String &name);
+    const String &get_csound_name();
 };
 } // namespace godot
 

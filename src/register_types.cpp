@@ -8,7 +8,9 @@
 #include <godot_cpp/godot.hpp>
 
 #include "audio_stream_csound.h"
+#include "audio_stream_csound_channel.h"
 #include "audio_stream_player_csound.h"
+#include "audio_stream_player_csound_channel.h"
 #include "csound_engine.h"
 #include "csound_godot.h"
 #include "midi_file_reader.h"
@@ -36,6 +38,8 @@ void initialize_gdmidiplayer_module(ModuleInitializationLevel p_level) {
     ClassDB::register_class<SoundFontFileReader>();
     ClassDB::register_class<AudioStreamPlaybackCsound>();
     ClassDB::register_class<AudioStreamCsound>();
+    ClassDB::register_class<AudioStreamPlaybackCsoundChannel>();
+    ClassDB::register_class<AudioStreamCsoundChannel>();
 }
 
 void uninitialize_gdmidiplayer_module(ModuleInitializationLevel p_level) {

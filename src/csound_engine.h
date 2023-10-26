@@ -43,6 +43,8 @@ public:
     void erase(String name);
     bool has(String name);
     void rename(String prev_name, String name);
+    void add(const String &name, CsoundGodot *csound_godot);
+    void remove(const String &name);
 };
 } // namespace godot
 

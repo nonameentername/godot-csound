@@ -4,12 +4,14 @@
 #include <csound.hpp>
 
 #include <godot_cpp/classes/audio_frame.hpp>
+#include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/main_loop.hpp>
 #include <godot_cpp/classes/node.hpp>
 #include <godot_cpp/classes/resource_loader.hpp>
 #include <godot_cpp/classes/scene_tree.hpp>
 #include <godot_cpp/classes/window.hpp>
+#include <godot_cpp/templates/hash_map.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
@@ -25,10 +27,6 @@ private:
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
-    float *buffer;
-    int buffer_size;
-    int buffer_index;
-    int read_buffer_index;
     Csound *csound;
     MYFLT *spin;
     MYFLT *spout;
@@ -36,6 +34,15 @@ private:
     int ksmps_index;
     bool finished;
     String csound_name;
+    Vector<Vector<MYFLT>> channel_buffers;
+    Vector<int> write_buffer_index;
+    Vector<int> read_buffer_index;
+    HashMap<String, Vector<MYFLT>> named_channel_buffers;
+    HashMap<String, int> write_named_buffer_index;
+    HashMap<String, int> read_named_buffer_index;
+
+    void next_frame(Vector<int> &buffer_index, int channel, int p_frames);
+    void next_frame(HashMap<String, int> &buffer_index, String channel, int p_frames);
 
 protected:
     static void _bind_methods();

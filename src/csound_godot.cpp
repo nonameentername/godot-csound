@@ -160,30 +160,7 @@ void CsoundGodot::next_frame(HashMap<String, int> &buffer_index, String channel,
     }
 }
 
-int CsoundGodot::get_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
-    godot::UtilityFunctions::print("p_rate = ", p_rate);
-    String left = "instr_1_left";
-    String right = "instr_1_right";
-
-    if (!named_channel_buffers.has(left) || !named_channel_buffers.has(right)) {
-        return p_frames;
-    }
-
-    const MYFLT *left_buffer = named_channel_buffers.get(left).ptr();
-    const MYFLT *right_buffer = named_channel_buffers.get(right).ptr();
-
-    for (int frame = 0; frame < p_frames; frame += 1) {
-        p_buffer[frame].left = left_buffer[read_named_buffer_index.get(left)];
-        next_frame(read_named_buffer_index, left, p_frames);
-
-        p_buffer[frame].right = right_buffer[read_named_buffer_index.get(right)];
-        next_frame(read_named_buffer_index, right, p_frames);
-    }
-
-    /*
-    int left = 0;
-    int right = 1;
-
+int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
     if (left > channel_buffers.size() || right > channel_buffers.size()) {
         return p_frames;
     }
@@ -198,7 +175,25 @@ int CsoundGodot::get_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
         p_buffer[frame].right = right_buffer[read_buffer_index.get(right)];
         next_frame(read_buffer_index, right, p_frames);
     }
-    */
+
+    return p_frames;
+}
+
+int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
+    if (!named_channel_buffers.has(left) || !named_channel_buffers.has(right)) {
+        return p_frames;
+    }
+
+    const MYFLT *left_buffer = named_channel_buffers.get(left).ptr();
+    const MYFLT *right_buffer = named_channel_buffers.get(right).ptr();
+
+    for (int frame = 0; frame < p_frames; frame += 1) {
+        p_buffer[frame].left = left_buffer[read_named_buffer_index.get(left)];
+        next_frame(read_named_buffer_index, left, p_frames);
+
+        p_buffer[frame].right = right_buffer[read_named_buffer_index.get(right)];
+        next_frame(read_named_buffer_index, right, p_frames);
+    }
 
     return p_frames;
 }
@@ -299,6 +294,6 @@ void CsoundGodot::_bind_methods() {
                           "set_midi_file", "get_midi_file");
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &CsoundGodot::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &CsoundGodot::get_csound_name);
-    ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound name"), "set_csound_name",
+    ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
 }

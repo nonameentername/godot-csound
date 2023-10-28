@@ -26,7 +26,7 @@ public:
     void reset();
     void set_position(uint64_t pos);
     virtual String get_stream_name() const;
-    int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
+    virtual int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
     virtual float get_length() const {
         return 0;
     } // if supported, otherwise return 0

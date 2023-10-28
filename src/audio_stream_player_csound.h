@@ -14,6 +14,8 @@ namespace godot {
 class AudioStreamPlaybackCsound : public AudioStreamPlayback {
     GDCLASS(AudioStreamPlaybackCsound, AudioStreamPlayback)
     friend class AudioStreamCsound;
+    friend class AudioStreamCsoundChannel;
+    friend class AudioStreamCsoundNamedChannel;
 
 private:
     enum {

@@ -63,7 +63,8 @@ public:
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);
     int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
-    int get_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+    int get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
+    int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     void process(double delta);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);

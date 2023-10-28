@@ -1,5 +1,5 @@
-#ifndef AUDIOSTREAMCSOUNDCHANNEL_H
-#define AUDIOSTREAMCSOUNDCHANNEL_H
+#ifndef AUDIOSTREAMCSOUNDNAMEDCHANNEL_H
+#define AUDIOSTREAMCSOUNDNAMEDCHANNEL_H
 
 #include "csound.hpp"
 
@@ -12,8 +12,8 @@
 
 namespace godot {
 
-class AudioStreamCsoundChannel : public AudioStreamCsound {
-    GDCLASS(AudioStreamCsoundChannel, AudioStreamCsound)
+class AudioStreamCsoundNamedChannel : public AudioStreamCsound {
+    GDCLASS(AudioStreamCsoundNamedChannel, AudioStreamCsound)
 
 private:
     friend class AudioStreamPlaybackCsound;
@@ -22,15 +22,14 @@ private:
     bool stereo;
     int hz;
     String csound_name;
-    int left;
-    int right;
+    String left;
+    String right;
 
 public:
-    AudioStreamCsoundChannel();
-    void set_left(int p_left);
-    int get_left();
-    void set_right(int p_right);
-    int get_right();
+    void set_left(String p_left);
+    String get_left();
+    void set_right(String p_right);
+    String get_right();
     int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) override;
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;
 

@@ -1,41 +1,20 @@
 #include "audio_stream_csound_channel.h"
-#include "audio_stream_player_csound_channel.h"
+#include "audio_stream_player_csound.h"
 #include "csound_engine.h"
 #include "godot_cpp/classes/resource.hpp"
 
 using namespace godot;
 
-AudioStreamCsoundChannel::AudioStreamCsoundChannel() : mix_rate(44100), stereo(false), hz(639) {
-}
-
-AudioStreamCsoundChannel::~AudioStreamCsoundChannel() {
+AudioStreamCsoundChannel::AudioStreamCsoundChannel() {
+    left = 0;
+    right = 1;
 }
 
 Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const {
-    Ref<AudioStreamPlaybackCsoundChannel> talking_tree;
+    Ref<AudioStreamPlaybackCsound> talking_tree;
     talking_tree.instantiate();
     talking_tree->base = Ref<AudioStreamCsoundChannel>(this);
     return talking_tree;
-}
-
-void AudioStreamCsoundChannel::set_csound_name(const String &name) {
-    csound_name = name;
-}
-
-const String &AudioStreamCsoundChannel::get_csound_name() {
-    return csound_name;
-}
-
-String AudioStreamCsoundChannel::get_stream_name() const {
-    return "Csound";
-}
-
-void AudioStreamCsoundChannel::reset() {
-    set_position(0);
-}
-
-void AudioStreamCsoundChannel::set_position(uint64_t p) {
-    pos = p;
 }
 
 int AudioStreamCsoundChannel::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
@@ -43,17 +22,35 @@ int AudioStreamCsoundChannel::gen_tone(AudioFrame *p_buffer, float p_rate, int p
     if (csound_engine != NULL) {
         CsoundGodot *csound_godot = csound_engine->get(csound_name);
         if (csound_godot != NULL) {
-            return csound_godot->get_sample(p_buffer, p_rate, p_frames);
+            return csound_godot->get_channel_sample(p_buffer, p_rate, p_frames, left, right);
         }
     }
     return p_frames;
 }
 
+void AudioStreamCsoundChannel::set_left(int p_left) {
+    left = p_left;
+}
+
+int AudioStreamCsoundChannel::get_left() {
+    return left;
+}
+
+void AudioStreamCsoundChannel::set_right(int p_right) {
+    right = p_right;
+}
+
+int AudioStreamCsoundChannel::get_right() {
+    return right;
+}
+
 void AudioStreamCsoundChannel::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("reset"), &AudioStreamCsoundChannel::reset);
-    ClassDB::bind_method(D_METHOD("get_stream_name"), &AudioStreamCsoundChannel::get_stream_name);
-    ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioStreamCsoundChannel::set_csound_name);
-    ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioStreamCsoundChannel::get_csound_name);
-    ClassDB::add_property("AudioStreamCsoundChannel", PropertyInfo(Variant::STRING, "csound name"), "set_csound_name",
-                          "get_csound_name");
+    ClassDB::bind_method(D_METHOD("set_left", "channel"), &AudioStreamCsoundChannel::set_left);
+    ClassDB::bind_method(D_METHOD("get_left"), &AudioStreamCsoundChannel::get_left);
+    ClassDB::add_property("AudioStreamCsoundChannel", PropertyInfo(Variant::INT, "channel_left"), "set_left",
+                          "get_left");
+    ClassDB::bind_method(D_METHOD("set_right", "channel"), &AudioStreamCsoundChannel::set_right);
+    ClassDB::bind_method(D_METHOD("get_right"), &AudioStreamCsoundChannel::get_right);
+    ClassDB::add_property("AudioStreamCsoundChannel", PropertyInfo(Variant::INT, "channel_right"), "set_right",
+                          "get_right");
 }

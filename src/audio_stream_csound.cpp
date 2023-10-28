@@ -55,6 +55,6 @@ void AudioStreamCsound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_stream_name"), &AudioStreamCsound::get_stream_name);
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioStreamCsound::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioStreamCsound::get_csound_name);
-    ClassDB::add_property("AudioStreamCsound", PropertyInfo(Variant::STRING, "csound name"), "set_csound_name",
+    ClassDB::add_property("AudioStreamCsound", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
 }

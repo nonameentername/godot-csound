@@ -1,14 +1,19 @@
-[gd_scene load_steps=6 format=3 uid="uid://n6csjkhxjfm2"]
+[gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
 
 [ext_resource type="Script" path="res://main.cs" id="1"]
 [ext_resource type="MidiFileReader" uid="uid://bcfsoo3bbifnj" path="res://assets/example.mid" id="2_t0j6e"]
 [ext_resource type="SoundFontFileReader" uid="uid://bnijkstv1hhr7" path="res://assets/example.sf2" id="3_1f0mk"]
 
 [sub_resource type="AudioStreamCsound" id="AudioStreamCsound_wscch"]
-"csound name" = "main"
+csound_name = "main"
 
 [sub_resource type="AudioStreamCsoundChannel" id="AudioStreamCsoundChannel_kfyye"]
-"csound name" = "main"
+csound_name = "main"
+
+[sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_4tb6j"]
+channel_left = "instr_1_left"
+channel_right = "instr_1_right"
+csound_name = "name"
 
 [node name="main" type="Node2D"]
 script = ExtResource("1")
@@ -69,18 +74,23 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+[node name="CsoundPlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamCsound_wscch")
 volume_db = -80.0
 autoplay = true
 
-[node name="AudioStreamPlayer2" type="AudioStreamPlayer" parent="."]
+[node name="CsoundChannelPlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamCsoundChannel_kfyye")
+autoplay = true
+
+[node name="CsoundNamedChannelPlayer" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamCsoundNamedChannel_4tb6j")
+volume_db = -80.0
 autoplay = true
 
 [node name="CsoundGodot" type="CsoundGodot" parent="."]
 soundfont = ExtResource("3_1f0mk")
-"csound name" = "main"
+csound_name = "main"
 
 [connection signal="toggled" from="CheckButton" to="." method="_on_CheckButton_toggled"]
 [connection signal="toggled" from="CheckButton2" to="." method="_on_CheckButton2_toggled"]

@@ -7,12 +7,18 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "audio_effect_capture_csound.h"
 #include "audio_stream_csound.h"
 #include "audio_stream_csound_channel.h"
 #include "audio_stream_csound_named_channel.h"
+#include "audio_stream_mytone.h"
 #include "audio_stream_player_csound.h"
+#include "audio_stream_player_csound_channel.h"
+#include "audio_stream_player_csound_named_channel.h"
+#include "audio_stream_player_mytone.h"
 #include "csound_engine.h"
 #include "csound_godot.h"
+#include "godot_cpp/classes/editor_plugin.hpp"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 
@@ -20,51 +26,55 @@ using namespace godot;
 
 static CsoundEngine *csound_module;
 
-void initialize_gdmidiplayer_module(ModuleInitializationLevel p_level) {
-    if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-        return;
+void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
+    if (p_level == MODULE_INITIALIZATION_LEVEL_SERVERS) {
     }
 
-    if (CsoundEngine::get_singleton() != NULL) {
-        return;
+    if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
     }
 
-    ClassDB::register_class<CsoundGodot>();
-    ClassDB::register_class<CsoundEngine>();
-    csound_module = memnew(CsoundEngine);
-    Engine::get_singleton()->register_singleton("Csound", CsoundEngine::get_singleton());
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+        ClassDB::register_class<CsoundGodot>();
+        ClassDB::register_class<CsoundEngine>();
+        csound_module = memnew(CsoundEngine);
+        Engine::get_singleton()->register_singleton("Csound", CsoundEngine::get_singleton());
 
-    ClassDB::register_class<MidiFileReader>();
-    ClassDB::register_class<SoundFontFileReader>();
-    ClassDB::register_class<AudioStreamPlaybackCsound>();
-    ClassDB::register_class<AudioStreamCsound>();
-    ClassDB::register_class<AudioStreamCsoundChannel>();
-    ClassDB::register_class<AudioStreamCsoundNamedChannel>();
+        ClassDB::register_class<MidiFileReader>();
+        ClassDB::register_class<SoundFontFileReader>();
+        ClassDB::register_class<AudioStreamCsound>();
+        ClassDB::register_class<AudioStreamPlaybackCsound>();
+        ClassDB::register_class<AudioStreamMyTone>();
+        ClassDB::register_class<AudioStreamPlaybackMyTone>();
+        ClassDB::register_class<AudioStreamCsoundChannel>();
+        ClassDB::register_class<AudioStreamPlaybackCsoundChannel>();
+        ClassDB::register_class<AudioStreamCsoundNamedChannel>();
+        ClassDB::register_class<AudioStreamPlaybackCsoundNamedChannel>();
+        ClassDB::register_class<AudioEffectCaptureCsound>();
+        ClassDB::register_class<AudioEffectCaptureCsoundInstance>();
+    }
 }
 
-void uninitialize_gdmidiplayer_module(ModuleInitializationLevel p_level) {
+void uninitialize_csoundgodot_module(ModuleInitializationLevel p_level) {
     if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
         return;
     }
 
-    if (CsoundEngine::get_singleton() == NULL) {
-        return;
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+        Engine::get_singleton()->unregister_singleton("Csound");
+        memdelete(csound_module);
     }
-
-    Engine::get_singleton()->unregister_singleton("Csound");
-    memdelete(csound_module);
 }
 
 extern "C" {
 // Initialization.
-GDExtensionBool GDE_EXPORT gdmidiplayer_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address,
-                                                     const GDExtensionClassLibraryPtr p_library,
-                                                     GDExtensionInitialization *r_initialization) {
+GDExtensionBool GDE_EXPORT csoundgodot_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address,
+                                                    const GDExtensionClassLibraryPtr p_library,
+                                                    GDExtensionInitialization *r_initialization) {
     godot::GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 
-    init_obj.register_initializer(initialize_gdmidiplayer_module);
-    init_obj.register_terminator(uninitialize_gdmidiplayer_module);
-    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
+    init_obj.register_initializer(initialize_csoundgodot_module);
+    init_obj.register_terminator(uninitialize_csoundgodot_module);
+    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_EDITOR);
 
     return init_obj.init();
 }

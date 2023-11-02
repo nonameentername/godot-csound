@@ -1,0 +1,43 @@
+[configuration]
+
+entry_symbol = "csoundgodot_library_init"
+compatibility_minimum = 4.1
+
+[libraries]
+
+macos.debug = "res://bin/libcsoundgodot.macos.template_debug.framework"
+macos.release = "res://bin/libcsoundgodot.macos.template_release.framework"
+windows.debug.x86_32 = "res://bin/libcsoundgodot.windows.template_debug.x86_32.dll"
+windows.release.x86_32 = "res://bin/libcsoundgodot.windows.template_release.x86_32.dll"
+windows.debug.x86_64 = "res://bin/libcsoundgodot.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://bin/libcsoundgodot.windows.template_release.x86_64.dll"
+linux.debug.x86_64 = "res://bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+linux.release.x86_64 = "res://bin/libcsoundgodot.linux.template_release.x86_64.so"
+linux.debug.arm64 = "res://bin/libcsoundgodot.linux.template_debug.dev.arm64.so"
+linux.release.arm64 = "res://bin/libcsoundgodot.linux.template_release.arm64.so"
+linux.debug.rv64 = "res://bin/libcsoundgodot.linux.template_debug.dev.rv64.so"
+linux.release.rv64 = "res://bin/libcsoundgodot.linux.template_release.rv64.so"
+android.debug.x86_64 = "res://bin/libcsoundgodot.android.template_debug.x86_64.so"
+android.release.x86_64 = "res://bin/libcsoundgodot.android.template_release.x86_64.so"
+android.debug.arm64 = "res://bin/libcsoundgodot.android.template_debug.arm64.so"
+android.release.arm64 = "res://bin/libcsoundgodot.android.template_release.arm64.so"
+
+[dependencies]
+
+linux.editor.x86_64  = {
+"csound/lib/libcsound64.so.7.0": ""
+}
+linux.debug.x86_64  = {
+"csound/lib/libcsound64.so.7.0": ""
+}
+linux.release.x86_64 = {
+"csound/lib/libcsound64.so.7.0": ""
+}
+
+[icons]
+
+CsoundGodot = "res://addons/csound/icons/CsoundGodot.svg"
+AudioStreamCsound = "res://addons/csound/icons/CsoundGodot.svg"
+AudioStreamMyTone = "res://addons/csound/icons/CsoundGodot.svg"
+AudioStreamCsoundChannel = "res://addons/csound/icons/CsoundGodot.svg"
+AudioStreamCsoundNamedChannel = "res://addons/csound/icons/CsoundGodot.svg"

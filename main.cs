@@ -13,7 +13,7 @@ public partial class main : Node2D
         Node csound_engine = (Node)Engine.GetSingleton("Csound");
         csound = (Node)csound_engine.Call("get", "main");
         csound.Call("send_control_channel", "cutoff", 1);
-        csound.Call("play_midi");
+        //csound.Call("play_midi");
     }
 
     public void _on_fluidsynth_ready()
@@ -44,11 +44,11 @@ public partial class main : Node2D
     {
         if (button_pressed)
         {
-            csound.Call("note_on", 1, 64, 90);
+            csound.Call("note_on", 2, 64, 90);
         }
         else
         {
-            csound.Call("note_off", 1, 64);
+            csound.Call("note_off", 2, 64);
         }
     }
 
@@ -56,11 +56,11 @@ public partial class main : Node2D
     {
         if (button_pressed)
         {
-            csound.Call("note_on", 13, 67, 90);
+            csound.Call("note_on", 3, 67, 90);
         }
         else
         {
-            csound.Call("note_off", 13, 67);
+            csound.Call("note_off", 3, 67);
         }
     }
 

@@ -17,7 +17,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -31,10 +31,12 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
+      "visualizerFile": "${workspaceFolder}/godot.natvis",
+      "showDisplayString": true,
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -48,10 +50,12 @@
       "args": ["--editor"],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
+      "visualizerFile": "${workspaceFolder}/godot.natvis",
+      "showDisplayString": true,
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -65,10 +69,12 @@
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
+      "visualizerFile": "${workspaceFolder}/godot.natvis",
+      "showDisplayString": true,
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libgdmidiplayer.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },

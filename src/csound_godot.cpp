@@ -1,5 +1,7 @@
 #include "csound_godot.h"
 #include "csound_engine.h"
+#include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/variant/variant.hpp"
 
 using namespace godot;
 
@@ -34,10 +36,6 @@ void CsoundGodot::_ready() {
 
     csound->Start();
 
-    spout = csound->GetSpout();
-    spin = csound->GetSpin();
-    scale = csound->Get0dBFS();
-
     CsoundEngine *csound_engine = Object::cast_to<CsoundEngine>(Engine::get_singleton()->get_singleton("Csound"));
     if (csound_engine != NULL) {
         csound_engine->add(csound_name, this);
@@ -71,21 +69,12 @@ Ref<MidiFileReader> CsoundGodot::get_midi_file() {
     return midi_file;
 }
 
-int CsoundGodot::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
-    int p_index = 0;
-    int to_fill = p_frames;
-
-    // initialize channels
+void CsoundGodot::initialize_channels(int p_frames) {
     if (channel_buffers.size() != csound->GetNchnls()) {
-        channel_buffers.clear();
-        write_buffer_index.resize(csound->GetNchnls());
-        read_buffer_index.resize(csound->GetNchnls());
         for (int channel = 0; channel < csound->GetNchnls(); channel++) {
             Vector<MYFLT> channel_buffer;
             channel_buffer.resize(p_frames);
             channel_buffers.append(channel_buffer);
-            write_buffer_index.set(channel, 0);
-            read_buffer_index.set(channel, 0);
         }
     }
 
@@ -95,20 +84,43 @@ int CsoundGodot::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
     for (int channel = 0; channel < num_channels; channel++) {
         char *name = tmp[channel].name;
         int type = tmp[channel].type;
-        if ((type & CSOUND_CHANNEL_TYPE_MASK) == CSOUND_AUDIO_CHANNEL && (type & CSOUND_OUTPUT_CHANNEL)) {
+        if ((type & CSOUND_CHANNEL_TYPE_MASK) == CSOUND_AUDIO_CHANNEL &&
+            (type & (CSOUND_INPUT_CHANNEL | CSOUND_OUTPUT_CHANNEL))) {
             if (!named_channel_buffers.has(name)) {
                 Vector<MYFLT> channel_buffer;
                 channel_buffer.resize(p_frames);
                 named_channel_buffers.insert(name, channel_buffer);
-                write_named_buffer_index.insert(name, 0);
-                read_named_buffer_index.insert(name, 0);
-                godot::UtilityFunctions::print("name = ", tmp[channel].name, " type = ", tmp[channel].type);
+                // godot::UtilityFunctions::print("name = ", tmp[channel].name, " type = ", tmp[channel].type);
             }
         }
     }
-    // end
+}
+
+int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+    int p_index = 0;
+    int to_fill = p_frames;
+
+    MYFLT *spin = csound->GetSpin();
+    MYFLT *spout = csound->GetSpout();
+    MYFLT scale = csound->Get0dBFS();
+
+    initialize_channels(p_frames);
+
+    int write_buffer_index = 0;
 
     while (to_fill > 0) {
+        for (KeyValue<String, Vector<MYFLT>> &E : named_channel_buffers) {
+            MYFLT temp_buffer[csound->GetKsmps()];
+            Vector<MYFLT> channel_buffer = named_channel_buffers.get(E.key);
+            const MYFLT *buffer = channel_buffer.ptr();
+            for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+                if (buffer) {
+                    temp_buffer[frame] = buffer[write_buffer_index + frame];
+                }
+            }
+            csound->SetAudioChannel(E.key.utf8().get_data(), temp_buffer);
+        }
+
         int result = csound->PerformKsmps();
         if (result == 1) {
             finished = true;
@@ -126,8 +138,7 @@ int CsoundGodot::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
             Vector<MYFLT> *channel_buffer = channel_buffers.ptrw();
             MYFLT *buffer = channel_buffer->ptrw();
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                buffer[write_buffer_index.get(channel)] = csound->GetSpoutSample(frame, channel) / scale;
-                next_frame(write_buffer_index, channel, p_frames);
+                buffer[write_buffer_index + frame] = csound->GetSpoutSample(frame, channel) / scale;
             }
         }
 
@@ -137,27 +148,14 @@ int CsoundGodot::gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) {
             Vector<MYFLT> *channel_buffer = named_channel_buffers.getptr(E.key);
             MYFLT *buffer = channel_buffer->ptrw();
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                buffer[write_named_buffer_index.get(E.key)] = temp_buffer[frame];
-                next_frame(write_named_buffer_index, E.key, p_frames);
+                buffer[write_buffer_index + frame] = temp_buffer[frame];
             }
         }
+
+        write_buffer_index += csound->GetKsmps();
     }
 
     return p_frames;
-}
-
-void CsoundGodot::next_frame(Vector<int> &buffer_index, int channel, int p_frames) {
-    buffer_index.set(channel, buffer_index.get(channel) + 1);
-    if (buffer_index.get(channel) >= p_frames) {
-        buffer_index.set(channel, 0);
-    }
-}
-
-void CsoundGodot::next_frame(HashMap<String, int> &buffer_index, String channel, int p_frames) {
-    buffer_index.insert(channel, buffer_index.get(channel) + 1);
-    if (buffer_index.get(channel) >= p_frames) {
-        buffer_index.insert(channel, 0);
-    }
 }
 
 int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
@@ -169,14 +167,42 @@ int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_fr
     const MYFLT *right_buffer = channel_buffers.get(right).ptr();
 
     for (int frame = 0; frame < p_frames; frame += 1) {
-        p_buffer[frame].left = left_buffer[read_buffer_index.get(left)];
-        next_frame(read_buffer_index, left, p_frames);
-
-        p_buffer[frame].right = right_buffer[read_buffer_index.get(right)];
-        next_frame(read_buffer_index, right, p_frames);
+        if (left_buffer) {
+            p_buffer[frame].left = left_buffer[frame];
+        } else {
+            p_buffer[frame].left = 0;
+        }
+        if (right_buffer) {
+            p_buffer[frame].right = right_buffer[frame];
+        } else {
+            p_buffer[frame].right = 0;
+        }
     }
 
     return p_frames;
+}
+
+void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left,
+                                           String right) {
+    if (!named_channel_buffers.has(left) || !named_channel_buffers.has(right)) {
+        return;
+    }
+
+    MYFLT *left_buffer = named_channel_buffers.getptr(left)->ptrw();
+    MYFLT *right_buffer = named_channel_buffers.getptr(right)->ptrw();
+
+    for (int frame = 0; frame < p_frames; frame += 1) {
+        if (left_buffer) {
+            left_buffer[frame] = p_buffer[frame].left;
+        } else {
+            left_buffer[frame] = 0;
+        }
+        if (right_buffer) {
+            right_buffer[frame] = p_buffer[frame].right;
+        } else {
+            right_buffer[frame] = 0;
+        }
+    }
 }
 
 int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
@@ -188,11 +214,16 @@ int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, in
     const MYFLT *right_buffer = named_channel_buffers.get(right).ptr();
 
     for (int frame = 0; frame < p_frames; frame += 1) {
-        p_buffer[frame].left = left_buffer[read_named_buffer_index.get(left)];
-        next_frame(read_named_buffer_index, left, p_frames);
-
-        p_buffer[frame].right = right_buffer[read_named_buffer_index.get(right)];
-        next_frame(read_named_buffer_index, right, p_frames);
+        if (left_buffer) {
+            p_buffer[frame].left = left_buffer[frame];
+        } else {
+            p_buffer[frame].left = 0;
+        }
+        if (right_buffer) {
+            p_buffer[frame].right = right_buffer[frame];
+        } else {
+            p_buffer[frame].right = 0;
+        }
     }
 
     return p_frames;
@@ -202,15 +233,15 @@ void CsoundGodot::program_select(int chan, int bank_num, int preset_num) {
 }
 
 void CsoundGodot::note_on(int chan, int key, int vel) {
-    char buffer[100];
-    sprintf(buffer, "i1 0 -1 %d %d", key, vel);
-    csound->InputMessage(buffer);
+    float instrnum = chan + chan / 100.0 + key / 100000.0;
+    String note_on = vformat("i%f 0 -1 %d %d", instrnum, key, vel);
+    csound->InputMessage(note_on.ascii().get_data());
 }
 
 void CsoundGodot::note_off(int chan, int key) {
-    char buffer[100];
-    sprintf(buffer, "i-1 0 0 %d", key);
-    csound->InputMessage(buffer);
+    float instrnum = chan + chan / 100.0 + key / 100000.0;
+    String note_off = vformat("i-%f 0 0 %d", instrnum, key);
+    csound->InputMessage(note_off.ascii().get_data());
 }
 
 void CsoundGodot::send_control_channel(String channel, float value) {

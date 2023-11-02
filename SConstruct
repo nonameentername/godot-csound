@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-libname = "libgdmidiplayer"
+libname = "libcsoundgodot"
 
 env = SConscript("godot-cpp/SConstruct")
 

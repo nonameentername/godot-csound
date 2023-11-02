@@ -33,7 +33,7 @@ assets:
 
 format:
 	clang-format -i src/*.cpp src/*.h
-	dotnet format ./MidiPlayer.sln
+	dotnet format ./CsoundGodot.sln
 	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*')
 
 clean:

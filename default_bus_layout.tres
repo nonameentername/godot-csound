@@ -1,3 +1,23 @@
-[gd_resource type="AudioBusLayout" format=3 uid="uid://cc243iilhwo2w"]
+[gd_resource type="AudioBusLayout" load_steps=3 format=3 uid="uid://cc243iilhwo2w"]
+
+[sub_resource type="AudioEffectCaptureCsound" id="AudioEffectCaptureCsound_st8yc"]
+csound_name = "main"
+channel_left = "instr_3_input_left"
+channel_right = "instr_3_input_right"
+resource_name = "CaptureCsound"
+
+[sub_resource type="AudioEffectFilter" id="AudioEffectFilter_uqooj"]
+resource_name = "Filter"
+resonance = 0.0
 
 [resource]
+bus/1/name = &"MyTone"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = &"Master"
+bus/1/effect/0/effect = SubResource("AudioEffectCaptureCsound_st8yc")
+bus/1/effect/0/enabled = true
+bus/1/effect/1/effect = SubResource("AudioEffectFilter_uqooj")
+bus/1/effect/1/enabled = true

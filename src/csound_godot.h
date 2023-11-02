@@ -28,21 +28,12 @@ private:
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
     Csound *csound;
-    MYFLT *spin;
-    MYFLT *spout;
-    MYFLT scale;
-    int ksmps_index;
     bool finished;
     String csound_name;
     Vector<Vector<MYFLT>> channel_buffers;
-    Vector<int> write_buffer_index;
-    Vector<int> read_buffer_index;
     HashMap<String, Vector<MYFLT>> named_channel_buffers;
-    HashMap<String, int> write_named_buffer_index;
-    HashMap<String, int> read_named_buffer_index;
 
-    void next_frame(Vector<int> &buffer_index, int channel, int p_frames);
-    void next_frame(HashMap<String, int> &buffer_index, String channel, int p_frames);
+    void initialize_channels(int p_frames);
 
 protected:
     static void _bind_methods();
@@ -62,8 +53,9 @@ public:
     // val value (0-16383 with 8192 being center)
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);
-    int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
+    int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
     int get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
+    void set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     void process(double delta);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);

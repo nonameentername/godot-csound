@@ -5,9 +5,9 @@
 
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_stream.hpp>
+#include <godot_cpp/classes/audio_stream_playback.hpp>
 #include <godot_cpp/godot.hpp>
-
-#include "csound_godot.h"
+#include <godot_cpp/templates/vector.hpp>
 
 namespace godot {
 
@@ -16,20 +16,12 @@ class AudioStreamCsound : public AudioStream {
 
 private:
     friend class AudioStreamPlaybackCsound;
-    float pos;
-    int mix_rate;
-    bool stereo;
-    int hz;
     String csound_name;
 
 public:
-    void reset();
-    void set_position(uint64_t pos);
     virtual String get_stream_name() const;
-    virtual int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames);
-    virtual float get_length() const {
-        return 0;
-    } // if supported, otherwise return 0
+    int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+    virtual float get_length() const;
     AudioStreamCsound();
     ~AudioStreamCsound();
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;

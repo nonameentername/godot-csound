@@ -32,7 +32,7 @@ a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 0			;preset index = 0
     chnset a2, "instr_1_right"
 	outs	a1, a2
 	
-	endin
+endin
 	
 instr 2	; play harpsichord from score and midi keyboard - preset index = 1
 
@@ -52,6 +52,23 @@ a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 3			;preset index = 1
 	
 endin
 
+instr 3
+	mididefault	60, p3
+	midinoteonkey	p4, p5
+inum	init	p4
+ivel	init	p5
+ivel	init	ivel/127
+kamp	linsegr	1, 1, 1, .1, 0
+kCutoff chnget "cutoff"
+al  lfo kamp, p4, 0
+a1  chnget "instr_3_input_left"
+a2  chnget "instr_3_input_right"
+a1  = a1 * ivel * al * kCutoff
+a2  = a2 * ivel * al * kCutoff
+    chnset a1, "instr_3_left"
+    chnset a2, "instr_3_right"
+	outs	a1, a2
+endin
 
 
 </CsInstruments>
@@ -67,6 +84,8 @@ i2 5 1 60 100
 i2 + 1 62 <
 i2 7 1 65 <
 i2 7 1 69 10
+
+;i3 0 3600
 
 </CsScore>
 </CsoundSynthesizer>

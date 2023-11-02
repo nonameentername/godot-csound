@@ -7,31 +7,32 @@
 #include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "audio_stream_csound.h"
 #include "csound_godot.h"
 
 namespace godot {
 
-class AudioStreamCsoundNamedChannel : public AudioStreamCsound {
-    GDCLASS(AudioStreamCsoundNamedChannel, AudioStreamCsound)
+class AudioStreamCsoundNamedChannel : public AudioStream {
+    GDCLASS(AudioStreamCsoundNamedChannel, AudioStream)
 
 private:
-    friend class AudioStreamPlaybackCsound;
-    float pos;
-    int mix_rate;
-    bool stereo;
-    int hz;
+    friend class AudioStreamPlaybackCsoundNamedChannel;
     String csound_name;
-    String left;
-    String right;
+    String channel_left;
+    String channel_right;
 
 public:
-    void set_left(String p_left);
-    String get_left();
-    void set_right(String p_right);
-    String get_right();
-    int gen_tone(AudioFrame *p_buffer, float p_rate, int p_frames) override;
+    virtual String get_stream_name() const;
+    virtual int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+    virtual float get_length() const;
+    AudioStreamCsoundNamedChannel();
+    ~AudioStreamCsoundNamedChannel();
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;
+    void set_csound_name(const String &name);
+    const String &get_csound_name();
+    void set_channel_left(String p_channel_left);
+    String get_channel_left();
+    void set_channel_right(String p_channel_right);
+    String get_channel_right();
 
 protected:
     static void _bind_methods();

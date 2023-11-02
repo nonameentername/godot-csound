@@ -1,5 +1,5 @@
-#ifndef AUDIOSTREAMPLAYERCSOUND_H
-#define AUDIOSTREAMPLAYERCSOUND_H
+#ifndef AUDIOSTREAMPLAYERCSOUNDNAMEDCHANNEL_H
+#define AUDIOSTREAMPLAYERCSOUNDNAMEDCHANNEL_H
 
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_server.hpp>
@@ -7,23 +7,16 @@
 #include <godot_cpp/classes/audio_stream_playback.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "audio_stream_csound.h"
+#include "audio_stream_csound_named_channel.h"
 
 namespace godot {
 
-class AudioStreamPlaybackCsound : public AudioStreamPlayback {
-    GDCLASS(AudioStreamPlaybackCsound, AudioStreamPlayback)
-    friend class AudioStreamCsound;
+class AudioStreamPlaybackCsoundNamedChannel : public AudioStreamPlayback {
+    GDCLASS(AudioStreamPlaybackCsoundNamedChannel, AudioStreamPlayback)
+    friend class AudioStreamCsoundNamedChannel;
 
 private:
-    struct PlaybackEntry {
-        Ref<AudioStreamPlayback> playback;
-        String channel_left;
-        String channel_right;
-    };
-
-    Vector<PlaybackEntry> playback_list;
-    Ref<AudioStreamCsound> base;
+    Ref<AudioStreamCsoundNamedChannel> base;
     bool active;
 
 public:
@@ -36,10 +29,9 @@ public:
     virtual double _get_playback_position() const override;
     virtual void _seek(double p_time) override;
     virtual int _mix(AudioFrame *p_buffer, double p_rate_scale, int p_frames) override;
-    virtual void _tag_used_streams() override;
     virtual float _get_length() const;
-    AudioStreamPlaybackCsound();
-    ~AudioStreamPlaybackCsound();
+    AudioStreamPlaybackCsoundNamedChannel();
+    ~AudioStreamPlaybackCsoundNamedChannel();
 };
 } // namespace godot
 

@@ -1,20 +1,25 @@
-[gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
+[gd_scene load_steps=8 format=3 uid="uid://n6csjkhxjfm2"]
 
 [ext_resource type="Script" path="res://main.cs" id="1"]
 [ext_resource type="MidiFileReader" uid="uid://bcfsoo3bbifnj" path="res://assets/example.mid" id="2_t0j6e"]
 
-[sub_resource type="AudioStreamCsound" id="AudioStreamCsound_wscch"]
-csound_name = "main"
+[sub_resource type="AudioStreamCsound" id="AudioStreamCsound_a6stl"]
+csound_name = "Main"
 
 [sub_resource type="AudioStreamCsoundChannel" id="AudioStreamCsoundChannel_kfyye"]
-csound_name = "main"
+csound_name = "Main"
 
 [sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_4tb6j"]
-csound_name = "main"
+csound_name = "Main"
 channel_left = "instr_1_left"
 channel_right = "instr_1_right"
 
-[sub_resource type="AudioStreamMyTone" id="AudioStreamMyTone_xt878"]
+[sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_ove8l"]
+csound_name = "Main"
+channel_left = "instr_3_left"
+channel_right = "instr_3_right"
+
+[sub_resource type="AudioStreamMyTone" id="AudioStreamMyTone_31rl7"]
 
 [node name="main" type="Node2D"]
 script = ExtResource("1")
@@ -76,7 +81,7 @@ step = 0.01
 value = 1.0
 
 [node name="CsoundPlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource("AudioStreamCsound_wscch")
+stream = SubResource("AudioStreamCsound_a6stl")
 autoplay = true
 
 [node name="CsoundChannelPlayer" type="AudioStreamPlayer" parent="."]
@@ -89,11 +94,13 @@ stream = SubResource("AudioStreamCsoundNamedChannel_4tb6j")
 volume_db = -80.0
 autoplay = true
 
-[node name="CsoundGodot" type="CsoundGodot" parent="."]
-csound_name = "main"
+[node name="CsoundNamedChannelPlayer2" type="AudioStreamPlayer" parent="."]
+stream = SubResource("AudioStreamCsoundNamedChannel_ove8l")
+volume_db = -80.0
+autoplay = true
 
 [node name="MyTonePlayer" type="AudioStreamPlayer" parent="."]
-stream = SubResource("AudioStreamMyTone_xt878")
+stream = SubResource("AudioStreamMyTone_31rl7")
 autoplay = true
 bus = &"MyTone"
 

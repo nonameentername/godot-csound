@@ -1,0 +1,8 @@
+[gd_resource type="CsoundLayout" format=3 uid="uid://c0aye3awcthh0"]
+
+[resource]
+csound/1/name = "New Csound"
+csound/1/solo = false
+csound/1/mute = false
+csound/1/bypass = false
+csound/1/volume_db = 0.0

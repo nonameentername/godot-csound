@@ -22,6 +22,22 @@
       ]
     },
     {
+      "name": "🕹 Debug Game in Editor",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${env:GODOT4}",
+      "args": ["--editor"],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "environment" : [
+          {
+              "name": "LD_PRELOAD",
+              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+          }
+      ]
+    },
+    {
       "name": "🕹 Native Debug Game",
       "type": "cppdbg",
       "request": "launch",

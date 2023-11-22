@@ -15,6 +15,9 @@ class AudioEffectCaptureCsoundInstance : public AudioEffectInstance {
     friend class AudioEffectCaptureCsound;
     Ref<AudioEffectCaptureCsound> base;
 
+private:
+    bool has_data = false;
+
 public:
     virtual void _process(const void *src_buffer, AudioFrame *dst_buffer, int32_t frame_count) override;
     virtual bool _process_silence() const override;

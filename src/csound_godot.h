@@ -17,11 +17,15 @@
 
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
+#include "sysdep.h"
+
+static const float AUDIO_MIN_PEAK_DB = -200.0f;
 
 namespace godot {
 
 class CsoundGodot : public Node {
     GDCLASS(CsoundGodot, Node);
+    friend class CsoundServer;
 
 private:
     int sfont_id;
@@ -30,8 +34,24 @@ private:
     Csound *csound;
     bool finished;
     String csound_name;
-    Vector<Vector<MYFLT>> channel_buffers;
-    HashMap<String, Vector<MYFLT>> named_channel_buffers;
+    bool solo;
+    bool mute;
+    bool bypass;
+    float volume_db;
+    bool initialized;
+
+    struct Channel {
+        bool used = false;
+        bool active = false;
+        AudioFrame peak_volume = AudioFrame{AUDIO_MIN_PEAK_DB, AUDIO_MIN_PEAK_DB};
+        Vector<MYFLT> buffer;
+        Channel() {
+        }
+    };
+
+    Vector<Channel> channels;
+    HashMap<String, Vector<MYFLT>> named_channel_input_buffers;
+    HashMap<String, Vector<MYFLT>> named_channel_output_buffers;
 
     void initialize_channels(int p_frames);
 
@@ -63,6 +83,10 @@ public:
     void _notification(int p_what);
     void set_csound_name(const String &name);
     const String &get_csound_name();
+
+    int get_channel_count();
+
+    static void csound_message_callback(CSOUND *csound, int attr, const char *format, va_list args);
 };
 } // namespace godot
 

@@ -1,5 +1,6 @@
 #include "audio_effect_capture_csound.h"
-#include "csound_engine.h"
+#include "csound_server.h"
+#include "godot_cpp/classes/audio_server.hpp"
 
 using namespace godot;
 
@@ -55,11 +56,18 @@ void AudioEffectCaptureCsoundInstance::_process(const void *p_src_frames, AudioF
 
     for (int i = 0; i < p_frame_count; i++) {
         p_dst_frames[i] = src_frames[i];
+        if (src_frames[i].left > 0 || src_frames[i].right > 0) {
+            has_data = true;
+        }
     }
 
-    CsoundEngine *csound_engine = (CsoundEngine *)Engine::get_singleton()->get_singleton("Csound");
-    if (csound_engine != NULL) {
-        CsoundGodot *csound_godot = csound_engine->get(base->csound_name);
+    if (!has_data) {
+        return;
+    }
+
+    CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
+    if (csound_server != NULL) {
+        CsoundGodot *csound_godot = csound_server->get_csound(base->csound_name);
         if (csound_godot != NULL) {
             int p_rate = 1;
             csound_godot->set_named_channel_sample(src_frames, p_rate, p_frame_count, base->channel_left,

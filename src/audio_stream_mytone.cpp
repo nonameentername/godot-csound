@@ -5,7 +5,6 @@
 using namespace godot;
 
 AudioStreamMyTone::AudioStreamMyTone() : hz(639) {
-    mix_rate = AudioServer::get_singleton()->get_mix_rate();
     pos = 0;
 }
 
@@ -29,6 +28,13 @@ void AudioStreamMyTone::set_position(uint64_t p) {
 }
 
 void AudioStreamMyTone::gen_tone(AudioFrame *p_buffer, double p_rate, int p_frames) {
+    AudioServer *audio_server = AudioServer::get_singleton();
+    if (audio_server != NULL) {
+        mix_rate = AudioServer::get_singleton()->get_mix_rate();
+    } else {
+        mix_rate = 44100;
+    }
+
     for (int i = 0; i < p_frames; i++) {
         float inc = 1.0 / (float(mix_rate) / hz);
         pos += inc;

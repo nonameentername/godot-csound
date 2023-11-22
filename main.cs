@@ -3,6 +3,7 @@ using System;
 
 public partial class main : Node2D
 {
+    private Node csound_server;
     private Node csound;
 
     [Export(PropertyHint.ResourceType, "MidiFileReader")]
@@ -10,8 +11,13 @@ public partial class main : Node2D
 
     public override void _Ready()
     {
-        Node csound_engine = (Node)Engine.GetSingleton("Csound");
-        csound = (Node)csound_engine.Call("get", "main");
+        csound_server = (Node)Engine.GetSingleton("CsoundServer");
+        csound_server.Connect("csound_layout_changed", new Callable(this, nameof(_csound_layout_changed)));
+    }
+
+    public void _csound_layout_changed()
+    {
+        csound = (Node)csound_server.Call("get_csound", "Main");
         csound.Call("send_control_channel", "cutoff", 1);
         //csound.Call("play_midi");
     }

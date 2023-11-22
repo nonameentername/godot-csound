@@ -17,6 +17,7 @@ isf	sfload	"assets/example.sf2"
 	sfpassign	0, isf	
 
 instr 1	; play guitar from score and midi keyboard - preset index = 0
+    prints "hello world\n"
 
 	mididefault	60, p3
 	midinoteonkey	p4, p5
@@ -28,6 +29,7 @@ kamp	= kamp/3000						;scale amplitude
 kfreq	init	1						;do not change freq from sf
 kCutoff chnget "cutoff"
 a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 0			;preset index = 0
+    prints "instr1 inum = %f ivel = %f\n", inum, ivel
     chnset a1, "instr_1_left"
     chnset a2, "instr_1_right"
 	outs	a1, a2
@@ -46,6 +48,11 @@ kamp	= kamp/2000						;scale amplitude
 kfreq	init	1						;do not change freq from sf
 kCutoff chnget "cutoff"
 a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 3			;preset index = 1
+kSig1 downsamp a1
+kSig2 downsamp a2
+    prints "instr2 inum = %f ivel = %f\n", inum, ivel
+    printks "instr2 kamp = %f kCutoff = %f\n", 1, kamp, kCutoff
+    printks "instr2 a1 = %f a2 = %f\n", 1, kSig1, kSig2
     chnset a1, "instr_2_left"
     chnset a2, "instr_2_right"
 	outs	a1, a2
@@ -63,8 +70,15 @@ kCutoff chnget "cutoff"
 al  lfo kamp, p4, 0
 a1  chnget "instr_3_input_left"
 a2  chnget "instr_3_input_right"
+
+kSig1 downsamp a1
+kSig2 downsamp a2
+
 a1  = a1 * ivel * al * kCutoff
 a2  = a2 * ivel * al * kCutoff
+    prints "instr3 inum = %f ivel = %f\n", inum, ivel
+    printks "instr3 kamp = %f kCutoff = %f\n", 1, kamp, kCutoff
+    printks "instr3 a1 = %f a2 = %f\n", 1, kSig1, kSig2
     chnset a1, "instr_3_left"
     chnset a2, "instr_3_right"
 	outs	a1, a2
@@ -86,6 +100,7 @@ i2 7 1 65 <
 i2 7 1 69 10
 
 ;i3 0 3600
+
 
 </CsScore>
 </CsoundSynthesizer>

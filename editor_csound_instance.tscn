@@ -1,0 +1,302 @@
+[gd_scene load_steps=5 format=3 uid="uid://ddvn4r7mj3ayy"]
+
+[ext_resource type="Script" path="res://editor_csound_instance.gd" id="1_3m284"]
+
+[sub_resource type="Image" id="Image_jbnva"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 231, 255, 94, 94, 54, 255, 94, 94, 57, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 231, 255, 94, 94, 54, 255, 94, 94, 57, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 93, 93, 41, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 44, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 44, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 235, 255, 94, 94, 234, 255, 95, 95, 43, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 235, 255, 94, 94, 234, 255, 95, 95, 43, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_qpgwm"]
+image = SubResource("Image_jbnva")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_558k6"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0, 0, 0, 0.5)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="Control" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+tooltip_text = "Drag & drop to rearrange."
+focus_mode = 1
+script = ExtResource("1_3m284")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+tooltip_text = "Drag & drop to rearrange."
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+text = "Main"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="LeftHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="solo" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+layout_mode = 2
+tooltip_text = "Solo"
+focus_mode = 0
+theme_override_colors/icon_pressed_color = Color(1, 0.89, 0.22, 1)
+toggle_mode = true
+icon = SubResource("ImageTexture_qpgwm")
+flat = true
+
+[node name="mute" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+layout_mode = 2
+tooltip_text = "Mute"
+focus_mode = 0
+theme_override_colors/icon_pressed_color = Color(1, 0.16, 0.16, 1)
+toggle_mode = true
+icon = SubResource("ImageTexture_qpgwm")
+flat = true
+
+[node name="bypass" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+layout_mode = 2
+tooltip_text = "Bypass"
+focus_mode = 0
+theme_override_colors/icon_pressed_color = Color(0.13, 0.8, 1, 1)
+toggle_mode = true
+icon = SubResource("ImageTexture_qpgwm")
+flat = true
+
+[node name="RightHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="options" type="MenuButton" parent="VBoxContainer/HBoxContainer/RightHBox" node_paths=PackedStringArray("shortcut_context")]
+layout_mode = 2
+size_flags_horizontal = 8
+tooltip_text = "Csound Options"
+shortcut_context = NodePath("../../../..")
+icon = SubResource("ImageTexture_qpgwm")
+item_count = 3
+popup/item_0/text = "Duplicate Csound"
+popup/item_0/id = 1
+popup/item_1/text = "Delete Csound"
+popup/item_1/id = 1
+popup/item_2/text = "Reset volume"
+popup/item_2/id = 2
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+tooltip_text = " 0.0 dB"
+max_value = 1.0
+step = 0.0
+value = 0.729073
+
+[node name="AudioValuePreview" type="Panel" parent="VBoxContainer/HBoxContainer2/Slider"]
+visible = false
+top_level = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = -10.5419
+offset_right = 68.0
+offset_bottom = 15.4581
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_558k6")
+
+[node name="AudioPreviewHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/Slider/AudioValuePreview"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AudioPreviewLabel" type="Label" parent="VBoxContainer/HBoxContainer2/Slider/AudioValuePreview/AudioPreviewHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+text = " 0.0 dB"
+
+[node name="Channel" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel2" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel3" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel4" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel5" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel6" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel7" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel8" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel9" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel10" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel11" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel12" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel13" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel14" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel15" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Channel16" type="TextureProgressBar" parent="VBoxContainer/HBoxContainer2"]
+visible = false
+layout_mode = 2
+min_value = -80.0
+max_value = 24.0
+step = 0.1
+fill_mode = 3
+texture_under = SubResource("ImageTexture_qpgwm")
+
+[node name="Tree" type="Tree" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+focus_mode = 1
+allow_reselect = true
+allow_rmb_select = true
+hide_folding = true
+hide_root = true
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.8
+one_shot = true
+
+[connection signal="focus_exited" from="VBoxContainer/LineEdit" to="." method="_name_focus_exit"]
+[connection signal="text_changed" from="VBoxContainer/LineEdit" to="." method="_name_changed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/solo" to="." method="_solo_toggled"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/mute" to="." method="_mute_toggled"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/bypass" to="." method="_bypass_toggled"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/Slider" to="." method="_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/Slider" to="." method="_show_value"]
+[connection signal="timeout" from="Timer" to="." method="_hide_value_preview"]

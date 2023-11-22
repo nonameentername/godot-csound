@@ -1,16 +1,26 @@
-[gd_resource type="AudioBusLayout" load_steps=3 format=3 uid="uid://cc243iilhwo2w"]
+[gd_resource type="AudioBusLayout" load_steps=5 format=3 uid="uid://cc243iilhwo2w"]
+
+[sub_resource type="AudioEffectSpectrumAnalyzer" id="AudioEffectSpectrumAnalyzer_3qteb"]
+resource_name = "SpectrumAnalyzer"
 
 [sub_resource type="AudioEffectCaptureCsound" id="AudioEffectCaptureCsound_st8yc"]
-csound_name = "main"
+csound_name = "Main"
 channel_left = "instr_3_input_left"
 channel_right = "instr_3_input_right"
 resource_name = "CaptureCsound"
 
-[sub_resource type="AudioEffectFilter" id="AudioEffectFilter_uqooj"]
+[sub_resource type="AudioEffectFilter" id="AudioEffectFilter_i3xxk"]
 resource_name = "Filter"
+cutoff_hz = 1.0
 resonance = 0.0
+gain = 0.0
+
+[sub_resource type="AudioEffectHighPassFilter" id="AudioEffectHighPassFilter_oiisu"]
+resource_name = "HighPassFilter"
 
 [resource]
+bus/0/effect/0/effect = SubResource("AudioEffectSpectrumAnalyzer_3qteb")
+bus/0/effect/0/enabled = true
 bus/1/name = &"MyTone"
 bus/1/solo = false
 bus/1/mute = false
@@ -19,5 +29,7 @@ bus/1/volume_db = 0.0
 bus/1/send = &"Master"
 bus/1/effect/0/effect = SubResource("AudioEffectCaptureCsound_st8yc")
 bus/1/effect/0/enabled = true
-bus/1/effect/1/effect = SubResource("AudioEffectFilter_uqooj")
+bus/1/effect/1/effect = SubResource("AudioEffectFilter_i3xxk")
 bus/1/effect/1/enabled = true
+bus/1/effect/2/effect = SubResource("AudioEffectHighPassFilter_oiisu")
+bus/1/effect/2/enabled = true

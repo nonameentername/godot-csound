@@ -16,15 +16,17 @@
 #include "audio_stream_player_csound_channel.h"
 #include "audio_stream_player_csound_named_channel.h"
 #include "audio_stream_player_mytone.h"
-#include "csound_engine.h"
 #include "csound_godot.h"
+#include "csound_layout.h"
+#include "csound_server.h"
+#include "editor_audio_meter_notches_csound.h"
 #include "godot_cpp/classes/editor_plugin.hpp"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 
 using namespace godot;
 
-static CsoundEngine *csound_module;
+static CsoundServer *csound_module;
 
 void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_SERVERS) {
@@ -35,9 +37,10 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
 
     if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
         ClassDB::register_class<CsoundGodot>();
-        ClassDB::register_class<CsoundEngine>();
-        csound_module = memnew(CsoundEngine);
-        Engine::get_singleton()->register_singleton("Csound", CsoundEngine::get_singleton());
+        ClassDB::register_class<CsoundServer>();
+        ClassDB::register_class<CsoundLayout>();
+        csound_module = memnew(CsoundServer);
+        Engine::get_singleton()->register_singleton("CsoundServer", CsoundServer::get_singleton());
 
         ClassDB::register_class<MidiFileReader>();
         ClassDB::register_class<SoundFontFileReader>();
@@ -51,6 +54,7 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<AudioStreamPlaybackCsoundNamedChannel>();
         ClassDB::register_class<AudioEffectCaptureCsound>();
         ClassDB::register_class<AudioEffectCaptureCsoundInstance>();
+        ClassDB::register_class<EditorAudioMeterNotchesCsound>();
     }
 }
 

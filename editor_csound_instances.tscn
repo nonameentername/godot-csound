@@ -1,0 +1,86 @@
+[gd_scene load_steps=3 format=3 uid="uid://n1siyk0vv1gq"]
+
+[ext_resource type="Script" path="res://editor_csound_instances.gd" id="1_8p7ml"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pu5hg"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 5.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[node name="Control" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8p7ml")
+
+[node name="TopBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="FileLabel" type="Label" parent="TopBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Layout: default_csound_layout.tres"
+clip_text = true
+
+[node name="AddCsound" type="Button" parent="TopBoxContainer"]
+layout_mode = 2
+tooltip_text = "Add a new Csound instance to this layout."
+text = "Add Csound"
+
+[node name="VSeparator" type="VSeparator" parent="TopBoxContainer"]
+layout_mode = 2
+
+[node name="Load" type="Button" parent="TopBoxContainer"]
+layout_mode = 2
+tooltip_text = "Load an existing Csound Layout."
+text = "Load"
+
+[node name="SaveAs" type="Button" parent="TopBoxContainer"]
+layout_mode = 2
+tooltip_text = "Save this Csound Layout to a file."
+text = "Save As"
+
+[node name="LoadDefault" type="Button" parent="TopBoxContainer"]
+layout_mode = 2
+tooltip_text = "Load the default Csound Layout."
+text = "Load Default"
+
+[node name="Create" type="Button" parent="TopBoxContainer"]
+layout_mode = 2
+tooltip_text = "Create a new Csound Layout."
+text = "Create"
+
+[node name="CsoundScroll" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_pu5hg")
+vertical_scroll_mode = 0
+
+[node name="CsoundHBox" type="HBoxContainer" parent="CsoundScroll"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Tree" type="Tree" parent="."]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SaveTimer" type="Timer" parent="."]
+wait_time = 0.8
+one_shot = true
+
+[connection signal="pressed" from="TopBoxContainer/AddCsound" to="." method="_add_csound"]
+[connection signal="pressed" from="TopBoxContainer/Load" to="." method="_load_layout"]
+[connection signal="pressed" from="TopBoxContainer/SaveAs" to="." method="_save_as_layout"]
+[connection signal="pressed" from="TopBoxContainer/LoadDefault" to="." method="_load_default_layout"]
+[connection signal="pressed" from="TopBoxContainer/Create" to="." method="_new_layout"]
+[connection signal="timeout" from="SaveTimer" to="." method="_server_save"]

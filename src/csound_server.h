@@ -23,6 +23,7 @@ class CsoundServer : public Node {
     GDCLASS(CsoundServer, Node);
 
 private:
+    bool solo_mode;
     bool edited;
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;
@@ -38,6 +39,8 @@ protected:
 public:
     CsoundServer();
     ~CsoundServer();
+
+    bool get_solo_mode();
 
     void set_edited(bool p_edited);
     bool get_edited();
@@ -82,8 +85,7 @@ public:
     void swap_csound_instruments(int p_bus, int p_instrument, int p_by_instrument);
     */
 
-    float get_csound_peak_volume_left_db(int p_csound, int p_channel) const;
-    float get_csound_peak_volume_right_db(int p_csound, int p_channel) const;
+    float get_csound_peak_volume_db(int p_csound, int p_channel) const;
 
     bool is_csound_channel_active(int p_csound, int p_channel) const;
 

@@ -19,6 +19,7 @@
 #include "soundfont_file_reader.h"
 #include "sysdep.h"
 
+static const float AUDIO_PEAK_OFFSET = 0.0000000001f;
 static const float AUDIO_MIN_PEAK_DB = -200.0f;
 
 namespace godot {
@@ -43,7 +44,7 @@ private:
     struct Channel {
         bool used = false;
         bool active = false;
-        AudioFrame peak_volume = AudioFrame{AUDIO_MIN_PEAK_DB, AUDIO_MIN_PEAK_DB};
+        float peak_volume = AUDIO_MIN_PEAK_DB;
         Vector<MYFLT> buffer;
         Channel() {
         }

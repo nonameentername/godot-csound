@@ -1,6 +1,7 @@
 #include "csound_godot.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 
 using namespace godot;
@@ -35,6 +36,16 @@ void CsoundGodot::_ready() {
     csound->Start();
 
     set_process_internal(true);
+
+    if (channels.size() != csound->GetNchnls()) {
+        channels.resize(csound->GetNchnls());
+
+        int p_frames = 512;
+        for (int j = 0; j < csound->GetNchnls(); j++) {
+            channels.write[j].buffer.resize(p_frames);
+        }
+    }
+
     initialized = true;
 }
 
@@ -66,14 +77,6 @@ Ref<MidiFileReader> CsoundGodot::get_midi_file() {
 void CsoundGodot::initialize_channels(int p_frames) {
     if (!initialized) {
         return;
-    }
-
-    if (channels.size() != csound->GetNchnls()) {
-        channels.resize(csound->GetNchnls());
-
-        for (int j = 0; j < csound->GetNchnls(); j++) {
-            channels.write[j].buffer.resize(p_frames);
-        }
     }
 
     controlChannelInfo_t *tmp;
@@ -114,6 +117,23 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
 
     int write_buffer_index = 0;
 
+    float volume = godot::UtilityFunctions::db_to_linear(volume_db);
+
+    if (CsoundServer::get_singleton()->get_solo_mode()) {
+        if (!solo) {
+            volume = 0.0;
+        }
+    } else {
+        if (mute) {
+            volume = 0.0;
+        }
+    }
+
+    float peak[channels.size()];
+    for (int i = 0; i < channels.size(); i++) {
+        peak[i] = 0;
+    }
+
     while (to_fill > 0) {
         for (KeyValue<String, Vector<MYFLT>> &E : named_channel_input_buffers) {
             Vector<MYFLT> temp_buffer;
@@ -130,8 +150,8 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
 
         for (int i = 0; i < csound->GetKsmps() * csound->GetNchnls(); i = i + csound->GetNchnls()) {
-            p_buffer[p_index].left = spout[i] / scale;
-            p_buffer[p_index].right = spout[i + 1] / scale;
+            p_buffer[p_index].left = spout[i] / scale * volume;
+            p_buffer[p_index].right = spout[i + 1] / scale * volume;
 
             p_index = p_index + 1;
             to_fill = to_fill - 1;
@@ -140,8 +160,12 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         for (int index = 0; index < csound->GetNchnls(); index++) {
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                 if (write_buffer_index + frame < channels[index].buffer.size()) {
-                    channels.write[index].buffer.write[write_buffer_index + frame] =
-                        csound->GetSpoutSample(frame, index) / scale;
+                    float value = csound->GetSpoutSample(frame, index) / scale * volume;
+                    float p = ABS(value);
+                    if (p > peak[index]) {
+                        peak[index] = p;
+                    }
+                    channels.write[index].buffer.write[write_buffer_index + frame] = value;
                 }
             }
         }
@@ -150,11 +174,22 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
             MYFLT temp_buffer[csound->GetKsmps()];
             csound->GetAudioChannel(E.key.utf8().get_data(), temp_buffer);
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                named_channel_output_buffers.getptr(E.key)->write[write_buffer_index + frame] = temp_buffer[frame];
+                named_channel_output_buffers.getptr(E.key)->write[write_buffer_index + frame] =
+                    temp_buffer[frame] / scale * volume;
             }
         }
 
         write_buffer_index += csound->GetKsmps();
+    }
+
+    for (int i = 0; i < channels.size(); i++) {
+        channels.write[i].peak_volume = godot::UtilityFunctions::linear_to_db(peak[i] + AUDIO_PEAK_OFFSET);
+
+        if (peak[i] > 0) {
+            channels.write[i].active = true;
+        } else {
+            channels.write[i].active = false;
+        }
     }
 
     return p_frames;

@@ -23,6 +23,10 @@ CsoundServer::~CsoundServer() {
     singleton = NULL;
 }
 
+bool CsoundServer::get_solo_mode() {
+    return solo_mode;
+}
+
 void CsoundServer::set_edited(bool p_edited) {
     edited = p_edited;
 }
@@ -63,6 +67,16 @@ void CsoundServer::initialize() {
 }
 
 void CsoundServer::process(double delta) {
+    bool use_solo = false;
+    for (int i = 0; i < csound_instances.size(); i++) {
+        if (csound_instances[i]->solo == true) {
+            use_solo = true;
+        }
+    }
+
+    if (use_solo != solo_mode) {
+        solo_mode = use_solo;
+    }
 }
 
 void CsoundServer::_notification(int p_what) {
@@ -345,18 +359,11 @@ bool CsoundServer::is_csound_bypassing(int p_csound) const {
     instruments
 */
 
-float CsoundServer::get_csound_peak_volume_left_db(int p_csound, int p_channel) const {
+float CsoundServer::get_csound_peak_volume_db(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
     ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->channels.size(), 0);
 
-    return csound_instances[p_csound]->channels[p_channel].peak_volume.left;
-}
-
-float CsoundServer::get_csound_peak_volume_right_db(int p_csound, int p_channel) const {
-    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
-    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->channels.size(), 0);
-
-    return csound_instances[p_csound]->channels[p_channel].peak_volume.right;
+    return csound_instances[p_csound]->channels[p_channel].peak_volume;
 }
 
 bool CsoundServer::is_csound_channel_active(int p_csound, int p_channel) const {
@@ -489,10 +496,11 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_bypass", "csound_idx", "enable"), &CsoundServer::set_csound_bypass);
     ClassDB::bind_method(D_METHOD("is_csound_bypassing", "csound_idx"), &CsoundServer::is_csound_bypassing);
 
-    ClassDB::bind_method(D_METHOD("get_csound_peak_volume_left_db", "csound_idx", "channel"),
-                         &CsoundServer::get_csound_peak_volume_left_db);
-    ClassDB::bind_method(D_METHOD("get_csound_peak_volume_right_db", "csound_idx", "channel"),
-                         &CsoundServer::get_csound_peak_volume_right_db);
+    ClassDB::bind_method(D_METHOD("get_csound_peak_volume_db", "csound_idx", "channel"),
+                         &CsoundServer::get_csound_peak_volume_db);
+
+    ClassDB::bind_method(D_METHOD("is_csound_channel_active", "csound_idx", "channel"),
+                         &CsoundServer::is_csound_channel_active);
 
     ClassDB::bind_method(D_METHOD("lock"), &CsoundServer::lock);
     ClassDB::bind_method(D_METHOD("unlock"), &CsoundServer::unlock);

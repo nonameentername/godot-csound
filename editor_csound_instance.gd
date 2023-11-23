@@ -18,11 +18,22 @@ var initialized = false
 var updating_csound: bool
 var csound_name: LineEdit
 var is_main: bool
+var enabled_vu: Texture2D
 var disabled_vu: Texture2D
 var active_bus_texture: Texture2D
 var hovering_drop: bool
 var editor_csound_instances: EditorCsoundInstances
 var undo_redo: EditorUndoRedoManager
+var channel_container: HBoxContainer
+
+
+class Channel:
+	var prev_active: bool
+	var peak: float = 0
+	var vu: TextureProgressBar
+
+
+var channels: Array[Channel]
 
 
 func _init():
@@ -38,6 +49,7 @@ func _init():
 
 func _ready():
 	csound_name = $VBoxContainer/LineEdit
+	channel_container = $VBoxContainer/HBoxContainer2
 	slider = $VBoxContainer/HBoxContainer2/Slider
 	audio_value_preview_box = $VBoxContainer/HBoxContainer2/Slider/AudioValuePreview
 	audio_value_preview_label = $VBoxContainer/HBoxContainer2/Slider/AudioValuePreview/AudioPreviewHBox/AudioPreviewLabel
@@ -53,8 +65,6 @@ func _ready():
 
 	options.shortcut_context = self
 	var popup = options.get_popup()
-
-	print("updating the popup")
 
 	popup.clear()
 
@@ -92,8 +102,63 @@ func _ready():
 	_update_theme()
 
 
+func _update_visiable_channels():
+	for channel in channel_container.get_children():
+		if is_instance_of(channel, TextureProgressBar):
+			channel_container.remove_child(channel)
+
+	channels.clear()
+	channels.resize(CsoundServer.get_csound_channel_count(get_index()))
+
+	for i in range(0, CsoundServer.get_csound_channel_count(get_index())):
+		var channel: TextureProgressBar = TextureProgressBar.new()
+		channel.fill_mode = TextureProgressBar.FILL_BOTTOM_TO_TOP
+		channel.min_value = -80
+		channel.max_value = 24
+		channel.step = 0.1
+		channel_container.add_child(channel)
+		channels[i] = Channel.new()
+		channels[i].peak = -200
+		channels[i].vu = channel
+		channels[i].prev_active = false
+
+		channel.texture_under = enabled_vu
+		channel.tint_under = Color(0.75, 0.75, 0.75)
+		channel.texture_progress = enabled_vu
+
+
 func _process(_delta):
-	pass
+	if channels.size() != CsoundServer.get_csound_channel_count(get_index()):
+		_update_visiable_channels()
+
+	for i in range(0, channels.size()):
+		var real_peak = -100
+
+		#var activity_found: bool = false
+
+		if CsoundServer.is_csound_channel_active(get_index(), i):
+			#activity_found = true
+			real_peak = max(real_peak, CsoundServer.get_csound_peak_volume_db(get_index(), i))
+
+		if real_peak > channels[i].peak:
+			channels[i].peak = real_peak
+		else:
+			channels[i].peak -= get_process_delta_time() * 60.0
+
+		channels[i].vu.value = channels[i].peak
+
+		#if activity_found != channels[i].prev_active:
+		#	if activity_found:
+		#		channels[i].vu.texture_over = Texture2D.new()
+		#	else:
+		#		channels[i].vu.texture_over = disabled_vu
+
+		#	channels[i].prev_active = activity_found
+
+		if _scaled_db_to_normalized_volume(channels[i].peak) > 0:
+			channels[i].vu.texture_over = null
+		else:
+			channels[i].vu.texture_over = disabled_vu
 
 
 func _notification(what):
@@ -263,21 +328,7 @@ func _update_theme():
 	tree_item.set_selectable(0, false)
 	tree_item.set_text(0, "Add Instrument")
 
-	get_node("VBoxContainer/HBoxContainer2/Channel").texture_under = get_theme_icon(
-		"BusVuActive", "EditorIcons"
-	)
-	get_node("VBoxContainer/HBoxContainer2/Channel").texture_under = get_theme_icon(
-		"BusVuFrozen", "EditorIcons"
-	)
-
-	for i in range(2, 17):
-		get_node("VBoxContainer/HBoxContainer2/Channel%s" % i).texture_under = get_theme_icon(
-			"BusVuActive", "EditorIcons"
-		)
-		get_node("VBoxContainer/HBoxContainer2/Channel%s" % i).texture_under = get_theme_icon(
-			"BusVuFrozen", "EditorIcons"
-		)
-
+	enabled_vu = get_theme_icon("BusVuActive", "EditorIcons")
 	disabled_vu = get_theme_icon("BusVuFrozen", "EditorIcons")
 
 	if not is_instance_valid(audio_meter):
@@ -286,8 +337,6 @@ func _update_theme():
 
 
 func _get_drag_data(at_position):
-	print("_get_drag_data")
-
 	if get_index() == 0:
 		return
 

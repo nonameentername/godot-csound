@@ -85,6 +85,13 @@ a2  = a2 * ivel * al * kCutoff
 endin
 
 
+instr 4
+    a1  chnget "instr_3_input_left"
+    a2  chnget "instr_3_input_right"
+    outs a1, a2
+endin
+
+
 </CsInstruments>
 <CsScore>
 f0 3600
@@ -100,6 +107,8 @@ i2 7 1 65 <
 i2 7 1 69 10
 
 ;i3 0 3600
+
+i4 0 3600
 
 
 </CsScore>

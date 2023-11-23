@@ -86,9 +86,10 @@ endin
 
 
 instr 4
-    a1  chnget "instr_3_input_left"
-    a2  chnget "instr_3_input_right"
-    outs a1, a2
+    a1  chnget "instr_4_input_left"
+    a2  chnget "instr_4_input_right"
+    chnset a1, "instr_4_left"
+    chnset a2, "instr_4_right"
 endin
 
 

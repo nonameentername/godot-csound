@@ -1,5 +1,5 @@
-#ifndef AUDIO_EFFECT_CAPTURE_CSOUND_H
-#define AUDIO_EFFECT_CAPTURE_CSOUND_H
+#ifndef AUDIO_EFFECT_SEND_CSOUND_NAMED_CHANNEL_H
+#define AUDIO_EFFECT_SEND_CSOUND_NAMED_CHANNEL_H
 
 #include <godot_cpp/classes/audio_effect.hpp>
 #include <godot_cpp/classes/audio_effect_instance.hpp>
@@ -8,12 +8,12 @@
 
 namespace godot {
 
-class AudioEffectCaptureCsound;
+class AudioEffectSetCsoundNamedChannel;
 
-class AudioEffectCaptureCsoundInstance : public AudioEffectInstance {
-    GDCLASS(AudioEffectCaptureCsoundInstance, AudioEffectInstance);
+class AudioEffectSetCsoundNamedChannelInstance : public AudioEffectInstance {
+    GDCLASS(AudioEffectSetCsoundNamedChannelInstance, AudioEffectInstance);
     friend class AudioEffectCaptureCsound;
-    Ref<AudioEffectCaptureCsound> base;
+    Ref<AudioEffectSetCsoundNamedChannel> base;
 
 private:
     bool has_data = false;
@@ -26,8 +26,8 @@ protected:
     static void _bind_methods();
 };
 
-class AudioEffectCaptureCsound : public AudioEffect {
-    GDCLASS(AudioEffectCaptureCsound, AudioEffect)
+class AudioEffectSetCsoundNamedChannel : public AudioEffect {
+    GDCLASS(AudioEffectSetCsoundNamedChannel, AudioEffect)
     friend class AudioEffectCaptureCsoundInstance;
 
     String csound_name;

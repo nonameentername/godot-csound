@@ -16,8 +16,8 @@ channel_right = "instr_1_right"
 
 [sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_ove8l"]
 csound_name = "Main"
-channel_left = "instr_3_left"
-channel_right = "instr_3_right"
+channel_left = "instr_4_left"
+channel_right = "instr_4_right"
 
 [sub_resource type="AudioStreamMyTone" id="AudioStreamMyTone_31rl7"]
 
@@ -82,6 +82,7 @@ value = 1.0
 
 [node name="CsoundPlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamCsound_a6stl")
+volume_db = -80.0
 autoplay = true
 
 [node name="CsoundChannelPlayer" type="AudioStreamPlayer" parent="."]
@@ -96,7 +97,6 @@ autoplay = true
 
 [node name="CsoundNamedChannelPlayer2" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamCsoundNamedChannel_ove8l")
-volume_db = -80.0
 autoplay = true
 
 [node name="MyTonePlayer" type="AudioStreamPlayer" parent="."]

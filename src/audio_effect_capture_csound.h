@@ -33,6 +33,7 @@ class AudioEffectCaptureCsound : public AudioEffect {
     String csound_name;
     String channel_left;
     String channel_right;
+    bool forward_audio = true;
 
 protected:
     static void _bind_methods();
@@ -42,10 +43,15 @@ public:
 
     void set_csound_name(const String &name);
     const String &get_csound_name();
+
     void set_channel_left(String p_channel_left);
     String get_channel_left();
+
     void set_channel_right(String p_channel_right);
     String get_channel_right();
+
+    void set_forward_audio(bool p_forward_audio);
+    bool get_forward_audio();
 };
 } // namespace godot
 

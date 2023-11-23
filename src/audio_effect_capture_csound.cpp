@@ -28,6 +28,14 @@ String AudioEffectCaptureCsound::get_channel_right() {
     return channel_right;
 }
 
+void AudioEffectCaptureCsound::set_forward_audio(bool p_forward_audio) {
+    forward_audio = p_forward_audio;
+}
+
+bool AudioEffectCaptureCsound::get_forward_audio() {
+    return forward_audio;
+}
+
 void AudioEffectCaptureCsound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioEffectCaptureCsound::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioEffectCaptureCsound::get_csound_name);
@@ -41,6 +49,10 @@ void AudioEffectCaptureCsound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_channel_right"), &AudioEffectCaptureCsound::get_channel_right);
     ClassDB::add_property("AudioEffectCaptureCsound", PropertyInfo(Variant::STRING, "channel_right"),
                           "set_channel_right", "get_channel_right");
+    ClassDB::bind_method(D_METHOD("set_forward_audio", "forward_audio"), &AudioEffectCaptureCsound::set_forward_audio);
+    ClassDB::bind_method(D_METHOD("get_forward_audio"), &AudioEffectCaptureCsound::get_forward_audio);
+    ClassDB::add_property("AudioEffectCaptureCsound", PropertyInfo(Variant::BOOL, "forward_audio"), "set_forward_audio",
+                          "get_forward_audio");
 }
 
 Ref<AudioEffectInstance> AudioEffectCaptureCsound::_instantiate() {
@@ -55,7 +67,12 @@ void AudioEffectCaptureCsoundInstance::_process(const void *p_src_frames, AudioF
     AudioFrame *src_frames = (AudioFrame *)p_src_frames;
 
     for (int i = 0; i < p_frame_count; i++) {
-        p_dst_frames[i] = src_frames[i];
+        if (base->forward_audio) {
+            p_dst_frames[i] = src_frames[i];
+        } else {
+            p_dst_frames[i].left = 0;
+            p_dst_frames[i].right = 0;
+        }
         if (src_frames[i].left > 0 || src_frames[i].right > 0) {
             has_data = true;
         }

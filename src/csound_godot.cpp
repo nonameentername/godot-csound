@@ -37,12 +37,14 @@ void CsoundGodot::_ready() {
 
     set_process_internal(true);
 
-    if (channels.size() != csound->GetNchnls()) {
-        channels.resize(csound->GetNchnls());
+    if (output_channels.size() != csound->GetNchnls()) {
+        input_channels.resize(csound->GetNchnls());
+        output_channels.resize(csound->GetNchnls());
 
         int p_frames = 512;
         for (int j = 0; j < csound->GetNchnls(); j++) {
-            channels.write[j].buffer.resize(p_frames);
+            input_channels.write[j].resize(p_frames);
+            output_channels.write[j].buffer.resize(p_frames);
         }
     }
 
@@ -106,7 +108,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         return p_frames;
     }
 
-    int p_index = 0;
+    int buffer_index = 0;
     int to_fill = p_frames;
 
     MYFLT *spin = csound->GetSpin();
@@ -115,7 +117,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
 
     initialize_channels(p_frames);
 
-    int write_buffer_index = 0;
+    int ksmps_buffer_index = 0;
 
     float volume = godot::UtilityFunctions::db_to_linear(volume_db);
 
@@ -129,17 +131,23 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
     }
 
-    float peak[channels.size()];
-    for (int i = 0; i < channels.size(); i++) {
+    float peak[output_channels.size()];
+    for (int i = 0; i < output_channels.size(); i++) {
         peak[i] = 0;
     }
 
     while (to_fill > 0) {
+        for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+            for (int channel = 0; channel < csound->GetNchnls(); channel++) {
+                spin[frame * csound->GetNchnls() + channel] = input_channels[channel][ksmps_buffer_index + frame];
+            }
+        }
+
         for (KeyValue<String, Vector<MYFLT>> &E : named_channel_input_buffers) {
             Vector<MYFLT> temp_buffer;
             temp_buffer.resize(csound->GetKsmps());
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                temp_buffer.write[frame] = named_channel_input_buffers.get(E.key)[write_buffer_index + frame];
+                temp_buffer.write[frame] = named_channel_input_buffers.get(E.key)[ksmps_buffer_index + frame];
             }
             csound->SetAudioChannel(E.key.utf8().get_data(), temp_buffer.ptrw());
         }
@@ -150,22 +158,22 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
 
         for (int i = 0; i < csound->GetKsmps() * csound->GetNchnls(); i = i + csound->GetNchnls()) {
-            p_buffer[p_index].left = spout[i] / scale * volume;
-            p_buffer[p_index].right = spout[i + 1] / scale * volume;
+            p_buffer[buffer_index].left = spout[i] / scale * volume;
+            p_buffer[buffer_index].right = spout[i + 1] / scale * volume;
 
-            p_index = p_index + 1;
+            buffer_index = buffer_index + 1;
             to_fill = to_fill - 1;
         }
 
-        for (int index = 0; index < csound->GetNchnls(); index++) {
+        for (int channel = 0; channel < csound->GetNchnls(); channel++) {
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                if (write_buffer_index + frame < channels[index].buffer.size()) {
-                    float value = csound->GetSpoutSample(frame, index) / scale * volume;
+                if (ksmps_buffer_index + frame < output_channels[channel].buffer.size()) {
+                    float value = csound->GetSpoutSample(frame, channel) / scale * volume;
                     float p = ABS(value);
-                    if (p > peak[index]) {
-                        peak[index] = p;
+                    if (p > peak[channel]) {
+                        peak[channel] = p;
                     }
-                    channels.write[index].buffer.write[write_buffer_index + frame] = value;
+                    output_channels.write[channel].buffer.write[ksmps_buffer_index + frame] = value;
                 }
             }
         }
@@ -174,36 +182,47 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
             MYFLT temp_buffer[csound->GetKsmps()];
             csound->GetAudioChannel(E.key.utf8().get_data(), temp_buffer);
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                named_channel_output_buffers.getptr(E.key)->write[write_buffer_index + frame] =
+                named_channel_output_buffers.getptr(E.key)->write[ksmps_buffer_index + frame] =
                     temp_buffer[frame] / scale * volume;
             }
         }
 
-        write_buffer_index += csound->GetKsmps();
+        ksmps_buffer_index += csound->GetKsmps();
     }
 
-    for (int i = 0; i < channels.size(); i++) {
-        channels.write[i].peak_volume = godot::UtilityFunctions::linear_to_db(peak[i] + AUDIO_PEAK_OFFSET);
+    for (int i = 0; i < output_channels.size(); i++) {
+        output_channels.write[i].peak_volume = godot::UtilityFunctions::linear_to_db(peak[i] + AUDIO_PEAK_OFFSET);
 
         if (peak[i] > 0) {
-            channels.write[i].active = true;
+            output_channels.write[i].active = true;
         } else {
-            channels.write[i].active = false;
+            output_channels.write[i].active = false;
         }
     }
 
     return p_frames;
 }
 
+void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
+    if (left >= input_channels.size() || right >= input_channels.size()) {
+        return;
+    }
+
+    for (int frame = 0; frame < p_frames; frame += 1) {
+        input_channels.write[left].write[frame] = p_buffer[frame].left;
+        input_channels.write[right].write[frame] = p_buffer[frame].right;
+    }
+}
+
 int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
     for (int frame = 0; frame < p_frames; frame += 1) {
-        if (left < channels.size() && frame < channels[left].buffer.size()) {
-            p_buffer[frame].left = channels[left].buffer[frame];
+        if (left < output_channels.size() && frame < output_channels[left].buffer.size()) {
+            p_buffer[frame].left = output_channels[left].buffer[frame];
         } else {
             p_buffer[frame].left = 0;
         }
-        if (right < channels.size() && frame < channels[right].buffer.size()) {
-            p_buffer[frame].right = channels[right].buffer[frame];
+        if (right < output_channels.size() && frame < output_channels[right].buffer.size()) {
+            p_buffer[frame].right = output_channels[right].buffer[frame];
         } else {
             p_buffer[frame].right = 0;
         }

@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=3 format=3 uid="uid://cc243iilhwo2w"]
+[gd_resource type="AudioBusLayout" load_steps=4 format=3 uid="uid://cc243iilhwo2w"]
 
 [sub_resource type="AudioEffectSpectrumAnalyzer" id="AudioEffectSpectrumAnalyzer_3qteb"]
 resource_name = "SpectrumAnalyzer"
@@ -10,10 +10,15 @@ channel_right = "instr_4_input_right"
 forward_audio = false
 resource_name = "SetCsoundNamedChannel"
 
+[sub_resource type="AudioEffectSetCsoundChannel" id="AudioEffectSetCsoundChannel_hx4qo"]
+csound_name = "Main"
+forward_audio = false
+resource_name = "SetCsoundChannel"
+
 [resource]
 bus/0/effect/0/effect = SubResource("AudioEffectSpectrumAnalyzer_3qteb")
 bus/0/effect/0/enabled = true
-bus/1/name = &"MyTone"
+bus/1/name = &"MyToneNamedChannel"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
@@ -21,3 +26,11 @@ bus/1/volume_db = 0.0
 bus/1/send = &"Master"
 bus/1/effect/0/effect = SubResource("AudioEffectSetCsoundNamedChannel_t02nr")
 bus/1/effect/0/enabled = true
+bus/2/name = &"MyToneChannel"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = 0.0
+bus/2/send = &"Master"
+bus/2/effect/0/effect = SubResource("AudioEffectSetCsoundChannel_hx4qo")
+bus/2/effect/0/enabled = true

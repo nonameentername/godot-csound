@@ -7,6 +7,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "audio_effect_send_csound_channel.h"
 #include "audio_effect_send_csound_named_channel.h"
 #include "audio_stream_csound.h"
 #include "audio_stream_csound_channel.h"
@@ -52,6 +53,8 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<AudioStreamPlaybackCsoundChannel>();
         ClassDB::register_class<AudioStreamCsoundNamedChannel>();
         ClassDB::register_class<AudioStreamPlaybackCsoundNamedChannel>();
+        ClassDB::register_class<AudioEffectSetCsoundChannel>();
+        ClassDB::register_class<AudioEffectSetCsoundChannelInstance>();
         ClassDB::register_class<AudioEffectSetCsoundNamedChannel>();
         ClassDB::register_class<AudioEffectSetCsoundNamedChannelInstance>();
         ClassDB::register_class<EditorAudioMeterNotchesCsound>();

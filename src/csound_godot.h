@@ -50,7 +50,8 @@ private:
         }
     };
 
-    Vector<Channel> channels;
+    Vector<Vector<MYFLT>> input_channels;
+    Vector<Channel> output_channels;
     HashMap<String, Vector<MYFLT>> named_channel_input_buffers;
     HashMap<String, Vector<MYFLT>> named_channel_output_buffers;
 
@@ -74,11 +75,17 @@ public:
     // val value (0-16383 with 8192 being center)
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);
+
     int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+
+    void set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
     int get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
+
     void set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
+
     void process(double delta);
+
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
     void _notification(int p_what);

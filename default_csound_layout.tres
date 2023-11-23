@@ -1,6 +1,7 @@
 [gd_resource type="CsoundLayout" format=3 uid="uid://c0aye3awcthh0"]
 
 [resource]
+csound/0/volume_db = -5.93175
 csound/1/name = "Csound"
 csound/1/solo = false
 csound/1/mute = false

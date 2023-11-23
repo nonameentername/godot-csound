@@ -1,6 +1,6 @@
 <CsoundSynthesizer>
 <CsOptions>
--i adc -o dac -B 4096 -+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
+-o dac -B 4096 -+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
 </CsOptions>
 <CsInstruments>
 
@@ -93,6 +93,12 @@ instr 4
 endin
 
 
+instr 5
+    a1, a2 inch 1, 2
+    outs	a1, a2
+endin
+
+
 </CsInstruments>
 <CsScore>
 f0 3600
@@ -110,6 +116,7 @@ i2 7 1 69 10
 ;i3 0 3600
 
 i4 0 3600
+i5 0 3600
 
 
 </CsScore>

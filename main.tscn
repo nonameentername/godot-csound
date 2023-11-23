@@ -102,7 +102,7 @@ autoplay = true
 [node name="MyTonePlayer" type="AudioStreamPlayer" parent="."]
 stream = SubResource("AudioStreamMyTone_31rl7")
 autoplay = true
-bus = &"MyTone"
+bus = &"MyToneNamedChannel"
 
 [connection signal="toggled" from="CheckButton" to="." method="_on_CheckButton_toggled"]
 [connection signal="toggled" from="CheckButton2" to="." method="_on_CheckButton2_toggled"]

@@ -361,16 +361,16 @@ bool CsoundServer::is_csound_bypassing(int p_csound) const {
 
 float CsoundServer::get_csound_peak_volume_db(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
-    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->channels.size(), 0);
+    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_channels.size(), 0);
 
-    return csound_instances[p_csound]->channels[p_channel].peak_volume;
+    return csound_instances[p_csound]->output_channels[p_channel].peak_volume;
 }
 
 bool CsoundServer::is_csound_channel_active(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), false);
-    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->channels.size(), false);
+    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_channels.size(), false);
 
-    return csound_instances[p_csound]->channels[p_channel].active;
+    return csound_instances[p_csound]->output_channels[p_channel].active;
 }
 
 bool CsoundServer::load_default_csound_layout() {

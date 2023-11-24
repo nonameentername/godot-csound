@@ -235,7 +235,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
 }
 
 void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
-    if (left >= input_channels.size() || right >= input_channels.size()) {
+    if (left < 0 || left >= input_channels.size() || right < 0 || right >= input_channels.size()) {
         return;
     }
 
@@ -247,12 +247,12 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
 
 int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
     for (int frame = 0; frame < p_frames; frame += 1) {
-        if (left < output_channels.size() && frame < output_channels[left].buffer.size()) {
+        if (left >= 0 && left < output_channels.size() && frame < output_channels[left].buffer.size()) {
             p_buffer[frame].left = output_channels[left].buffer[frame];
         } else {
             p_buffer[frame].left = 0;
         }
-        if (right < output_channels.size() && frame < output_channels[right].buffer.size()) {
+        if (right >= 0 && right < output_channels.size() && frame < output_channels[right].buffer.size()) {
             p_buffer[frame].right = output_channels[right].buffer[frame];
         } else {
             p_buffer[frame].right = 0;

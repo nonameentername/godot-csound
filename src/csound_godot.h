@@ -29,6 +29,10 @@ class CsoundGodot : public Node {
     friend class CsoundServer;
 
 private:
+    uint64_t last_mix_time;
+    int last_mix_frames;
+    bool active;
+
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
@@ -63,11 +67,15 @@ protected:
 public:
     CsoundGodot();
     ~CsoundGodot();
+
     virtual void _ready() override;
+
     void set_soundfont(Ref<SoundFontFileReader> p_soundfont);
     Ref<SoundFontFileReader> get_soundfont();
+
     void set_midi_file(Ref<MidiFileReader> p_midi_file);
     Ref<MidiFileReader> get_midi_file();
+
     void program_select(int chan, int bank_num, int preset_num);
     void note_on(int chan, int key, int vel);
     void note_off(int chan, int key);
@@ -93,6 +101,9 @@ public:
     const String &get_csound_name();
 
     int get_channel_count();
+
+    double get_time_since_last_mix();
+    double get_time_to_next_mix();
 
     static void csound_message_callback(CSOUND *csound, int attr, const char *format, va_list args);
 };

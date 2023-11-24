@@ -1,6 +1,7 @@
 #include "csound_godot.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 
@@ -9,6 +10,7 @@ using namespace godot;
 CsoundGodot::CsoundGodot() {
     csound = NULL;
     initialized = false;
+    active = false;
 }
 
 CsoundGodot::~CsoundGodot() {
@@ -107,6 +109,14 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
     if (!initialized) {
         return p_frames;
     }
+
+    active = true;
+
+    if (Time::get_singleton()) {
+        last_mix_time = Time::get_singleton()->get_ticks_usec();
+    }
+
+    last_mix_frames = p_frames;
 
     int buffer_index = 0;
     int to_fill = p_frames;
@@ -359,6 +369,19 @@ void CsoundGodot::process(double delta) {
         return;
     }
 
+    if (active) {
+        double time_to_future_mix = 2 * get_time_to_next_mix();
+
+        if (time_to_future_mix < 0) {
+            active = false;
+
+            for (int channel = 0; channel < output_channels.size(); channel++) {
+                output_channels.write[channel].active = false;
+                output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+            }
+        }
+    }
+
     for (int i = 0; i < csound->GetMessageCnt(); i++) {
         godot::UtilityFunctions::printraw(csound->GetFirstMessage());
         csound->PopFirstMessage();
@@ -387,6 +410,16 @@ int CsoundGodot::get_channel_count() {
     } else {
         return 2;
     }
+}
+
+double CsoundGodot::get_time_since_last_mix() {
+    return (Time::get_singleton()->get_ticks_usec() - last_mix_time) / 1000000.0;
+}
+
+double CsoundGodot::get_time_to_next_mix() {
+    double total = get_time_since_last_mix();
+    double mix_buffer = last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
+    return mix_buffer - total;
 }
 
 void CsoundGodot::_bind_methods() {

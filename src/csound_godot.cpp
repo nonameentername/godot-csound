@@ -22,22 +22,24 @@ CsoundGodot::~CsoundGodot() {
 
 void CsoundGodot::_ready() {
     finished = false;
-
     csound = new Csound();
-    csound->Compile("test.csd");
 
     csound->CreateMessageBuffer(0);
     csound->SetDebug(true);
-
     csound->SetHostImplementedAudioIO(1, 0);
 
     // csound->SetHostImplementedMIDIIO(true);
     // csound->SetExternalMidiWriteCallback(write_midi_data);
     // csound->SetExternalMidiReadCallback(read_midi_data);
 
-    csound->Start();
-
     set_process_internal(true);
+
+    start();
+}
+
+void CsoundGodot::start() {
+    csound->Compile("test.csd");
+    csound->Start();
 
     if (output_channels.size() != csound->GetNchnls()) {
         input_channels.resize(csound->GetNchnls());
@@ -47,10 +49,32 @@ void CsoundGodot::_ready() {
         for (int j = 0; j < csound->GetNchnls(); j++) {
             input_channels.write[j].resize(p_frames);
             output_channels.write[j].buffer.resize(p_frames);
+
+            for (int frame = 0; frame < p_frames; frame++) {
+                input_channels.write[j].write[frame] = 0;
+                output_channels.write[j].buffer.write[frame] = 0;
+            }
         }
     }
 
     initialized = true;
+}
+
+void CsoundGodot::stop() {
+    if (csound != NULL) {
+        csound->Stop();
+    }
+}
+
+void CsoundGodot::reset() {
+    if (csound != NULL) {
+        csound->Reset();
+    }
+
+    input_channels.clear();
+    output_channels.clear();
+    named_channel_input_buffers.clear();
+    named_channel_output_buffers.clear();
 }
 
 void CsoundGodot::set_soundfont(Ref<SoundFontFileReader> p_soundfont) {
@@ -107,6 +131,10 @@ void CsoundGodot::initialize_channels(int p_frames) {
 
 int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
     if (!initialized) {
+        for (int frame = 0; frame < p_frames; frame++) {
+            p_buffer[frame].left = 0;
+            p_buffer[frame].right = 0;
+        }
         return p_frames;
     }
 

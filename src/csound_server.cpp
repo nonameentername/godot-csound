@@ -392,13 +392,22 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
     ERR_FAIL_COND(p_csound_layout.is_null() || p_csound_layout->csounds.size() == 0);
 
     lock();
-    for (int i = 0; i < csound_instances.size(); i++) {
-        memdelete(csound_instances[i]);
+    int prev_size = csound_instances.size();
+    for (int i = prev_size; i < csound_instances.size(); i++) {
+        csound_instances[i]->stop();
+        csound_instances[i]->queue_free();
     }
     csound_instances.resize(p_csound_layout->csounds.size());
     csound_map.clear();
     for (int i = 0; i < p_csound_layout->csounds.size(); i++) {
-        CsoundGodot *csound = memnew(CsoundGodot);
+        CsoundGodot *csound;
+        if (i >= prev_size) {
+            csound = memnew(CsoundGodot);
+        } else {
+            csound = csound_instances[i];
+            csound->reset();
+        }
+
         if (i == 0) {
             csound->csound_name = "Main";
         } else {
@@ -412,7 +421,12 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
 
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
-        call_deferred("add_child", csound_instances[i]);
+
+        if (i >= prev_size) {
+            call_deferred("add_child", csound_instances[i]);
+        } else {
+            csound->start();
+        }
     }
     edited = false;
     unlock();
@@ -436,9 +450,11 @@ Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
 }
 
 void CsoundServer::lock() {
+    AudioServer::get_singleton()->lock();
 }
 
 void CsoundServer::unlock() {
+    AudioServer::get_singleton()->unlock();
 }
 
 CsoundGodot *CsoundServer::get_csound(const String &p_name) {

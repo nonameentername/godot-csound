@@ -70,6 +70,10 @@ public:
 
     virtual void _ready() override;
 
+    void start();
+    void stop();
+    void reset();
+
     void set_soundfont(Ref<SoundFontFileReader> p_soundfont);
     Ref<SoundFontFileReader> get_soundfont();
 

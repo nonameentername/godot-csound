@@ -20,10 +20,13 @@ private:
 
 public:
     virtual String get_stream_name() const;
-    int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
     virtual float get_length() const;
+
+    int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+
     AudioStreamCsound();
     ~AudioStreamCsound();
+
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;
     void set_csound_name(const String &name);
     const String &get_csound_name();

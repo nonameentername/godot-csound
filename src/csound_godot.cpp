@@ -61,6 +61,8 @@ void CsoundGodot::start() {
 }
 
 void CsoundGodot::stop() {
+    initialized = false;
+
     if (csound != NULL) {
         csound->Stop();
     }
@@ -70,7 +72,6 @@ void CsoundGodot::reset() {
     if (csound != NULL) {
         csound->Reset();
     }
-
     input_channels.clear();
     output_channels.clear();
     named_channel_input_buffers.clear();
@@ -412,7 +413,9 @@ void CsoundGodot::process(double delta) {
     }
 
     if (active) {
-        double time_to_future_mix = 2 * get_time_to_next_mix();
+        double total = get_time_since_last_mix();
+        double mix_buffer = 2 * last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
+        double time_to_future_mix = mix_buffer - total;
 
         if (time_to_future_mix < 0) {
             active = false;
@@ -420,6 +423,16 @@ void CsoundGodot::process(double delta) {
             for (int channel = 0; channel < output_channels.size(); channel++) {
                 output_channels.write[channel].active = false;
                 output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+
+                for (int frame = 0; frame < last_mix_frames; frame++) {
+                    output_channels.write[channel].buffer.write[frame] = 0;
+                }
+            }
+
+            for (KeyValue<String, Vector<MYFLT>> &E : named_channel_output_buffers) {
+                for (int frame = 0; frame < last_mix_frames; frame++) {
+                    named_channel_output_buffers.getptr(E.key)->write[frame] = 0;
+                }
             }
         }
     }

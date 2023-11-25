@@ -16,13 +16,6 @@ class AudioStreamPlaybackCsound : public AudioStreamPlayback {
     friend class AudioStreamCsound;
 
 private:
-    struct PlaybackEntry {
-        Ref<AudioStreamPlayback> playback;
-        String channel_left;
-        String channel_right;
-    };
-
-    Vector<PlaybackEntry> playback_list;
     Ref<AudioStreamCsound> base;
     bool active;
 

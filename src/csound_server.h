@@ -71,6 +71,9 @@ public:
     void set_csound_volume_db(int p_csound, float p_volume_db);
     float get_csound_volume_db(int p_csound) const;
 
+    void set_csound_tab(int p_csound, float p_tab);
+    int get_csound_tab(int p_csound) const;
+
     void set_csound_solo(int p_csound, bool p_enable);
     bool is_csound_solo(int p_csound) const;
 

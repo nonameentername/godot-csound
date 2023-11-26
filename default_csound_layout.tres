@@ -7,3 +7,4 @@ csound/1/solo = false
 csound/1/mute = false
 csound/1/bypass = false
 csound/1/volume_db = 0.0
+csound/1/tab = 0

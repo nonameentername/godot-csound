@@ -24,6 +24,8 @@ bool CsoundLayout::_set(const StringName &p_name, const Variant &p_value) {
             csound.bypass = p_value;
         } else if (what == "volume_db") {
             csound.volume_db = p_value;
+        } else if (what == "tab") {
+            csound.tab = p_value;
         } else {
             return false;
         }
@@ -56,6 +58,8 @@ bool CsoundLayout::_get(const StringName &p_name, Variant &r_ret) const {
             r_ret = csound.bypass;
         } else if (what == "volume_db") {
             r_ret = csound.volume_db;
+        } else if (what == "tab") {
+            r_ret = csound.tab;
         } else {
             return false;
         }
@@ -77,6 +81,8 @@ void CsoundLayout::_get_property_list(List<PropertyInfo> *p_list) const {
         p_list->push_back(PropertyInfo(Variant::BOOL, "csound/" + itos(i) + "/bypass", PROPERTY_HINT_NONE, "",
                                        PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
         p_list->push_back(PropertyInfo(Variant::FLOAT, "csound/" + itos(i) + "/volume_db", PROPERTY_HINT_NONE, "",
+                                       PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+        p_list->push_back(PropertyInfo(Variant::INT, "csound/" + itos(i) + "/tab", PROPERTY_HINT_NONE, "",
                                        PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
     }
 }

@@ -43,6 +43,7 @@ private:
     bool mute;
     bool bypass;
     float volume_db;
+    int tab;
     bool initialized;
 
     struct Channel {

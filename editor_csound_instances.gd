@@ -130,8 +130,6 @@ func _update_csound_instance(index):
 
 
 func _delete_csound(editor_csound_instance: EditorCsoundInstance):
-	print("editor_csound_instance.get_index() = ", editor_csound_instance.get_index())
-
 	var index: int = editor_csound_instance.get_index()
 	if index == 0:
 		push_warning("Main Csound can't be deleted!")
@@ -199,9 +197,7 @@ func _reset_csound_volume(editor_csound_instance: EditorCsoundInstance):
 
 
 func _request_drop_end():
-	print("_request_drop_end.0")
 	if not drop_end and csound_hbox.get_child_count():
-		print("_request_drop_end.1")
 		drop_end = EditorCsoundDrop.new()
 		csound_hbox.add_child(drop_end)
 		drop_end.custom_minimum_size = csound_hbox.get_child(0).size
@@ -209,7 +205,6 @@ func _request_drop_end():
 
 
 func _drop_at_index(csound, index):
-	print("_drop_at_index")
 	undo_redo.create_action("Move Csound")
 
 	undo_redo.add_do_method(CsoundServer, "move_csound", csound, index)
@@ -244,9 +239,7 @@ func _new_layout():
 
 
 func _select_layout():
-	print("_select_layout.0")
 	if editor_interface:
-		print("_select_layout.1 ", edited_path)
 		editor_interface.get_file_system_dock().navigate_to_path(edited_path)
 
 

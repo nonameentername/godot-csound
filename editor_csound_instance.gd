@@ -27,6 +27,7 @@ var editor_csound_instances: EditorCsoundInstances
 var undo_redo: EditorUndoRedoManager
 var channel_container: HBoxContainer
 var named_channel_container: HBoxContainer
+var tab_container: TabContainer
 
 
 class Channel:
@@ -52,6 +53,7 @@ func _init():
 
 func _ready():
 	csound_name = $VBoxContainer/LineEdit
+	tab_container = $VBoxContainer/HBoxContainer2/TabContainer
 	channel_container = $VBoxContainer/HBoxContainer2/TabContainer/Channels
 	named_channel_container = $VBoxContainer/HBoxContainer2/TabContainer/Named
 	slider = $VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider
@@ -143,8 +145,7 @@ func _update_visiable_channels():
 		channels[i] = channel
 		channel_container.add_child(channel_progress_bar)
 
-	channel_container.remove_child(audio_meter)
-	channel_container.add_child(audio_meter)
+	channel_container.move_child(audio_meter, channel_container.get_child_count())
 
 	for channel in named_channel_container.get_children():
 		if is_instance_of(channel, TextureProgressBar):
@@ -163,8 +164,7 @@ func _update_visiable_channels():
 		named_channels[i] = channel
 		named_channel_container.add_child(channel_progress_bar)
 
-	named_channel_container.remove_child(audio_meter2)
-	named_channel_container.add_child(audio_meter2)
+	named_channel_container.move_child(audio_meter2, named_channel_container.get_child_count())
 
 
 func _process(_delta):
@@ -274,6 +274,14 @@ func _show_value(value):
 	if slider.has_focus() and !audio_value_preview_box.visible:
 		audio_value_preview_box.show()
 	preview_timer.start()
+
+
+func _tab_changed(tab: int):
+	if updating_csound:
+		return
+
+	CsoundServer.set_csound_tab(get_index(), tab)
+	_update_slider()
 
 
 func _value_changed(normalized):
@@ -453,7 +461,24 @@ func update_csound():
 	mute.button_pressed = CsoundServer.is_csound_mute(index)
 	bypass.button_pressed = CsoundServer.is_csound_bypassing(index)
 
+	tab_container.current_tab = CsoundServer.get_csound_tab(index)
+	_update_slider()
+
 	updating_csound = false
+
+
+func _update_slider():
+	match CsoundServer.get_csound_tab(get_index()):
+		0:
+			if not slider in channel_container.get_children():
+				named_channel_container.remove_child(slider)
+				channel_container.add_child(slider)
+				channel_container.move_child(slider, 0)
+		1:
+			if not slider in named_channel_container.get_children():
+				channel_container.remove_child(slider)
+				named_channel_container.add_child(slider)
+				named_channel_container.move_child(slider, 0)
 
 
 func _solo_toggled():

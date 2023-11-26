@@ -124,7 +124,6 @@ void CsoundGodot::initialize_channels(int p_frames) {
             }
             if (!named_channels.has(name)) {
                 int index = output_named_channels.size();
-                godot::UtilityFunctions::print("name = ", name, " index = ", index);
                 output_named_channels.resize(index + 1);
                 output_named_channels.write[index].buffer.resize(p_frames);
 

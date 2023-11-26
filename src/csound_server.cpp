@@ -135,6 +135,7 @@ void CsoundServer::set_csound_count(int p_count) {
         csound_instances[i]->mute = false;
         csound_instances[i]->bypass = false;
         csound_instances[i]->volume_db = 0;
+        csound_instances[i]->tab = 0;
 
         csound_map[attempt] = csound_instances[i];
         call_deferred("add_child", csound_instances[i]);
@@ -202,6 +203,7 @@ void CsoundServer::add_csound(int p_at_pos) {
     csound_godot->mute = false;
     csound_godot->bypass = false;
     csound_godot->volume_db = 0;
+    csound_godot->tab = 0;
 
     csound_map[attempt] = csound_godot;
     call_deferred("add_child", csound_godot);
@@ -335,6 +337,19 @@ float CsoundServer::get_csound_volume_db(int p_csound) const {
     return csound_instances[p_csound]->volume_db;
 }
 
+void CsoundServer::set_csound_tab(int p_csound, float p_tab) {
+    ERR_FAIL_INDEX(p_csound, csound_instances.size());
+
+    edited = true;
+
+    csound_instances[p_csound]->tab = p_tab;
+}
+
+int CsoundServer::get_csound_tab(int p_csound) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
+    return csound_instances[p_csound]->tab;
+}
+
 void CsoundServer::set_csound_solo(int p_csound, bool p_enable) {
     ERR_FAIL_INDEX(p_csound, csound_instances.size());
 
@@ -454,6 +469,7 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound->mute = p_csound_layout->csounds[i].mute;
         csound->bypass = p_csound_layout->csounds[i].bypass;
         csound->volume_db = p_csound_layout->csounds[i].volume_db;
+        csound->tab = p_csound_layout->csounds[i].tab;
 
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
@@ -480,6 +496,7 @@ Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
         state->csounds.write[i].solo = csound_instances[i]->solo;
         state->csounds.write[i].bypass = csound_instances[i]->bypass;
         state->csounds.write[i].volume_db = csound_instances[i]->volume_db;
+        state->csounds.write[i].tab = csound_instances[i]->tab;
     }
 
     return state;
@@ -542,6 +559,9 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_volume_db", "csound_idx", "volume_db"),
                          &CsoundServer::set_csound_volume_db);
     ClassDB::bind_method(D_METHOD("get_csound_volume_db", "csound_idx"), &CsoundServer::get_csound_volume_db);
+
+    ClassDB::bind_method(D_METHOD("set_csound_tab", "csound_idx", "tab"), &CsoundServer::set_csound_tab);
+    ClassDB::bind_method(D_METHOD("get_csound_tab", "csound_idx"), &CsoundServer::get_csound_tab);
 
     ClassDB::bind_method(D_METHOD("set_csound_solo", "csound_idx", "enable"), &CsoundServer::set_csound_solo);
     ClassDB::bind_method(D_METHOD("is_csound_solo", "csound_idx"), &CsoundServer::is_csound_solo);

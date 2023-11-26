@@ -16,6 +16,7 @@ class CsoundLayout : public Resource {
         bool mute = false;
         bool bypass = false;
         float volume_db = 0.0f;
+        int tab = 0;
 
         Csound() {
         }

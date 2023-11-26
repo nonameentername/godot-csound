@@ -46,6 +46,7 @@ private:
     bool initialized;
 
     struct Channel {
+        String name;
         bool used = false;
         bool active = false;
         float peak_volume = AUDIO_MIN_PEAK_DB;
@@ -56,8 +57,11 @@ private:
 
     Vector<Vector<MYFLT>> input_channels;
     Vector<Channel> output_channels;
-    HashMap<String, Vector<MYFLT>> named_channel_input_buffers;
-    HashMap<String, Vector<MYFLT>> named_channel_output_buffers;
+
+    HashMap<String, Vector<MYFLT>> input_named_channels_buffer;
+
+    Vector<Channel> output_named_channels;
+    HashMap<String, int> named_channels;
 
     void initialize_channels(int p_frames);
 
@@ -105,6 +109,8 @@ public:
     const String &get_csound_name();
 
     int get_channel_count();
+    int get_named_channel_count();
+    String get_named_channel_name(int p_channel);
 
     double get_time_since_last_mix();
     double get_time_to_next_mix();

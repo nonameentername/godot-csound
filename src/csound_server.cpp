@@ -312,6 +312,16 @@ int CsoundServer::get_csound_channel_count(int p_csound) const {
     return csound_instances[p_csound]->get_channel_count();
 }
 
+int CsoundServer::get_csound_named_channel_count(int p_csound) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
+    return csound_instances[p_csound]->get_named_channel_count();
+}
+
+String CsoundServer::get_csound_named_channel_name(int p_csound, int p_channel) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), "");
+    return csound_instances[p_csound]->get_named_channel_name(p_channel);
+}
+
 void CsoundServer::set_csound_volume_db(int p_csound, float p_volume_db) {
     ERR_FAIL_INDEX(p_csound, csound_instances.size());
 
@@ -371,11 +381,18 @@ bool CsoundServer::is_csound_bypassing(int p_csound) const {
     instruments
 */
 
-float CsoundServer::get_csound_peak_volume_db(int p_csound, int p_channel) const {
+float CsoundServer::get_csound_channel_peak_volume_db(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
     ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_channels.size(), 0);
 
     return csound_instances[p_csound]->output_channels[p_channel].peak_volume;
+}
+
+float CsoundServer::get_csound_named_channel_peak_volume_db(int p_csound, int p_channel) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
+    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_named_channels.size(), 0);
+
+    return csound_instances[p_csound]->output_named_channels[p_channel].peak_volume;
 }
 
 bool CsoundServer::is_csound_channel_active(int p_csound, int p_channel) const {
@@ -383,6 +400,13 @@ bool CsoundServer::is_csound_channel_active(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_channels.size(), false);
 
     return csound_instances[p_csound]->output_channels[p_channel].active;
+}
+
+bool CsoundServer::is_csound_named_channel_active(int p_csound, int p_channel) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), false);
+    ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_named_channels.size(), false);
+
+    return csound_instances[p_csound]->output_named_channels[p_channel].active;
 }
 
 bool CsoundServer::load_default_csound_layout() {
@@ -510,6 +534,10 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_csound_index", "csound_name"), &CsoundServer::get_csound_index);
 
     ClassDB::bind_method(D_METHOD("get_csound_channel_count", "csound_idx"), &CsoundServer::get_csound_channel_count);
+    ClassDB::bind_method(D_METHOD("get_csound_named_channel_count", "csound_idx"),
+                         &CsoundServer::get_csound_named_channel_count);
+    ClassDB::bind_method(D_METHOD("get_csound_named_channel_name", "csound_idx"),
+                         &CsoundServer::get_csound_named_channel_name);
 
     ClassDB::bind_method(D_METHOD("set_csound_volume_db", "csound_idx", "volume_db"),
                          &CsoundServer::set_csound_volume_db);
@@ -524,11 +552,15 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_bypass", "csound_idx", "enable"), &CsoundServer::set_csound_bypass);
     ClassDB::bind_method(D_METHOD("is_csound_bypassing", "csound_idx"), &CsoundServer::is_csound_bypassing);
 
-    ClassDB::bind_method(D_METHOD("get_csound_peak_volume_db", "csound_idx", "channel"),
-                         &CsoundServer::get_csound_peak_volume_db);
+    ClassDB::bind_method(D_METHOD("get_csound_channel_peak_volume_db", "csound_idx", "channel"),
+                         &CsoundServer::get_csound_channel_peak_volume_db);
+    ClassDB::bind_method(D_METHOD("get_csound_named_channel_peak_volume_db", "csound_idx", "channel"),
+                         &CsoundServer::get_csound_named_channel_peak_volume_db);
 
     ClassDB::bind_method(D_METHOD("is_csound_channel_active", "csound_idx", "channel"),
                          &CsoundServer::is_csound_channel_active);
+    ClassDB::bind_method(D_METHOD("is_csound_named_channel_active", "csound_idx", "channel"),
+                         &CsoundServer::is_csound_named_channel_active);
 
     ClassDB::bind_method(D_METHOD("lock"), &CsoundServer::lock);
     ClassDB::bind_method(D_METHOD("unlock"), &CsoundServer::unlock);

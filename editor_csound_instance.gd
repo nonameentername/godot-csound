@@ -5,6 +5,7 @@ class_name EditorCsoundInstance
 var editor_interface: EditorInterface
 var dark_theme = false
 var audio_meter: EditorAudioMeterNotchesCsound
+var audio_meter2: EditorAudioMeterNotchesCsound
 var audio_value_preview_box: Panel
 var audio_value_preview_label: Label
 var solo: Button
@@ -25,6 +26,7 @@ var hovering_drop: bool
 var editor_csound_instances: EditorCsoundInstances
 var undo_redo: EditorUndoRedoManager
 var channel_container: HBoxContainer
+var named_channel_container: HBoxContainer
 
 
 class Channel:
@@ -34,6 +36,7 @@ class Channel:
 
 
 var channels: Array[Channel]
+var named_channels: Array[Channel]
 
 
 func _init():
@@ -49,10 +52,11 @@ func _init():
 
 func _ready():
 	csound_name = $VBoxContainer/LineEdit
-	channel_container = $VBoxContainer/HBoxContainer2
-	slider = $VBoxContainer/HBoxContainer2/Slider
-	audio_value_preview_box = $VBoxContainer/HBoxContainer2/Slider/AudioValuePreview
-	audio_value_preview_label = $VBoxContainer/HBoxContainer2/Slider/AudioValuePreview/AudioPreviewHBox/AudioPreviewLabel
+	channel_container = $VBoxContainer/HBoxContainer2/TabContainer/Channels
+	named_channel_container = $VBoxContainer/HBoxContainer2/TabContainer/Named
+	slider = $VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider
+	audio_value_preview_box = $VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview
+	audio_value_preview_label = $VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview/AudioPreviewHBox/AudioPreviewLabel
 	solo = $VBoxContainer/HBoxContainer/LeftHBox/solo
 	mute = $VBoxContainer/HBoxContainer/LeftHBox/mute
 	bypass = $VBoxContainer/HBoxContainer/LeftHBox/bypass
@@ -102,6 +106,28 @@ func _ready():
 	_update_theme()
 
 
+func _create_channel_progress_bar():
+	var channel_progress_bar: TextureProgressBar = TextureProgressBar.new()
+	channel_progress_bar.fill_mode = TextureProgressBar.FILL_BOTTOM_TO_TOP
+	channel_progress_bar.min_value = -80
+	channel_progress_bar.max_value = 24
+	channel_progress_bar.step = 0.1
+
+	channel_progress_bar.texture_under = enabled_vu
+	channel_progress_bar.tint_under = Color(0.75, 0.75, 0.75)
+	channel_progress_bar.texture_progress = enabled_vu
+
+	return channel_progress_bar
+
+
+func _create_channel():
+	var channel: Channel = Channel.new()
+	channel.peak = -200
+	channel.prev_active = false
+
+	return channel
+
+
 func _update_visiable_channels():
 	for channel in channel_container.get_children():
 		if is_instance_of(channel, TextureProgressBar):
@@ -111,54 +137,75 @@ func _update_visiable_channels():
 	channels.resize(CsoundServer.get_csound_channel_count(get_index()))
 
 	for i in range(0, CsoundServer.get_csound_channel_count(get_index())):
-		var channel: TextureProgressBar = TextureProgressBar.new()
-		channel.fill_mode = TextureProgressBar.FILL_BOTTOM_TO_TOP
-		channel.min_value = -80
-		channel.max_value = 24
-		channel.step = 0.1
-		channel_container.add_child(channel)
-		channels[i] = Channel.new()
-		channels[i].peak = -200
-		channels[i].vu = channel
-		channels[i].prev_active = false
+		var channel: Channel = _create_channel()
+		var channel_progress_bar: TextureProgressBar = _create_channel_progress_bar()
+		channel.vu = channel_progress_bar
+		channels[i] = channel
+		channel_container.add_child(channel_progress_bar)
 
-		channel.texture_under = enabled_vu
-		channel.tint_under = Color(0.75, 0.75, 0.75)
-		channel.texture_progress = enabled_vu
+	channel_container.remove_child(audio_meter)
+	channel_container.add_child(audio_meter)
+
+	for channel in named_channel_container.get_children():
+		if is_instance_of(channel, TextureProgressBar):
+			named_channel_container.remove_child(channel)
+
+	named_channels.clear()
+	named_channels.resize(CsoundServer.get_csound_named_channel_count(get_index()))
+
+	for i in range(0, CsoundServer.get_csound_named_channel_count(get_index())):
+		var channel: Channel = _create_channel()
+		var channel_progress_bar: TextureProgressBar = _create_channel_progress_bar()
+		channel_progress_bar.tooltip_text = CsoundServer.get_csound_named_channel_name(
+			get_index(), i
+		)
+		channel.vu = channel_progress_bar
+		named_channels[i] = channel
+		named_channel_container.add_child(channel_progress_bar)
+
+	named_channel_container.remove_child(audio_meter2)
+	named_channel_container.add_child(audio_meter2)
 
 
 func _process(_delta):
-	if channels.size() != CsoundServer.get_csound_channel_count(get_index()):
+	if (
+		channels.size() != CsoundServer.get_csound_channel_count(get_index())
+		or named_channels.size() != CsoundServer.get_csound_named_channel_count(get_index())
+	):
 		_update_visiable_channels()
 
 	for i in range(0, channels.size()):
 		var real_peak = -100
 
-		#var activity_found: bool = false
-
 		if CsoundServer.is_csound_channel_active(get_index(), i):
-			#activity_found = true
-			real_peak = max(real_peak, CsoundServer.get_csound_peak_volume_db(get_index(), i))
+			real_peak = max(
+				real_peak, CsoundServer.get_csound_channel_peak_volume_db(get_index(), i)
+			)
 
-		if real_peak > channels[i].peak:
-			channels[i].peak = real_peak
-		else:
-			channels[i].peak -= get_process_delta_time() * 60.0
+		_update_channel_vu(channels[i], real_peak)
 
-		channels[i].vu.value = channels[i].peak
+	for i in range(0, named_channels.size()):
+		var real_peak = -100
 
-		#if activity_found != channels[i].prev_active:
-		#	if activity_found:
-		#		channels[i].vu.texture_over = Texture2D.new()
-		#	else:
-		#		channels[i].vu.texture_over = disabled_vu
+		if CsoundServer.is_csound_named_channel_active(get_index(), i):
+			real_peak = max(
+				real_peak, CsoundServer.get_csound_named_channel_peak_volume_db(get_index(), i)
+			)
 
-		#	channels[i].prev_active = activity_found
+		_update_channel_vu(named_channels[i], real_peak)
 
-		if _scaled_db_to_normalized_volume(channels[i].peak) > 0:
-			channels[i].vu.texture_over = null
-		else:
-			channels[i].vu.texture_over = disabled_vu
+
+func _update_channel_vu(channel, real_peak):
+	if real_peak > channel.peak:
+		channel.peak = real_peak
+	else:
+		channel.peak -= get_process_delta_time() * 60.0
+	channel.vu.value = channel.peak
+
+	if _scaled_db_to_normalized_volume(channel.peak) > 0:
+		channel.vu.texture_over = null
+	else:
+		channel.vu.texture_over = disabled_vu
 
 
 func _notification(what):
@@ -333,7 +380,11 @@ func _update_theme():
 
 	if not is_instance_valid(audio_meter):
 		audio_meter = EditorAudioMeterNotchesCsound.new()
-		$VBoxContainer/HBoxContainer2.add_child(audio_meter)
+		channel_container.add_child(audio_meter)
+
+	if not is_instance_valid(audio_meter2):
+		audio_meter2 = EditorAudioMeterNotchesCsound.new()
+		named_channel_container.add_child(audio_meter2)
 
 
 func _get_drag_data(at_position):

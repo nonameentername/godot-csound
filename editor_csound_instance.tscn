@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://editor_csound_instance.gd" id="1_3m284"]
 
-[sub_resource type="Image" id="Image_jbnva"]
+[sub_resource type="Image" id="Image_0ilir"]
 data = {
 "data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 94, 94, 127, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 231, 255, 94, 94, 54, 255, 94, 94, 57, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 231, 255, 94, 94, 54, 255, 94, 94, 57, 255, 93, 93, 233, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 93, 93, 41, 255, 255, 255, 0, 255, 255, 255, 0, 255, 97, 97, 42, 255, 93, 93, 233, 255, 93, 93, 232, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 44, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 44, 255, 255, 255, 0, 255, 97, 97, 42, 255, 97, 97, 42, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 235, 255, 94, 94, 234, 255, 95, 95, 43, 255, 255, 255, 0, 255, 255, 255, 0, 255, 96, 96, 45, 255, 93, 93, 235, 255, 94, 94, 234, 255, 95, 95, 43, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 93, 93, 235, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 233, 255, 95, 95, 59, 255, 96, 96, 61, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 93, 93, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
 "format": "RGBA8",
@@ -12,7 +12,7 @@ data = {
 }
 
 [sub_resource type="ImageTexture" id="ImageTexture_qpgwm"]
-image = SubResource("Image_jbnva")
+image = SubResource("Image_0ilir")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_558k6"]
 content_margin_left = 8.0
@@ -103,14 +103,22 @@ mouse_filter = 1
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2"]
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-tooltip_text = " 0.0 dB"
+size_flags_horizontal = 3
+
+[node name="Channels" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+
+[node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels"]
+layout_mode = 2
+tooltip_text = "0.0 dB"
 max_value = 1.0
 step = 0.0
 value = 0.729073
 
-[node name="AudioValuePreview" type="Panel" parent="VBoxContainer/HBoxContainer2/Slider"]
+[node name="AudioValuePreview" type="Panel" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider"]
 visible = false
 top_level = true
 layout_mode = 0
@@ -121,7 +129,7 @@ offset_bottom = 15.4581
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_558k6")
 
-[node name="AudioPreviewHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/Slider/AudioValuePreview"]
+[node name="AudioPreviewHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -129,13 +137,18 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AudioPreviewLabel" type="Label" parent="VBoxContainer/HBoxContainer2/Slider/AudioValuePreview/AudioPreviewHBox"]
+[node name="AudioPreviewLabel" type="Label" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview/AudioPreviewHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
-text = " 0.0 dB"
+text = "0.0 dB"
+
+[node name="Named" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer"]
+visible = false
+custom_minimum_size = Vector2(150, 128)
+layout_mode = 2
 
 [node name="Tree" type="Tree" parent="VBoxContainer"]
 layout_mode = 2
@@ -155,6 +168,6 @@ one_shot = true
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/solo" to="." method="_solo_toggled"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/mute" to="." method="_mute_toggled"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/LeftHBox/bypass" to="." method="_bypass_toggled"]
-[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/Slider" to="." method="_value_changed"]
-[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/Slider" to="." method="_show_value"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider" to="." method="_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider" to="." method="_show_value"]
 [connection signal="timeout" from="Timer" to="." method="_hide_value_preview"]

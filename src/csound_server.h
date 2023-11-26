@@ -65,6 +65,8 @@ public:
     String get_csound_name_options() const;
 
     int get_csound_channel_count(int p_csound) const;
+    int get_csound_named_channel_count(int p_csound) const;
+    String get_csound_named_channel_name(int p_csound, int p_channel) const;
 
     void set_csound_volume_db(int p_csound, float p_volume_db);
     float get_csound_volume_db(int p_csound) const;
@@ -87,9 +89,11 @@ public:
     void swap_csound_instruments(int p_bus, int p_instrument, int p_by_instrument);
     */
 
-    float get_csound_peak_volume_db(int p_csound, int p_channel) const;
+    float get_csound_channel_peak_volume_db(int p_csound, int p_channel) const;
+    float get_csound_named_channel_peak_volume_db(int p_csound, int p_channel) const;
 
     bool is_csound_channel_active(int p_csound, int p_channel) const;
+    bool is_csound_named_channel_active(int p_csound, int p_channel) const;
 
     bool load_default_csound_layout();
     void set_csound_layout(const Ref<CsoundLayout> &p_csound_layout);

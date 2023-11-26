@@ -4,12 +4,26 @@
 
 using namespace godot;
 
+AudioEffectSetCsoundNamedChannel::AudioEffectSetCsoundNamedChannel() {
+    CsoundServer::get_singleton()->connect("csound_layout_changed", Callable(this, "csound_layout_changed"));
+}
+
+AudioEffectSetCsoundNamedChannel::~AudioEffectSetCsoundNamedChannel() {
+}
+
 void AudioEffectSetCsoundNamedChannel::set_csound_name(const String &name) {
     csound_name = name;
 }
 
-const String &AudioEffectSetCsoundNamedChannel::get_csound_name() {
-    return csound_name;
+const String &AudioEffectSetCsoundNamedChannel::get_csound_name() const {
+    for (int i = 0; i < CsoundServer::get_singleton()->get_csound_count(); i++) {
+        if (CsoundServer::get_singleton()->get_csound_name(i) == csound_name) {
+            return csound_name;
+        }
+    }
+
+    static const String default_name = "Main";
+    return default_name;
 }
 
 void AudioEffectSetCsoundNamedChannel::set_channel_left(String p_channel_left) {
@@ -36,11 +50,35 @@ bool AudioEffectSetCsoundNamedChannel::get_forward_audio() {
     return forward_audio;
 }
 
+bool AudioEffectSetCsoundNamedChannel::_set(const StringName &p_name, const Variant &p_value) {
+    if ((String)p_name == "csound_name") {
+        set_csound_name(p_value);
+        return true;
+    }
+    return false;
+}
+
+bool AudioEffectSetCsoundNamedChannel::_get(const StringName &p_name, Variant &r_ret) const {
+    if ((String)p_name == "csound_name") {
+        r_ret = get_csound_name();
+        return true;
+    }
+    return false;
+}
+
+void AudioEffectSetCsoundNamedChannel::csound_layout_changed() {
+    notify_property_list_changed();
+}
+
+void AudioEffectSetCsoundNamedChannel::_get_property_list(List<PropertyInfo> *p_list) const {
+    String options = CsoundServer::get_singleton()->get_csound_name_options();
+    p_list->push_back(PropertyInfo(Variant::STRING_NAME, "csound_name", PROPERTY_HINT_ENUM, options));
+}
+
 void AudioEffectSetCsoundNamedChannel::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioEffectSetCsoundNamedChannel::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioEffectSetCsoundNamedChannel::get_csound_name);
-    ClassDB::add_property("AudioEffectSetCsoundNamedChannel", PropertyInfo(Variant::STRING, "csound_name"),
-                          "set_csound_name", "get_csound_name");
+
     ClassDB::bind_method(D_METHOD("set_channel_left", "channel"), &AudioEffectSetCsoundNamedChannel::set_channel_left);
     ClassDB::bind_method(D_METHOD("get_channel_left"), &AudioEffectSetCsoundNamedChannel::get_channel_left);
     ClassDB::add_property("AudioEffectSetCsoundNamedChannel", PropertyInfo(Variant::STRING, "channel_left"),
@@ -55,6 +93,8 @@ void AudioEffectSetCsoundNamedChannel::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_forward_audio"), &AudioEffectSetCsoundNamedChannel::get_forward_audio);
     ClassDB::add_property("AudioEffectSetCsoundNamedChannel", PropertyInfo(Variant::BOOL, "forward_audio"),
                           "set_forward_audio", "get_forward_audio");
+
+    ClassDB::bind_method(D_METHOD("csound_layout_changed"), &AudioEffectSetCsoundNamedChannel::csound_layout_changed);
 }
 
 Ref<AudioEffectInstance> AudioEffectSetCsoundNamedChannel::_instantiate() {
@@ -87,7 +127,7 @@ void AudioEffectSetCsoundNamedChannelInstance::_process(const void *p_src_frames
 
     CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
     if (csound_server != NULL) {
-        CsoundGodot *csound_godot = csound_server->get_csound(base->csound_name);
+        CsoundGodot *csound_godot = csound_server->get_csound(base->get_csound_name());
         if (csound_godot != NULL) {
             int p_rate = 1;
             csound_godot->set_named_channel_sample(src_frames, p_rate, p_frame_count, base->channel_left,

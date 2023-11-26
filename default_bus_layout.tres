@@ -4,14 +4,12 @@
 resource_name = "SpectrumAnalyzer"
 
 [sub_resource type="AudioEffectSetCsoundNamedChannel" id="AudioEffectSetCsoundNamedChannel_t02nr"]
-csound_name = "Main"
 channel_left = "instr_4_input_left"
 channel_right = "instr_4_input_right"
 forward_audio = false
 resource_name = "SetCsoundNamedChannel"
 
 [sub_resource type="AudioEffectSetCsoundChannel" id="AudioEffectSetCsoundChannel_hx4qo"]
-csound_name = "Main"
 forward_audio = false
 resource_name = "SetCsoundChannel"
 

@@ -4,18 +4,14 @@
 [ext_resource type="MidiFileReader" uid="uid://bcfsoo3bbifnj" path="res://assets/example.mid" id="2_t0j6e"]
 
 [sub_resource type="AudioStreamCsound" id="AudioStreamCsound_a6stl"]
-csound_name = "Main"
 
 [sub_resource type="AudioStreamCsoundChannel" id="AudioStreamCsoundChannel_kfyye"]
-csound_name = "Main"
 
 [sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_4tb6j"]
-csound_name = "Main"
 channel_left = "instr_1_left"
 channel_right = "instr_1_right"
 
 [sub_resource type="AudioStreamCsoundNamedChannel" id="AudioStreamCsoundNamedChannel_ove8l"]
-csound_name = "Main"
 channel_left = "instr_4_left"
 channel_right = "instr_4_right"
 

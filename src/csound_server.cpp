@@ -242,7 +242,7 @@ void CsoundServer::move_csound(int p_csound, int p_to_pos) {
 void CsoundServer::set_csound_name(int p_csound, const String &p_name) {
     ERR_FAIL_INDEX(p_csound, csound_instances.size());
     if (p_csound == 0 && p_name != "Main") {
-        return; // csound 0 is always master
+        return; // csound 0 is always main
     }
 
     edited = true;
@@ -293,6 +293,18 @@ int CsoundServer::get_csound_index(const StringName &p_csound_name) const {
         }
     }
     return -1;
+}
+
+String CsoundServer::get_csound_name_options() const {
+    String options;
+    for (int i = 0; i < get_csound_count(); i++) {
+        if (i > 0) {
+            options += ",";
+        }
+        String name = get_csound_name(i);
+        options += name;
+    }
+    return options;
 }
 
 int CsoundServer::get_csound_channel_count(int p_csound) const {

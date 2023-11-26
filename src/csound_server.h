@@ -62,6 +62,8 @@ public:
     String get_csound_name(int p_csound) const;
     int get_csound_index(const StringName &p_csound_name) const;
 
+    String get_csound_name_options() const;
+
     int get_csound_channel_count(int p_csound) const;
 
     void set_csound_volume_db(int p_csound, float p_volume_db);

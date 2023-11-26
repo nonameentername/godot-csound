@@ -29,7 +29,13 @@ public:
 
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;
     void set_csound_name(const String &name);
-    const String &get_csound_name();
+    const String &get_csound_name() const;
+
+    bool _set(const StringName &p_name, const Variant &p_value);
+    bool _get(const StringName &p_name, Variant &r_ret) const;
+    void _get_property_list(List<PropertyInfo> *p_list) const;
+
+    void csound_layout_changed();
 
 protected:
     static void _bind_methods();

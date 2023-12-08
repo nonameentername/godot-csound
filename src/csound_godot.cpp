@@ -178,14 +178,17 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
     }
 
-    float channel_peak[output_channels.size()];
+    Vector<float> channel_peak;
+    channel_peak.resize(output_channels.size());
     for (int i = 0; i < output_channels.size(); i++) {
-        channel_peak[i] = 0;
+        channel_peak.write[i] = 0;
     }
-    float named_channel_peak[output_named_channels.size()];
+    Vector<float> named_channel_peak;
+    named_channel_peak.resize(output_named_channels.size());
     for (int i = 0; i < output_named_channels.size(); i++) {
-        named_channel_peak[i] = 0;
+        named_channel_peak.write[i] = 0;
     }
+    temp_buffer.resize(csound->GetKsmps());
 
     while (to_fill > 0) {
         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
@@ -197,8 +200,6 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
 
         for (KeyValue<String, Vector<MYFLT>> &E : input_named_channels_buffer) {
-            Vector<MYFLT> temp_buffer;
-            temp_buffer.resize(csound->GetKsmps());
             for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                 temp_buffer.write[frame] = input_named_channels_buffer.get(E.key)[ksmps_buffer_index + frame] * scale;
                 input_named_channels_buffer.get(E.key).write[ksmps_buffer_index + frame] = 0;
@@ -237,7 +238,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
                     float value = csound->GetSpoutSample(frame, channel) / scale * volume;
                     float p = ABS(value);
                     if (p > channel_peak[channel]) {
-                        channel_peak[channel] = p;
+                        channel_peak.write[channel] = p;
                     }
                     output_channels.write[channel].buffer.write[ksmps_buffer_index + frame] = value;
                 }
@@ -252,13 +253,12 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
             }
         } else {
             for (int channel = 0; channel < output_named_channels.size(); channel++) {
-                MYFLT temp_buffer[csound->GetKsmps()];
-                csound->GetAudioChannel(output_named_channels[channel].name.utf8().get_data(), temp_buffer);
+                csound->GetAudioChannel(output_named_channels[channel].name.utf8().get_data(), temp_buffer.ptrw());
                 for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                     float value = temp_buffer[frame] / scale * volume;
                     float p = ABS(value);
                     if (p > named_channel_peak[channel]) {
-                        named_channel_peak[channel] = p;
+                        named_channel_peak.write[channel] = p;
                     }
                     output_named_channels.write[channel].buffer.write[ksmps_buffer_index + frame] = value;
                 }

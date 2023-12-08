@@ -9,6 +9,7 @@ ksmps = 32
 nchnls = 2
 0dbfs = 1
 
+chnset 1, "cutoff"
 
 ;load soundfonts
 isf	sfload	"assets/example.sf2"

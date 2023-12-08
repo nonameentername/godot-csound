@@ -2,9 +2,10 @@ UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
 PLATFORM=linux
-endif
-ifeq ($(UNAME), Darwin)
+else ifeq ($(UNAME), Darwin)
 PLATFORM=osx
+else
+PLATFORM=windows
 endif
 
 all:

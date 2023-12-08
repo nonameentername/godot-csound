@@ -12,10 +12,10 @@ class AudioEffectSetCsoundChannel;
 
 class AudioEffectSetCsoundChannelInstance : public AudioEffectInstance {
     GDCLASS(AudioEffectSetCsoundChannelInstance, AudioEffectInstance);
-    friend class AudioEffectCaptureCsound;
-    Ref<AudioEffectSetCsoundChannel> base;
 
 private:
+    friend class AudioEffectSetCsoundChannel;
+    Ref<AudioEffectSetCsoundChannel> base;
     bool has_data = false;
 
 public:
@@ -28,7 +28,7 @@ protected:
 
 class AudioEffectSetCsoundChannel : public AudioEffect {
     GDCLASS(AudioEffectSetCsoundChannel, AudioEffect)
-    friend class AudioEffectCaptureCsoundInstance;
+    friend class AudioEffectSetCsoundChannelInstance;
 
     String csound_name;
     int channel_left = 0;

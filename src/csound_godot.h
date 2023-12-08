@@ -60,6 +60,7 @@ private:
     Vector<Channel> output_channels;
 
     HashMap<String, Vector<MYFLT>> input_named_channels_buffer;
+    Vector<MYFLT> temp_buffer;
 
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;

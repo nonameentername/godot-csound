@@ -1,3 +1,4 @@
+*.obj
 *.os
 *.so
 .cache
@@ -9,6 +10,7 @@ assets/example.mid
 assets/example.sf2
 assets/example2.mid
 bin/csound
+bin/windows
 bin/x11/
 build
 build-log.txt

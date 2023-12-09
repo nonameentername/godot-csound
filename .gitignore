@@ -10,6 +10,7 @@ assets/example.mid
 assets/example.sf2
 assets/example2.mid
 bin/csound
+bin/linux
 bin/windows
 bin/x11/
 build

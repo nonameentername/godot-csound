@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 
 
 def normalize_path(val, env):
@@ -14,7 +15,10 @@ def validate_parent_dir(key, val, env):
 libname = "csoundgodot"
 projectdir = "."
 
-localEnv = Environment(tools=["mingw"], PLATFORM="")
+if sys.platform == 'windows':
+    localEnv = Environment(tools=["mingw"], PLATFORM="")
+else:
+    localEnv = Environment(tools=["default"], PLATFORM="")
 
 customs = ["custom.py"]
 customs = [os.path.abspath(path) for path in customs]
@@ -59,7 +63,7 @@ if env["platform"] == "windows":
     #env.Append(RPATH=['bin/csound/bin', '.'])
 else:
     env.Append(LIBPATH=['bin/csound/lib'])
-    #env.Append(RPATH=['bin/csound/lib', '.'])
+    env.Append(RPATH=['bin/csound/lib', '.'])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
@@ -76,9 +80,9 @@ library = env.SharedLibrary(
     source=sources,
 )
 
-copy = env.InstallAs("{}/bin/{}/lib{}".format(projectdir, env["platform"], file), library)
+#copy = env.InstallAs("{}/bin/{}/lib{}".format(projectdir, env["platform"], file), library)
 
-default_args = [library, copy]
+default_args = [library]
 if localEnv.get("compiledb", False):
     default_args += [compilation_db]
 Default(*default_args)

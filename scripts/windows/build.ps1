@@ -15,4 +15,11 @@ cmake --build build --config Release
 Write-Host "Install Csound"
 
 cmake --build build --target install --config Release
+
 popd
+
+rm bin/windows -r -Force
+md bin/windows
+
+cp -r modules/csound/build/Release/*.dll bin/windows
+cp -r modules/csound/build/Release/*.DLL bin/windows

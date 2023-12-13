@@ -163,6 +163,9 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
     MYFLT scale = csound->Get0dBFS();
 
     initialize_channels(p_frames);
+    if (temp_buffer.size() != csound->GetKsmps()) {
+        temp_buffer.resize(csound->GetKsmps());
+    }
 
     int ksmps_buffer_index = 0;
 
@@ -188,7 +191,6 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
     for (int i = 0; i < output_named_channels.size(); i++) {
         named_channel_peak.write[i] = 0;
     }
-    temp_buffer.resize(csound->GetKsmps());
 
     while (to_fill > 0) {
         for (int frame = 0; frame < csound->GetKsmps(); frame++) {

@@ -1,21 +1,28 @@
 godot-csound
 ============
 
-Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.1.1 stable release.
+Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.2.0 stable release.
 
 How to Install
 --------------
 
 The first thing to do is make sure you have all of the required dependencies for
-building Csound. In a terminal, do the following:
+building Csound.
 
-Edit, as root, `/etc/apt/sources.list` and ensure that each line beginning with `deb` has another line below it that is identical except that `deb` is replaced with `deb-src`. Then run to install system dependencies for Ubuntu:
+Ubuntu
+------
 
-    sudo apt update
-    sudo apt build-dep csound
-    sudo apt install cmake
-    sudo apt install git
-    sudo apt install abcmidi
+In a terminal, run the following:
+
+    ./scripts/ubuntu/dependencies.sh
+
+Windows
+-------
+
+In powershell run the following as an Administator:
+
+    ./scripts/windows/system-dependencies.ps1
+    ./scripts/windows/dependencies.ps1
 
 Build
 -----
@@ -24,17 +31,9 @@ Initialize git submodules:
 
     git submodule update --init --recursive
 
-Create assets:
-
-    make assets
-
 Compile csound:
 
     make csound
-
-Compile godot-cpp library:
-
-    make godot-cpp
 
 Compile gdextension library:
 

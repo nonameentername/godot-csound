@@ -1,0 +1,14 @@
+[remap]
+
+importer="soundfont"
+type="SoundFontFileReader"
+uid="uid://dcoxujdx60ars"
+path="res://.godot/imported/FluidR3_GM.sf2-6794b17e71aae049a6ae5f272aa5942f.sf2str"
+
+[deps]
+
+source_file="res://assets/FluidR3_GM.sf2"
+dest_files=["res://.godot/imported/FluidR3_GM.sf2-6794b17e71aae049a6ae5f272aa5942f.sf2str"]
+
+[params]
+

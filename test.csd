@@ -12,7 +12,7 @@ nchnls = 2
 chnset 1, "cutoff"
 
 ;load soundfonts
-isf	sfload	"assets/example.sf2"
+isf	sfload	"assets/FluidR3_GM.sf2"
 	;sfplist isf
 	;sfplist ir
 	sfpassign	0, isf	

@@ -1,7 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://n6csjkhxjfm2"]
+[gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
 
 [ext_resource type="Script" path="res://main.cs" id="1"]
-[ext_resource type="MidiFileReader" uid="uid://bcfsoo3bbifnj" path="res://assets/example.mid" id="2_t0j6e"]
 
 [sub_resource type="AudioStreamCsound" id="AudioStreamCsound_a6stl"]
 
@@ -19,7 +18,6 @@ channel_right = "instr_4_right"
 
 [node name="main" type="Node2D"]
 script = ExtResource("1")
-midi_file = ExtResource("2_t0j6e")
 
 [node name="CheckButton" type="CheckButton" parent="."]
 offset_left = 229.0

@@ -19,18 +19,11 @@ godot-cpp:
 
 .ONESHELL:
 csound:
-	dir=$(realpath bin)
-	mkdir -p modules/csound/build
-	cd modules/csound/build
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=$$dir/csound -DBUILD_JAVA_INTERFACE=OFF ..
-	make -j 20
-	make install
-
-.PHONY: assets godot-cpp
-assets:
-	cp /usr/share/sounds/sf2/FluidR3_GM.sf2 assets/example.sf2
-	abc2midi assets/example.abc -o assets/example.mid
-	abc2midi assets/example2.abc -o assets/example2.mid
+ifeq ($(PLATFORM), linux)
+	./scripts/ubuntu/build.sh
+else
+	./scripts/windows/build.sh
+endif
 
 format:
 	clang-format -i src/*.cpp src/*.h

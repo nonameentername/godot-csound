@@ -1,3 +1,4 @@
+*.o
 *.obj
 *.os
 *.so
@@ -9,8 +10,9 @@
 assets/example.mid
 assets/example.sf2
 assets/example2.mid
-bin/csound
 bin/linux
+bin/wasm
+bin/web
 bin/windows
 bin/x11/
 build

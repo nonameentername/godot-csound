@@ -55,15 +55,29 @@ env.Alias("compiledb", compilation_db)
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 csound_library = "csound64"
+
 env.Append(LIBS=[csound_library])
-env.Append(CPPPATH=["bin/csound/include/csound"])
 
 if env["platform"] == "windows":
     env.Append(LIBPATH=['bin/csound/lib64'])
+    env.Append(CPPPATH=["bin/csound/include/csound"])
     #env.Append(RPATH=['bin/csound/bin', '.'])
-else:
-    env.Append(LIBPATH=['bin/csound/lib'])
-    env.Append(RPATH=['bin/csound/lib', '.'])
+elif env["platform"] == "web":
+    if env['dev_build']:
+        env.Append(LIBPATH=['bin/web/debug/lib'])
+        env.Append(CPPPATH=["bin/web/debug/include/csound"])
+    else:
+        env.Append(LIBPATH=['bin/web/release/lib'])
+        env.Append(CPPPATH=["bin/web/release/include/csound"])
+elif env["platform"] == "linux":
+    if env['dev_build']:
+        env.Append(LIBPATH=['bin/linux/debug/lib'])
+        env.Append(RPATH=['bin/linux/debug/lib', '.'])
+        env.Append(CPPPATH=["bin/linux/debug/include/csound"])
+    else:
+        env.Append(LIBPATH=['bin/linux/release/lib'])
+        env.Append(RPATH=['bin/linux/release/lib', '.'])
+        env.Append(CPPPATH=["bin/linux/release/include/csound"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

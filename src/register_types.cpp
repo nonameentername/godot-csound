@@ -34,9 +34,6 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
     }
 
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-    }
-
-    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
         ClassDB::register_class<CsoundGodot>();
         ClassDB::register_class<CsoundServer>();
         ClassDB::register_class<CsoundLayout>();
@@ -57,6 +54,9 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<AudioEffectSetCsoundChannelInstance>();
         ClassDB::register_class<AudioEffectSetCsoundNamedChannel>();
         ClassDB::register_class<AudioEffectSetCsoundNamedChannelInstance>();
+    }
+
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
         ClassDB::register_class<EditorAudioMeterNotchesCsound>();
     }
 }

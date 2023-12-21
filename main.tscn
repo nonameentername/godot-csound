@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
 
-[ext_resource type="Script" path="res://main.cs" id="1"]
+[ext_resource type="Script" path="res://main.gd" id="1_ob6y6"]
 
 [sub_resource type="AudioStreamCsound" id="AudioStreamCsound_a6stl"]
 
@@ -17,7 +17,7 @@ channel_right = "instr_4_right"
 [sub_resource type="AudioStreamMyTone" id="AudioStreamMyTone_31rl7"]
 
 [node name="main" type="Node2D"]
-script = ExtResource("1")
+script = ExtResource("1_ob6y6")
 
 [node name="CheckButton" type="CheckButton" parent="."]
 offset_left = 229.0
@@ -98,8 +98,8 @@ stream = SubResource("AudioStreamMyTone_31rl7")
 autoplay = true
 bus = &"MyToneNamedChannel"
 
-[connection signal="toggled" from="CheckButton" to="." method="_on_CheckButton_toggled"]
-[connection signal="toggled" from="CheckButton2" to="." method="_on_CheckButton2_toggled"]
-[connection signal="toggled" from="CheckButton3" to="." method="_on_CheckButton3_toggled"]
+[connection signal="toggled" from="CheckButton" to="." method="_on_check_button_toggled"]
+[connection signal="toggled" from="CheckButton2" to="." method="_on_check_button_2_toggled"]
+[connection signal="toggled" from="CheckButton3" to="." method="_on_check_button_3_toggled"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="value_changed" from="VSlider" to="." method="_on_v_slider_value_changed"]

@@ -1,6 +1,6 @@
 <CsoundSynthesizer>
 <CsOptions>
--o dac -B 4096 -+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
+-+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
 </CsOptions>
 <CsInstruments>
 

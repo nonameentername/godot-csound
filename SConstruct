@@ -59,8 +59,12 @@ csound_library = "csound64"
 env.Append(LIBS=[csound_library])
 
 if env["platform"] == "windows":
-    env.Append(LIBPATH=['bin/csound/lib64'])
-    env.Append(CPPPATH=["bin/csound/include/csound"])
+    if env['dev_build']:
+        env.Append(LIBPATH=['bin/windows/debug/lib'])
+        env.Append(CPPPATH=["bin/windows/debug/include/csound"])
+    else:
+        env.Append(LIBPATH=['bin/windows/release/lib'])
+        env.Append(CPPPATH=["bin/windows/release/include/csound"])
     #env.Append(RPATH=['bin/csound/bin', '.'])
 elif env["platform"] == "web":
     if env['dev_build']:

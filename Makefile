@@ -60,10 +60,20 @@ web:
 	$(MAKE) shell-web SHELL_COMMAND='./scripts/web/build.sh'
 	$(MAKE) shell-web SHELL_COMMAND='./scripts/web/build_debug.sh'
 
+docker-mingw:
+	docker build -t godot-csound-mingw ./scripts/mingw
+
+shell-mingw: docker-mingw
+	docker run -it --rm -v ${CURDIR}:/tmp/workdir --user ${UID}:${GID} -w /tmp/workdir godot-csound-mingw ${SHELL_COMMAND}
+
+mingw:
+	$(MAKE) shell-mingw SHELL_COMMAND='./scripts/mingw/build.sh'
+	$(MAKE) shell-mingw SHELL_COMMAND='./scripts/mingw/build_debug.sh'
+
 docker-windows:
 	docker build -t godot-csound-windows ./scripts/windows
 
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:c:\\workdir -w c:\\workdir godot-csound-windows powershell
 
-all: ubuntu web
+all: ubuntu web mingw

@@ -32,6 +32,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$src_dir/vcpkg/scripts/buildsystems/vcpkg.cmake \
 make
 make install
 
+cp $build_dir/csound64.dll $prefix/lib/
 cp $prefix/lib/libcsound64.dll.a $prefix/lib/libcsound64.a
 cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libstdc++-6.dll $dir/bin/windows/debug/lib/
 cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libgcc_s_seh-1.dll $dir/bin/windows/debug/lib/

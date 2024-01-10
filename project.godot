@@ -12,8 +12,8 @@ config_version=5
 
 config/name="CsoundGodot"
 run/main_scene="res://main.tscn"
-config/features=PackedStringArray("4.2")
-config/icon="res://icon.png"
+config/features=PackedStringArray("4.2", "GL Compatibility")
+config/icon="res://icon.svg"
 
 [audio]
 
@@ -34,5 +34,7 @@ enabled=PackedStringArray("res://addons/csound/plugin.cfg")
 
 [rendering]
 
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_environment="res://default_env.tres"
 quality/2d/use_pixel_snap=true

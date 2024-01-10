@@ -41,39 +41,39 @@ endif
 SHELL_COMMAND = bash
 
 docker-ubuntu:
-	docker build -t godot-csound-ubuntu ./scripts/ubuntu
+	docker build -t godot-csound-ubuntu ./platform/ubuntu
 
 shell-ubuntu: docker-ubuntu
-	docker run -it --rm -v ${CURDIR}:/tmp/workdir --user ${UID}:${GID} -w /tmp/workdir godot-csound-ubuntu ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-ubuntu ${SHELL_COMMAND}
 
 ubuntu:
-	$(MAKE) shell-ubuntu SHELL_COMMAND='./scripts/ubuntu/build.sh'
-	$(MAKE) shell-ubuntu SHELL_COMMAND='./scripts/ubuntu/build_debug.sh'
+	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_release.sh'
+	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
 
 docker-web:
-	docker build -t godot-csound-web ./scripts/web
+	docker build -t godot-csound-web ./platform/web
 
 shell-web: docker-web
-	docker run -it --rm -v ${CURDIR}:/tmp/workdir --user ${UID}:${GID} -w /tmp/workdir godot-csound-web ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-web ${SHELL_COMMAND}
 
 web:
-	$(MAKE) shell-web SHELL_COMMAND='./scripts/web/build.sh'
-	$(MAKE) shell-web SHELL_COMMAND='./scripts/web/build_debug.sh'
+	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_release.sh'
+	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_debug.sh'
 
 docker-mingw:
-	docker build -t godot-csound-mingw ./scripts/mingw
+	docker build -t godot-csound-mingw ./platform/mingw
 
 shell-mingw: docker-mingw
-	docker run -it --rm -v ${CURDIR}:/tmp/workdir --user ${UID}:${GID} -w /tmp/workdir godot-csound-mingw ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-mingw ${SHELL_COMMAND}
 
 mingw:
-	$(MAKE) shell-mingw SHELL_COMMAND='./scripts/mingw/build.sh'
-	$(MAKE) shell-mingw SHELL_COMMAND='./scripts/mingw/build_debug.sh'
+	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_release.sh'
+	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_debug.sh'
 
 docker-windows:
-	docker build -t godot-csound-windows ./scripts/windows
+	docker build -t godot-csound-windows ./platform/windows
 
 shell-windows: docker-windows
-	docker run -it --rm -v ${CURDIR}:c:\\workdir -w c:\\workdir godot-csound-windows powershell
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
 all: ubuntu web mingw

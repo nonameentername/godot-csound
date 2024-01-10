@@ -43,6 +43,12 @@ windows.release.x86_64 = {
 "windows/release/lib/libgcc_s_seh-1.dll": "",
 "windows/release/lib/libwinpthread-1.dll": ""
 }
+web.release.wasm32 = {
+"web/release/lib/libcsound.so": ""
+}
+web.debug.wasm32 = {
+"web/debug/lib/libcsound.so": ""
+}
 
 [icons]
 

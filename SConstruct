@@ -54,9 +54,11 @@ env.Alias("compiledb", compilation_db)
 
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
-csound_library = "csound64"
-
-env.Append(LIBS=[csound_library])
+if env["platform"] == "web":
+    csound_library = "csound"
+else:
+    csound_library = "csound64"
+    env.Append(LIBS=[csound_library])
 
 if env["platform"] == "windows":
     if env['dev_build']:
@@ -68,10 +70,12 @@ if env["platform"] == "windows":
     #env.Append(RPATH=['bin/csound/bin', '.'])
 elif env["platform"] == "web":
     if env['dev_build']:
-        env.Append(LIBPATH=['bin/web/debug/lib'])
+        env.Append(LIBPATH=['bin/web/debug/lib', 'modules/csound/build/web/debug/vcpkg_installed/wasm32-emscripten/lib'])
         env.Append(CPPPATH=["bin/web/debug/include/csound"])
+        env.Append(CPPFLAGS=["-g"])
+        env.Append(LINKFLAGS=["-g", "-s", "ERROR_ON_UNDEFINED_SYMBOLS=1"])
     else:
-        env.Append(LIBPATH=['bin/web/release/lib'])
+        env.Append(LIBPATH=['bin/web/release/lib', 'modules/csound/build/web/release/vcpkg_installed/wasm32-emscripten/lib'])
         env.Append(CPPPATH=["bin/web/release/include/csound"])
 elif env["platform"] == "linux":
     if env['dev_build']:

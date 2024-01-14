@@ -15,7 +15,7 @@ def validate_parent_dir(key, val, env):
 libname = "libcsoundgodot"
 projectdir = "."
 
-if sys.platform == 'windows':
+if sys.platform == "windows":
     localEnv = Environment(tools=["mingw"], PLATFORM="")
 else:
     localEnv = Environment(tools=["default"], PLATFORM="")
@@ -56,36 +56,49 @@ env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 if env["platform"] == "web":
     csound_library = "csound"
+elif env["platform"] == "macos":
+    csound_library = "CsoundLib64"
 else:
     csound_library = "csound64"
     env.Append(LIBS=[csound_library])
 
 if env["platform"] == "windows":
-    if env['dev_build']:
-        env.Append(LIBPATH=['bin/windows/debug/lib'])
+    if env["dev_build"]:
+        env.Append(LIBPATH=["bin/windows/debug/lib"])
         env.Append(CPPPATH=["bin/windows/debug/include/csound"])
     else:
-        env.Append(LIBPATH=['bin/windows/release/lib'])
+        env.Append(LIBPATH=["bin/windows/release/lib"])
         env.Append(CPPPATH=["bin/windows/release/include/csound"])
-    #env.Append(RPATH=['bin/csound/bin', '.'])
+    #env.Append(RPATH=["bin/csound/bin", "."])
 elif env["platform"] == "web":
-    if env['dev_build']:
-        env.Append(LIBPATH=['bin/web/debug/lib', 'modules/csound/build/web/debug/vcpkg_installed/wasm32-emscripten/lib'])
+    if env["dev_build"]:
+        env.Append(LIBPATH=["bin/web/debug/lib", "modules/csound/build/web/debug/vcpkg_installed/wasm32-emscripten/lib"])
         env.Append(CPPPATH=["bin/web/debug/include/csound"])
         env.Append(CPPFLAGS=["-g"])
         env.Append(LINKFLAGS=["-g", "-s", "ERROR_ON_UNDEFINED_SYMBOLS=1"])
     else:
-        env.Append(LIBPATH=['bin/web/release/lib', 'modules/csound/build/web/release/vcpkg_installed/wasm32-emscripten/lib'])
+        env.Append(LIBPATH=["bin/web/release/lib", "modules/csound/build/web/release/vcpkg_installed/wasm32-emscripten/lib"])
         env.Append(CPPPATH=["bin/web/release/include/csound"])
 elif env["platform"] == "linux":
-    if env['dev_build']:
-        env.Append(LIBPATH=['bin/linux/debug/lib'])
-        env.Append(RPATH=['bin/linux/debug/lib', '.'])
+    if env["dev_build"]:
+        env.Append(LIBPATH=["bin/linux/debug/lib"])
+        env.Append(RPATH=["bin/linux/debug/lib", "."])
         env.Append(CPPPATH=["bin/linux/debug/include/csound"])
     else:
-        env.Append(LIBPATH=['bin/linux/release/lib'])
-        env.Append(RPATH=['bin/linux/release/lib', '.'])
+        env.Append(LIBPATH=["bin/linux/release/lib"])
+        env.Append(RPATH=["bin/linux/release/lib", "."])
         env.Append(CPPPATH=["bin/linux/release/include/csound"])
+elif env["platform"] == "macos":
+    if env["dev_build"]:
+        env.Append(LINKFLAGS=["-framework", csound_library])
+        env.Append(LINKFLAGS=["-F", "bin/macos/debug/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", "@loader_path/../debug/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
+        env.Append(CPPPATH=["bin/macos/debug/Library/Frameworks/CsoundLib64.framework/Headers"])
+    else:
+        env.Append(LINKFLAGS=["-framework", csound_library])
+        env.Append(LINKFLAGS=["-F", "bin/macos/release/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path../Frameworks"])
+        env.Append(CPPPATH=["bin/macos/release/Library/Frameworks/CsoundLib64.framework/Headers"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

@@ -11,6 +11,7 @@ assets/example.mid
 assets/example.sf2
 assets/example2.mid
 bin/linux
+bin/macos
 bin/wasm
 bin/web
 bin/windows

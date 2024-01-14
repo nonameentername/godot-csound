@@ -70,10 +70,20 @@ mingw:
 	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_release.sh'
 	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_debug.sh'
 
+docker-osxcross:
+	docker build -t godot-csound-osxcross ./platform/osxcross
+
+shell-osxcross: docker-osxcross
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-osxcross ${SHELL_COMMAND}
+
+osxcross:
+	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_release.sh'
+	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_debug.sh'
+
 docker-windows:
 	docker build -t godot-csound-windows ./platform/windows
 
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
-all: ubuntu web mingw
+all: ubuntu web mingw osxcross

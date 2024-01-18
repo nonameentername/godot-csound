@@ -15,20 +15,11 @@ void MidiFileReader::clear_data() {
 }
 
 void MidiFileReader::set_data(PackedByteArray data) {
-    PackedByteArray in_array = data;
-    PackedByteArray out_array;
-    for (int i = 0; i < in_array.size(); i++) {
-        out_array.append(in_array[i]);
-    }
-    array_data = out_array;
+    array_data = data;
 }
 
 PackedByteArray MidiFileReader::get_data() {
-    PackedByteArray out_array;
-    for (int i = 0; i < array_data.size(); i++) {
-        out_array.append(array_data[i]);
-    }
-    return out_array;
+    return array_data;
 }
 
 String MidiFileReader::get_extension() {

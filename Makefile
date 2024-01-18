@@ -23,10 +23,11 @@ format:
 	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*')
 
 clean:
-	rm src/*.os
+	rm -f src/*.os
 
 compiledb: clean
-	scons platform=$(PLATFORM) | tee build-log.txt
+	scons -c platform=$(PLATFORM) target=template_debug dev_build=yes debug_symbols=yes | tee build-log.txt
+	scons platform=$(PLATFORM) target=template_debug dev_build=yes debug_symbols=yes | tee build-log.txt
 	compiledb --parse build-log.txt
 
 UNAME := $(shell uname)
@@ -87,3 +88,6 @@ shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
 all: ubuntu web mingw osxcross
+
+cgdb:
+	cgdb --args $GODOT4 --editor

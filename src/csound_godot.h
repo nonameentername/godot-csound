@@ -15,6 +15,7 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
+#include "csound_file_reader.h"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 #include "sysdep.h"
@@ -45,6 +46,7 @@ private:
     float volume_db;
     int tab;
     bool initialized;
+    Ref<CsoundFileReader> script;
 
     struct Channel {
         String name;
@@ -106,9 +108,17 @@ public:
 
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
+
+    static FILE *open_file(CSOUND *csound, const char *filename, const char *mode);
+    static void *open_sound_file(CSOUND *csound, const char *pathname, int mode, void *userdata);
+
     void _notification(int p_what);
+
     void set_csound_name(const String &name);
     const String &get_csound_name();
+
+    void set_csound_script(Ref<CsoundFileReader> p_script);
+    Ref<CsoundFileReader> get_csound_script();
 
     int get_channel_count();
     int get_named_channel_count();

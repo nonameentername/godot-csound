@@ -28,6 +28,9 @@ var undo_redo: EditorUndoRedoManager
 var channel_container: HBoxContainer
 var named_channel_container: HBoxContainer
 var tab_container: TabContainer
+var csound_file_label: LineEdit
+var csound_file_hbox: HBoxContainer
+var resource_picker: CsoundResourcePicker
 
 
 class Channel:
@@ -64,6 +67,8 @@ func _ready():
 	bypass = $VBoxContainer/HBoxContainer/LeftHBox/bypass
 	options = $VBoxContainer/HBoxContainer/RightHBox/options
 	tree = $VBoxContainer/Tree
+	csound_file_label = $VBoxContainer/HBoxContainer3/LeftHBox/Label
+	csound_file_hbox = $VBoxContainer/HBoxContainer3/RightHBox
 	preview_timer = $Timer
 	initialized = true
 
@@ -103,6 +108,13 @@ func _ready():
 	tree.allow_rmb_select = true
 	tree.focus_mode = FOCUS_CLICK
 	tree.allow_reselect = true
+
+	resource_picker = CsoundResourcePicker.new(csound_file_label)
+	resource_picker.base_type = "CsoundFileReader"
+	resource_picker.resource_selected.connect(_resource_selected)
+	resource_picker.resource_changed.connect(_resource_changed)
+
+	csound_file_hbox.add_child(resource_picker)
 
 	update_csound()
 	_update_theme()
@@ -462,6 +474,14 @@ func update_csound():
 	bypass.button_pressed = CsoundServer.is_csound_bypassing(index)
 
 	tab_container.current_tab = CsoundServer.get_csound_tab(index)
+	var file = CsoundServer.get_csound_script(index)
+	resource_picker.edited_resource = file
+
+	if file:
+		csound_file_label.text = file.resource_path.get_file()
+	else:
+		csound_file_label.text = "<empty>"
+
 	_update_slider()
 
 	updating_csound = false
@@ -577,5 +597,28 @@ func _name_changed(new_name: String):
 	return attempt
 
 
+func _resource_changed(resource: Resource):
+	updating_csound = true
+
+	undo_redo.create_action("Set Csound script")
+	undo_redo.add_do_method(CsoundServer, "set_csound_script", get_index(), resource)
+	undo_redo.add_undo_method(
+		CsoundServer, "set_csound_script", get_index(), CsoundServer.get_csound_script(get_index())
+	)
+	undo_redo.add_do_method(editor_csound_instances, "_update_csound_instance", get_index())
+	undo_redo.add_undo_method(editor_csound_instances, "_update_csound_instance", get_index())
+	undo_redo.commit_action()
+
+	updating_csound = false
+
+
 func _name_focus_exit():
 	csound_name.text = _name_changed(csound_name.get_text())
+
+
+func resource_saved(resource: Resource):
+	resource_picker.resource_saved(resource)
+
+
+func _resource_selected(resource: Resource, _inspect: bool):
+	EditorInterface.edit_resource(resource)

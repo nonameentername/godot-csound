@@ -38,8 +38,6 @@ func _ready():
 	csound_hbox = $CsoundScroll/CsoundHBox
 	file_label = $TopBoxContainer/FileLabel
 
-	#file_label.text = "Layout: %s" % edited_path.get_file()
-
 	_update_csound()
 
 
@@ -298,3 +296,9 @@ func _file_dialog_callback(filename: String):
 
 func _set_renaming_csound(renaming: bool):
 	renaming_csound = renaming
+
+
+func resource_saved(resource: Resource):
+	for editor_csound_instance in csound_hbox.get_children():
+		if editor_csound_instance is EditorCsoundInstance:
+			editor_csound_instance.resource_saved(resource)

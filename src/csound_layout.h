@@ -1,6 +1,7 @@
 #ifndef CSOUNDLAYOUT_H
 #define CSOUNDLAYOUT_H
 
+#include "csound_file_reader.h"
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/templates/vector.hpp>
 
@@ -17,6 +18,8 @@ class CsoundLayout : public Resource {
         bool bypass = false;
         float volume_db = 0.0f;
         int tab = 0;
+
+        Ref<CsoundFileReader> script;
 
         Csound() {
         }

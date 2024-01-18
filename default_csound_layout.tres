@@ -1,10 +1,14 @@
-[gd_resource type="CsoundLayout" format=3 uid="uid://c0aye3awcthh0"]
+[gd_resource type="CsoundLayout" load_steps=2 format=3 uid="uid://c0aye3awcthh0"]
+
+[ext_resource type="CsoundFileReader" uid="uid://bfw1vnxt32kjy" path="res://test.csd" id="1_06dw3"]
 
 [resource]
 csound/0/volume_db = -5.93175
+csound/0/script = ExtResource("1_06dw3")
 csound/1/name = "Csound"
 csound/1/solo = false
 csound/1/mute = false
 csound/1/bypass = false
 csound/1/volume_db = 0.0
 csound/1/tab = 0
+csound/1/script = ExtResource("1_06dw3")

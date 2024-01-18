@@ -17,7 +17,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -33,7 +33,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -43,7 +43,7 @@
       "request": "launch",
       "preLaunchTask": "build",
       "program": "${env:GODOT4}",
-      "additionalSOLibSearchPath": "bin",
+      "additionalSOLibSearchPath": "bin/linux/debug/lib",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
@@ -52,7 +52,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -62,7 +62,7 @@
       "request": "launch",
       "preLaunchTask": "build",
       "program": "${env:GODOT4}",
-      "additionalSOLibSearchPath": "bin",
+      "additionalSOLibSearchPath": "bin/linux/debug/lib",
       "args": ["--editor"],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
@@ -71,7 +71,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },
@@ -81,7 +81,7 @@
       "program": "${env:GODOT4}",
       "request": "attach",
       "processId": "${command:pickProcess}", 
-      "additionalSOLibSearchPath": "bin",
+      "additionalSOLibSearchPath": "bin/linux/debug/lib",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
@@ -90,7 +90,7 @@
       "environment" : [
           {
               "name": "LD_PRELOAD",
-              "value": "${workspaceFolder}/bin/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+              "value": "${workspaceFolder}/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
           }
       ]
     },

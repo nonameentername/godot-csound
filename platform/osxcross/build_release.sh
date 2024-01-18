@@ -5,7 +5,7 @@ $(eval /osxcross/tools/osxcross_conf.sh)
 dir=$(realpath .)
 src_dir=$dir/modules/csound
 
-for ARCH in x86_64; do
+for ARCH in x86_64 arm64; do
     build_dir=$src_dir/build/osxcross-$ARCH/release
     prefix=$src_dir/bin/osxcross-$ARCH/release
 

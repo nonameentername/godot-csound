@@ -136,6 +136,7 @@ void CsoundServer::set_csound_count(int p_count) {
         csound_instances[i]->bypass = false;
         csound_instances[i]->volume_db = 0;
         csound_instances[i]->tab = 0;
+        csound_instances[i]->script = Ref<CsoundFileReader>();
 
         csound_map[attempt] = csound_instances[i];
         call_deferred("add_child", csound_instances[i]);
@@ -204,6 +205,7 @@ void CsoundServer::add_csound(int p_at_pos) {
     csound_godot->bypass = false;
     csound_godot->volume_db = 0;
     csound_godot->tab = 0;
+    csound_godot->script = Ref<CsoundFileReader>();
 
     csound_map[attempt] = csound_godot;
     call_deferred("add_child", csound_godot);
@@ -392,6 +394,20 @@ bool CsoundServer::is_csound_bypassing(int p_csound) const {
     return csound_instances[p_csound]->bypass;
 }
 
+void CsoundServer::set_csound_script(int p_csound, Ref<CsoundFileReader> p_script) {
+    ERR_FAIL_INDEX(p_csound, csound_instances.size());
+
+    edited = true;
+
+    csound_instances[p_csound]->set_csound_script(p_script);
+}
+
+Ref<CsoundFileReader> CsoundServer::get_csound_script(int p_csound) const {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), NULL);
+
+    return csound_instances[p_csound]->script;
+}
+
 /*
     instruments
 */
@@ -470,6 +486,7 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound->bypass = p_csound_layout->csounds[i].bypass;
         csound->volume_db = p_csound_layout->csounds[i].volume_db;
         csound->tab = p_csound_layout->csounds[i].tab;
+        csound->script = p_csound_layout->csounds[i].script;
 
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
@@ -497,6 +514,7 @@ Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
         state->csounds.write[i].bypass = csound_instances[i]->bypass;
         state->csounds.write[i].volume_db = csound_instances[i]->volume_db;
         state->csounds.write[i].tab = csound_instances[i]->tab;
+        state->csounds.write[i].script = csound_instances[i]->script;
     }
 
     return state;
@@ -571,6 +589,9 @@ void CsoundServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_csound_bypass", "csound_idx", "enable"), &CsoundServer::set_csound_bypass);
     ClassDB::bind_method(D_METHOD("is_csound_bypassing", "csound_idx"), &CsoundServer::is_csound_bypassing);
+
+    ClassDB::bind_method(D_METHOD("set_csound_script", "csound_idx", "script"), &CsoundServer::set_csound_script);
+    ClassDB::bind_method(D_METHOD("get_csound_script", "csound_idx"), &CsoundServer::get_csound_script);
 
     ClassDB::bind_method(D_METHOD("get_csound_channel_peak_volume_db", "csound_idx", "channel"),
                          &CsoundServer::get_csound_channel_peak_volume_db);

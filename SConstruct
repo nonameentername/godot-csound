@@ -69,6 +69,7 @@ if env["platform"] == "windows":
     else:
         env.Append(LIBPATH=["bin/windows/release/lib"])
         env.Append(CPPPATH=["bin/windows/release/include/csound"])
+    env.Append(CPPFLAGS=["-DMINGW"])
     #env.Append(RPATH=["bin/csound/bin", "."])
 elif env["platform"] == "web":
     if env["dev_build"]:

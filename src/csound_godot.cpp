@@ -4,6 +4,12 @@
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
+#include <cstdio>
+#ifdef MINGW
+#include "win_fmemopen.h"
+#else
+#include <sys/mman.h>
+#endif
 
 using namespace godot;
 
@@ -25,8 +31,10 @@ void CsoundGodot::_ready() {
     csound = new Csound();
 
     csound->CreateMessageBuffer(0);
-    csound->SetDebug(true);
+    csound->SetDebug(false);
     csound->SetHostImplementedAudioIO(1, 0);
+
+    csound->SetOpenFileCallback(open_file);
 
     // csound->SetHostImplementedMIDIIO(true);
     // csound->SetExternalMidiWriteCallback(write_midi_data);
@@ -38,153 +46,29 @@ void CsoundGodot::_ready() {
 }
 
 void CsoundGodot::start() {
-    // csound->Compile("test.csd");
+    csound->SetOption("-n");
+    csound->SetOption("-d");
 
-    const char *csd_text = R"CSD(
-<CsoundSynthesizer>
-<CsOptions>
--+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
-</CsOptions>
-<CsInstruments>
+    if (script.is_valid()) {
+        int error = csound->Compile(script->get_path().get_file().ascii());
+        if (error != 0) {
+            godot::UtilityFunctions::push_error("Could not compile csound script: ", script->get_path().get_file());
+        }
+    }
 
-sr = 44100
-ksmps = 32
-nchnls = 2
-0dbfs = 1
-
-chnset 1, "cutoff"
-
-;load soundfonts
-;isf	sfload	"assets/FluidR3_GM.sf2"
-	;sfplist isf
-	;sfplist ir
-;	sfpassign	0, isf	
-
-instr 1	; play guitar from score and midi keyboard - preset index = 0
-    prints "hello world\n"
-
-	mididefault	60, p3
-	midinoteonkey	p4, p5
-inum	init	p4
-ivel	init	p5
-ivel	init	ivel/127					;make velocity dependent
-kamp	linsegr	1, 1, 1, .1, 0
-kamp	= kamp/3000						;scale amplitude
-kfreq	init	1						;do not change freq from sf
-kCutoff chnget "cutoff"
-;a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 0			;preset index = 0
-a1 noise 1, 0
-a2 noise 1, 0
-;a2 = oscils kamp*ivel*kCutoff, 440, 0
-    prints "instr1 inum = %f ivel = %f\n", inum, ivel
-    chnset a1, "instr_1_left"
-    chnset a2, "instr_1_right"
-	outs	a1, a2
-	
-endin
-	
-instr 2	; play harpsichord from score and midi keyboard - preset index = 1
-
-	mididefault	60, p3
-	midinoteonkey	p4, p5
-inum	init	p4
-ivel	init	p5
-ivel	init	ivel/127					;make velocity dependent
-kamp	linsegr	1, 1, 1, .1, 0
-kamp	= kamp/2000						;scale amplitude
-kfreq	init	1						;do not change freq from sf
-kCutoff chnget "cutoff"
-;a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 3			;preset index = 1
-a1 noise 1, 0
-a2 noise 1, 0
-kSig1 downsamp a1
-kSig2 downsamp a2
-    prints "instr2 inum = %f ivel = %f\n", inum, ivel
-    printks "instr2 kamp = %f kCutoff = %f\n", 1, kamp, kCutoff
-    printks "instr2 a1 = %f a2 = %f\n", 1, kSig1, kSig2
-    chnset a1, "instr_2_left"
-    chnset a2, "instr_2_right"
-	outs	a1, a2
-	
-endin
-
-instr 3
-	mididefault	60, p3
-	midinoteonkey	p4, p5
-inum	init	p4
-ivel	init	p5
-ivel	init	ivel/127
-kamp	linsegr	1, 1, 1, .1, 0
-kCutoff chnget "cutoff"
-al  lfo kamp, p4, 0
-a1  chnget "instr_3_input_left"
-a2  chnget "instr_3_input_right"
-
-kSig1 downsamp a1
-kSig2 downsamp a2
-
-a1  = a1 * ivel * al * kCutoff
-a2  = a2 * ivel * al * kCutoff
-    prints "instr3 inum = %f ivel = %f\n", inum, ivel
-    printks "instr3 kamp = %f kCutoff = %f\n", 1, kamp, kCutoff
-    printks "instr3 a1 = %f a2 = %f\n", 1, kSig1, kSig2
-    chnset a1, "instr_3_left"
-    chnset a2, "instr_3_right"
-	outs	a1, a2
-endin
-
-
-instr 4
-    a1  chnget "instr_4_input_left"
-    a2  chnget "instr_4_input_right"
-    chnset a1, "instr_4_left"
-    chnset a2, "instr_4_right"
-endin
-
-
-instr 5
-    a1, a2 inch 1, 2
-    outs	a1, a2
-endin
-
-
-</CsInstruments>
-<CsScore>
-f0 3600
-
-;i1 0 1 60 100
-;i1 + 1 62 <
-;i1 + 1 65 <
-;i1 + 1 69 10
-
-;i2 5 1 60 100
-;i2 + 1 62 <
-;i2 7 1 65 <
-;i2 7 1 69 10
-
-;i3 0 3600
-
-i4 0 3600
-i5 0 3600
-
-
-</CsScore>
-</CsoundSynthesizer>
-)CSD";
-
-    csound->CompileCsdText(csd_text);
     csound->Start();
+
+    int frame_size = 512 + csound->GetKsmps();
 
     if (output_channels.size() != csound->GetNchnls()) {
         input_channels.resize(csound->GetNchnls());
         output_channels.resize(csound->GetNchnls());
 
-        int p_frames = 512;
         for (int j = 0; j < csound->GetNchnls(); j++) {
-            input_channels.write[j].resize(p_frames);
-            output_channels.write[j].buffer.resize(p_frames);
+            input_channels.write[j].resize(frame_size);
+            output_channels.write[j].buffer.resize(frame_size);
 
-            for (int frame = 0; frame < p_frames; frame++) {
+            for (int frame = 0; frame < frame_size; frame++) {
                 input_channels.write[j].write[frame] = 0;
                 output_channels.write[j].buffer.write[frame] = 0;
             }
@@ -203,6 +87,8 @@ void CsoundGodot::stop() {
 }
 
 void CsoundGodot::reset() {
+    initialized = false;
+
     if (csound != NULL) {
         csound->Reset();
     }
@@ -243,6 +129,8 @@ void CsoundGodot::initialize_channels(int p_frames) {
         return;
     }
 
+    int frame_size = p_frames + csound->GetKsmps();
+
     controlChannelInfo_t *tmp;
     int num_channels = csound->ListChannels(tmp);
 
@@ -253,15 +141,15 @@ void CsoundGodot::initialize_channels(int p_frames) {
             (type & (CSOUND_INPUT_CHANNEL | CSOUND_OUTPUT_CHANNEL))) {
             if (!input_named_channels_buffer.has(name)) {
                 Vector<MYFLT> channel_buffer;
-                channel_buffer.resize(p_frames);
+                channel_buffer.resize(frame_size);
                 input_named_channels_buffer.insert(name, channel_buffer);
             }
             if (!named_channels.has(name)) {
                 int index = output_named_channels.size();
                 output_named_channels.resize(index + 1);
-                output_named_channels.write[index].buffer.resize(p_frames);
+                output_named_channels.write[index].buffer.resize(frame_size);
 
-                for (int frame = 0; frame < p_frames; frame++) {
+                for (int frame = 0; frame < frame_size; frame++) {
                     output_named_channels.write[index].buffer.write[frame] = 0;
                 }
 
@@ -628,12 +516,43 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
     return 0;
 }
 
+FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *mode) {
+    String node_path = filename;
+    if (ResourceLoader::get_singleton()->exists(node_path)) {
+        Variant resource = ResourceLoader::get_singleton()->load(node_path);
+        Ref<CsoundFileReader> csound_file = resource;
+        if (csound_file != NULL) {
+            FILE *fp = fmemopen(NULL, csound_file->get_array_size() + 1, "w+");
+            fprintf(fp, "%s\n", csound_file->get_array_data());
+            fflush(fp);
+            rewind(fp);
+            return fp;
+        }
+    }
+
+    return NULL;
+}
+
+void *CsoundGodot::open_sound_file(CSOUND *csound, const char *pathname, int mode, void *userdata) {
+    return NULL;
+}
+
 void CsoundGodot::set_csound_name(const String &name) {
     csound_name = name;
 }
 
 const String &CsoundGodot::get_csound_name() {
     return csound_name;
+}
+
+void CsoundGodot::set_csound_script(Ref<CsoundFileReader> p_script) {
+    reset();
+    script = p_script;
+    start();
+}
+
+Ref<CsoundFileReader> CsoundGodot::get_csound_script() {
+    return script;
 }
 
 int CsoundGodot::get_channel_count() {
@@ -688,6 +607,10 @@ void CsoundGodot::_bind_methods() {
                           "set_midi_file", "get_midi_file");
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &CsoundGodot::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &CsoundGodot::get_csound_name);
+
+    ClassDB::bind_method(D_METHOD("set_csound_script", "script"), &CsoundGodot::set_csound_script);
+    ClassDB::bind_method(D_METHOD("get_csound_script"), &CsoundGodot::get_csound_script);
+
     ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
 }

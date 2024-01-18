@@ -83,6 +83,9 @@ public:
     void set_csound_bypass(int p_csound, bool p_enable);
     bool is_csound_bypassing(int p_csound) const;
 
+    void set_csound_script(int p_csound, Ref<CsoundFileReader> p_script);
+    Ref<CsoundFileReader> get_csound_script(int p_csound) const;
+
     /*
     void add_csound_instrument(int p_csound, const Ref<AudioEffect> &p_instrument, int p_at_pos = -1);
     void remove_csound_instrument(int p_csound, int p_instrument);

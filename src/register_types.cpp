@@ -17,6 +17,7 @@
 #include "audio_stream_player_csound_channel.h"
 #include "audio_stream_player_csound_named_channel.h"
 #include "audio_stream_player_mytone.h"
+#include "csound_file_reader.h"
 #include "csound_godot.h"
 #include "csound_layout.h"
 #include "csound_server.h"
@@ -42,6 +43,7 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
 
         ClassDB::register_class<MidiFileReader>();
         ClassDB::register_class<SoundFontFileReader>();
+        ClassDB::register_class<CsoundFileReader>();
         ClassDB::register_class<AudioStreamCsound>();
         ClassDB::register_class<AudioStreamPlaybackCsound>();
         ClassDB::register_class<AudioStreamMyTone>();

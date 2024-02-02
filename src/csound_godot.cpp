@@ -46,36 +46,38 @@ void CsoundGodot::_ready() {
 }
 
 void CsoundGodot::start() {
-    csound->SetOption("-n");
-    csound->SetOption("-d");
+    if (csound != NULL) {
+        csound->SetOption("-n");
+        csound->SetOption("-d");
 
-    if (script.is_valid()) {
-        int error = csound->Compile(script->get_path().get_file().ascii());
-        if (error != 0) {
-            godot::UtilityFunctions::push_error("Could not compile csound script: ", script->get_path().get_file());
-        }
-    }
-
-    csound->Start();
-
-    int frame_size = 512 + csound->GetKsmps();
-
-    if (output_channels.size() != csound->GetNchnls()) {
-        input_channels.resize(csound->GetNchnls());
-        output_channels.resize(csound->GetNchnls());
-
-        for (int j = 0; j < csound->GetNchnls(); j++) {
-            input_channels.write[j].resize(frame_size);
-            output_channels.write[j].buffer.resize(frame_size);
-
-            for (int frame = 0; frame < frame_size; frame++) {
-                input_channels.write[j].write[frame] = 0;
-                output_channels.write[j].buffer.write[frame] = 0;
+        if (script.is_valid()) {
+            int error = csound->Compile(script->get_path().get_file().ascii());
+            if (error != 0) {
+                godot::UtilityFunctions::push_error("Could not compile csound script: ", script->get_path().get_file());
             }
         }
-    }
 
-    initialized = true;
+        csound->Start();
+
+        int frame_size = 512 + csound->GetKsmps();
+
+        if (output_channels.size() != csound->GetNchnls()) {
+            input_channels.resize(csound->GetNchnls());
+            output_channels.resize(csound->GetNchnls());
+
+            for (int j = 0; j < csound->GetNchnls(); j++) {
+                input_channels.write[j].resize(frame_size);
+                output_channels.write[j].buffer.resize(frame_size);
+
+                for (int frame = 0; frame < frame_size; frame++) {
+                    input_channels.write[j].write[frame] = 0;
+                    output_channels.write[j].buffer.write[frame] = 0;
+                }
+            }
+        }
+
+        initialized = true;
+    }
 }
 
 void CsoundGodot::stop() {

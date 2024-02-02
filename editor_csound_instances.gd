@@ -176,6 +176,16 @@ func _duplicate_csound(which: int):
 	undo_redo.add_do_method(
 		CsoundServer, "set_csound_bypass", add_at_pos, CsoundServer.is_csound_bypassing(which)
 	)
+	undo_redo.add_do_method(
+		CsoundServer, "set_csound_script", add_at_pos, CsoundServer.get_csound_script(which)
+	)
+	for i in range(0, CsoundServer.get_csound_instrument_count(which)):
+		undo_redo.add_do_method(
+			CsoundServer,
+			"add_csound_instrument",
+			add_at_pos,
+			CsoundServer.get_csound_instrument(which, i)
+		)
 	undo_redo.add_undo_method(CsoundServer, "remove_csound", add_at_pos)
 	undo_redo.add_do_method(self, "_update_csound")
 	undo_redo.add_undo_method(self, "_update_csound")

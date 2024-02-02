@@ -2,6 +2,7 @@
 #define CSOUNDLAYOUT_H
 
 #include "csound_file_reader.h"
+#include "csound_instrument.h"
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/templates/vector.hpp>
 
@@ -20,6 +21,7 @@ class CsoundLayout : public Resource {
         int tab = 0;
 
         Ref<CsoundFileReader> script;
+        Vector<Ref<CsoundInstrument>> instruments;
 
         Csound() {
         }

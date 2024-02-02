@@ -408,9 +408,67 @@ Ref<CsoundFileReader> CsoundServer::get_csound_script(int p_csound) const {
     return csound_instances[p_csound]->script;
 }
 
-/*
-    instruments
-*/
+void CsoundServer::add_csound_instrument(int p_csound, const Ref<CsoundInstrument> &p_instrument, int p_at_pos) {
+    ERR_FAIL_COND(p_instrument.is_null());
+    ERR_FAIL_INDEX(p_csound, csound_instances.size());
+
+    edited = true;
+
+    lock();
+
+    if (p_at_pos >= csound_instances[p_csound]->instruments.size() || p_at_pos < 0) {
+        csound_instances[p_csound]->instruments.push_back(p_instrument);
+    } else {
+        csound_instances[p_csound]->instruments.insert(p_at_pos, p_instrument);
+    }
+
+    //_update_csound_instruments(p_csound);
+
+    unlock();
+    emit_signal("csound_layout_changed");
+}
+
+void CsoundServer::remove_csound_instrument(int p_csound, int p_instrument) {
+    ERR_FAIL_INDEX(p_csound, csound_instances.size());
+
+    edited = true;
+
+    lock();
+
+    csound_instances[p_csound]->instruments.remove_at(p_instrument);
+    //_update_csound_instruments(p_csound);
+
+    unlock();
+    emit_signal("csound_layout_changed");
+}
+
+int CsoundServer::get_csound_instrument_count(int p_csound) {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
+
+    return csound_instances[p_csound]->instruments.size();
+}
+
+Ref<CsoundInstrument> CsoundServer::get_csound_instrument(int p_csound, int p_instrument) {
+    ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), Ref<CsoundInstrument>());
+    ERR_FAIL_INDEX_V(p_instrument, csound_instances[p_csound]->instruments.size(), Ref<CsoundInstrument>());
+
+    return csound_instances[p_csound]->instruments[p_instrument];
+}
+
+void CsoundServer::swap_csound_instruments(int p_csound, int p_instrument, int p_by_instrument) {
+    ERR_FAIL_INDEX(p_csound, csound_instances.size());
+    ERR_FAIL_INDEX(p_instrument, csound_instances[p_csound]->instruments.size());
+    ERR_FAIL_INDEX(p_by_instrument, csound_instances[p_csound]->instruments.size());
+
+    edited = true;
+
+    lock();
+    SWAP(csound_instances.write[p_csound]->instruments.write[p_instrument],
+         csound_instances.write[p_csound]->instruments.write[p_by_instrument]);
+    //_update_csound_instruments(p_csound);
+    unlock();
+    emit_signal("csound_layout_changed");
+}
 
 float CsoundServer::get_csound_channel_peak_volume_db(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), 0);
@@ -487,6 +545,10 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound->volume_db = p_csound_layout->csounds[i].volume_db;
         csound->tab = p_csound_layout->csounds[i].tab;
         csound->script = p_csound_layout->csounds[i].script;
+        csound->instruments.resize(p_csound_layout->csounds[i].instruments.size());
+        for (int j = 0; j < csound->instruments.size(); j++) {
+            csound->instruments.write[j] = p_csound_layout->csounds[i].instruments[j];
+        }
 
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
@@ -515,6 +577,10 @@ Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
         state->csounds.write[i].volume_db = csound_instances[i]->volume_db;
         state->csounds.write[i].tab = csound_instances[i]->tab;
         state->csounds.write[i].script = csound_instances[i]->script;
+        state->csounds.write[i].instruments.resize(csound_instances[i]->instruments.size());
+        for (int j = 0; j < csound_instances[i]->instruments.size(); j++) {
+            state->csounds.write[i].instruments.write[j] = csound_instances[i]->instruments[j];
+        }
     }
 
     return state;
@@ -592,6 +658,17 @@ void CsoundServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_csound_script", "csound_idx", "script"), &CsoundServer::set_csound_script);
     ClassDB::bind_method(D_METHOD("get_csound_script", "csound_idx"), &CsoundServer::get_csound_script);
+
+    ClassDB::bind_method(D_METHOD("add_csound_instrument", "csound_idx", "instrument", "at_position"),
+                         &CsoundServer::add_csound_instrument, DEFVAL(-1));
+    ClassDB::bind_method(D_METHOD("remove_csound_instrument", "csound_idx", "instrument_idx"),
+                         &CsoundServer::remove_csound_instrument);
+    ClassDB::bind_method(D_METHOD("get_csound_instrument_count", "csound_idx"),
+                         &CsoundServer::get_csound_instrument_count);
+    ClassDB::bind_method(D_METHOD("get_csound_instrument", "csound_idx", "instrument_idx"),
+                         &CsoundServer::get_csound_instrument);
+    ClassDB::bind_method(D_METHOD("swap_csound_instruments", "csound_idx", "instrument_idx", "by_instrument_idx"),
+                         &CsoundServer::swap_csound_instruments);
 
     ClassDB::bind_method(D_METHOD("get_csound_channel_peak_volume_db", "csound_idx", "channel"),
                          &CsoundServer::get_csound_channel_peak_volume_db);

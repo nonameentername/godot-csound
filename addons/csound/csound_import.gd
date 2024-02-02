@@ -47,3 +47,22 @@ func _exit_tree():
 
 func _notification(what):
 	pass
+
+
+func _has_main_screen():
+	return true
+
+
+func _make_visible(visible):
+	pass
+	#if main_panel_instance:
+	#	main_panel_instance.visible = visible
+
+
+func _get_plugin_name():
+	return "Csound"
+
+
+func _get_plugin_icon():
+	# Must return some kind of Texture for the icon.
+	return EditorInterface.get_editor_theme().get_icon("Node", "EditorIcons")

@@ -16,6 +16,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #include "csound_file_reader.h"
+#include "csound_instrument.h"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 #include "sysdep.h"
@@ -47,6 +48,7 @@ private:
     int tab;
     bool initialized;
     Ref<CsoundFileReader> script;
+    Vector<Ref<CsoundInstrument>> instruments;
 
     struct Channel {
         String name;

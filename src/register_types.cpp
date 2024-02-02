@@ -19,6 +19,7 @@
 #include "audio_stream_player_mytone.h"
 #include "csound_file_reader.h"
 #include "csound_godot.h"
+#include "csound_instrument.h"
 #include "csound_layout.h"
 #include "csound_server.h"
 #include "editor_audio_meter_notches_csound.h"
@@ -38,6 +39,7 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<CsoundGodot>();
         ClassDB::register_class<CsoundServer>();
         ClassDB::register_class<CsoundLayout>();
+        ClassDB::register_class<CsoundInstrument>();
         csound_module = memnew(CsoundServer);
         Engine::get_singleton()->register_singleton("CsoundServer", CsoundServer::get_singleton());
 

@@ -1,4 +1,5 @@
 #include "csound_layout.h"
+#include "csound_instrument.h"
 
 using namespace godot;
 
@@ -28,6 +29,13 @@ bool CsoundLayout::_set(const StringName &p_name, const Variant &p_value) {
             csound.tab = p_value;
         } else if (what == "script") {
             csound.script = p_value;
+
+        } else if (what == "instrument") {
+            int which = s.get_slice("/", 3).to_int();
+            if (csound.instruments.size() <= which) {
+                csound.instruments.resize(which + 1);
+            }
+            csound.instruments.write[which] = p_value;
         } else {
             return false;
         }
@@ -64,6 +72,12 @@ bool CsoundLayout::_get(const StringName &p_name, Variant &r_ret) const {
             r_ret = csound.tab;
         } else if (what == "script") {
             r_ret = csound.script;
+        } else if (what == "instrument") {
+            int which = s.get_slice("/", 3).to_int();
+            if (which < 0 || which >= csound.instruments.size()) {
+                return false;
+            }
+            r_ret = csound.instruments[which];
         } else {
             return false;
         }
@@ -90,6 +104,11 @@ void CsoundLayout::_get_property_list(List<PropertyInfo> *p_list) const {
                                        PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
         p_list->push_back(PropertyInfo(Variant::OBJECT, "csound/" + itos(i) + "/script", PROPERTY_HINT_NONE, "",
                                        PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+
+        for (int j = 0; j < csounds[i].instruments.size(); j++) {
+            p_list->push_back(PropertyInfo(Variant::OBJECT, "csound/" + itos(i) + "/instrument/" + itos(j),
+                                           PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR | PROPERTY_USAGE_INTERNAL));
+        }
     }
 }
 

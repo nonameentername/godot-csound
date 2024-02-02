@@ -13,6 +13,7 @@ var mute: Button
 var bypass: Button
 var options: MenuButton
 var tree: Tree
+var add_intrument: TreeItem
 var slider: VSlider
 var preview_timer: Timer
 var initialized = false
@@ -31,6 +32,7 @@ var tab_container: TabContainer
 var csound_file_label: LineEdit
 var csound_file_hbox: HBoxContainer
 var resource_picker: CsoundResourcePicker
+var delete_instrument_popup: PopupMenu
 
 
 class Channel:
@@ -70,6 +72,7 @@ func _ready():
 	csound_file_label = $VBoxContainer/HBoxContainer3/LeftHBox/Label
 	csound_file_hbox = $VBoxContainer/HBoxContainer3/RightHBox
 	preview_timer = $Timer
+
 	initialized = true
 
 	focus_mode = Control.FOCUS_CLICK
@@ -115,6 +118,13 @@ func _ready():
 	resource_picker.resource_changed.connect(_resource_changed)
 
 	csound_file_hbox.add_child(resource_picker)
+
+	shortcut = Shortcut.new()
+	shortcut.resource_name = "Delete Instrument"
+	delete_instrument_popup = PopupMenu.new()
+	delete_instrument_popup.add_shortcut(shortcut)
+	delete_instrument_popup.connect("index_pressed", _csound_delete_instrument)
+	add_child(delete_instrument_popup)
 
 	update_csound()
 	_update_theme()
@@ -349,7 +359,7 @@ func _update_theme():
 	if not editor_interface:
 		return
 
-	var base_color: Color = editor_interface.get_editor_settings().get_setting(
+	var base_color: Color = EditorInterface.get_editor_settings().get_setting(
 		"interface/theme/base_color"
 	)
 
@@ -379,21 +389,33 @@ func _update_theme():
 		"panel", get_theme_stylebox("panel", "TooltipPanel")
 	)
 
-	tree.custom_minimum_size = Vector2(0, 80) * editor_interface.get_editor_scale()
+	tree.custom_minimum_size = Vector2(0, 80) * EditorInterface.get_editor_scale()
 	tree.clear()
 
-	var root: TreeItem = $VBoxContainer/Tree.create_item()
+	var root: TreeItem = tree.create_item()
 
-	#var tree_item: TreeItem = $VBoxContainer/Tree.create_item(root)
-	#tree_item.set_text(0, "Instrument1")
-	#tree_item.set_editable(0, true)
-	#tree_item.set_metadata(0, 1)
+	tree.button_clicked.connect(_tree_button_clicked)
+	tree.custom_item_clicked.connect(_tree_custom_item_clicked)
 
-	var tree_item: TreeItem = $VBoxContainer/Tree.create_item(root)
-	tree_item.set_cell_mode(0, TreeItem.CELL_MODE_CUSTOM)
-	tree_item.set_editable(0, true)
-	tree_item.set_selectable(0, false)
-	tree_item.set_text(0, "Add Instrument")
+	for i in range(0, CsoundServer.get_csound_instrument_count(get_index())):
+		var instrument = CsoundServer.get_csound_instrument(get_index(), i)
+		var tree_item: TreeItem = tree.create_item(root)
+		tree_item.set_cell_mode(0, TreeItem.CELL_MODE_CUSTOM)
+		tree_item.set_text(0, instrument.get_name())
+		tree_item.set_editable(0, true)
+		tree_item.set_selectable(0, true)
+		tree_item.set_metadata(0, i)
+		#var remove_button = get_theme_icon("Edit", "EditorIcons")
+		#tree_item.add_button(0, remove_button)
+
+	add_intrument = tree.create_item(root)
+	add_intrument.set_cell_mode(0, TreeItem.CELL_MODE_CUSTOM)
+	add_intrument.set_editable(0, false)
+	add_intrument.set_selectable(0, false)
+	add_intrument.set_text(0, "Add Instrument")
+
+	var add_button = get_theme_icon("Add", "EditorIcons")
+	add_intrument.add_button(0, add_button)
 
 	enabled_vu = get_theme_icon("BusVuActive", "EditorIcons")
 	disabled_vu = get_theme_icon("BusVuFrozen", "EditorIcons")
@@ -405,6 +427,73 @@ func _update_theme():
 	if not is_instance_valid(audio_meter2):
 		audio_meter2 = EditorAudioMeterNotchesCsound.new()
 		named_channel_container.add_child(audio_meter2)
+
+
+func _tree_button_clicked(item: TreeItem, _column: int, _id: int, _mouse_button_index: int):
+	if item == add_intrument:
+		print("adding an instrument")
+
+		updating_csound = true
+
+		var instrument = CsoundInstrument.new()
+		instrument.set_name("NewInstrument")
+		undo_redo.create_action("Add Csound Instrument")
+		undo_redo.add_do_method(CsoundServer, "add_csound_instrument", get_index(), instrument)
+		undo_redo.add_undo_method(
+			CsoundServer,
+			"remove_csound_instrument",
+			get_index(),
+			CsoundServer.get_csound_instrument_count(get_index())
+		)
+		undo_redo.add_do_method(editor_csound_instances, "_update_csound_instance", get_index())
+		undo_redo.add_undo_method(editor_csound_instances, "_update_csound_instance", get_index())
+		undo_redo.commit_action()
+
+		updating_csound = false
+	else:
+		print("gone clicking")
+
+
+func _tree_custom_item_clicked(mouse_button_index: int):
+	if mouse_button_index == MOUSE_BUTTON_LEFT:
+		var selected: TreeItem = tree.get_selected()
+		var index = selected.get_metadata(0)
+		var instrument: CsoundInstrument = CsoundServer.get_csound_instrument(get_index(), index)
+		if not instrument.changed.is_connected(_csound_instrument_changed):
+			instrument.changed.connect(_csound_instrument_changed)
+		EditorInterface.edit_resource(instrument)
+	elif mouse_button_index == MOUSE_BUTTON_RIGHT:
+		delete_instrument_popup.set_position(get_screen_position() + get_local_mouse_position())
+		delete_instrument_popup.reset_size()
+		delete_instrument_popup.popup()
+	print("adding an instrument", mouse_button_index, MOUSE_BUTTON_RIGHT)
+
+
+func _csound_instrument_changed():
+	print("resource_saved")
+	var selected: TreeItem = tree.get_selected()
+	var index = selected.get_metadata(0)
+	var instrument: CsoundInstrument = CsoundServer.get_csound_instrument(get_index(), index)
+	CsoundServer.set_edited(true)
+	selected.set_text(0, instrument.get_name())
+
+
+func _csound_delete_instrument(_option: int):
+	print("deleting an instrument")
+	updating_csound = true
+
+	var selected: TreeItem = tree.get_selected()
+	var index = selected.get_metadata(0)
+
+	undo_redo.create_action("Remove Csound Instrument")
+	var instrument = CsoundServer.get_csound_instrument(get_index(), index)
+	undo_redo.add_do_method(CsoundServer, "remove_csound_instrument", get_index(), index)
+	undo_redo.add_undo_method(CsoundServer, "add_csound_instrument", get_index(), instrument)
+	undo_redo.add_do_method(editor_csound_instances, "_update_csound_instance", get_index())
+	undo_redo.add_undo_method(editor_csound_instances, "_update_csound_instance", get_index())
+	undo_redo.commit_action()
+
+	updating_csound = false
 
 
 func _get_drag_data(at_position):

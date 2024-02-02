@@ -15,6 +15,7 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #include "csound_godot.h"
+#include "csound_instrument.h"
 #include "csound_layout.h"
 
 namespace godot {
@@ -86,14 +87,13 @@ public:
     void set_csound_script(int p_csound, Ref<CsoundFileReader> p_script);
     Ref<CsoundFileReader> get_csound_script(int p_csound) const;
 
-    /*
-    void add_csound_instrument(int p_csound, const Ref<AudioEffect> &p_instrument, int p_at_pos = -1);
+    void add_csound_instrument(int p_csound, const Ref<CsoundInstrument> &p_instrument, int p_at_pos = -1);
     void remove_csound_instrument(int p_csound, int p_instrument);
 
     int get_csound_instrument_count(int p_csound);
+    Ref<CsoundInstrument> get_csound_instrument(int p_csound, int p_instrument);
 
     void swap_csound_instruments(int p_bus, int p_instrument, int p_by_instrument);
-    */
 
     float get_csound_channel_peak_volume_db(int p_csound, int p_channel) const;
     float get_csound_named_channel_peak_volume_db(int p_csound, int p_channel) const;

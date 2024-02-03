@@ -17,7 +17,7 @@ func _enter_tree():
 	csound_import_plugin = preload("import_csound_plugin.gd").new()
 	add_import_plugin(csound_import_plugin)
 
-	csound_plugin = preload("res://editor_csound_instances.tscn").instantiate()
+	csound_plugin = preload("res://addons/csound/editor_csound_instances.tscn").instantiate()
 	csound_plugin.editor_interface = get_editor_interface()
 	csound_plugin.undo_redo = get_undo_redo()
 

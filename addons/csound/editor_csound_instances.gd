@@ -32,7 +32,7 @@ func _init():
 
 func _ready():
 	edited_path = ProjectSettings.get_setting_with_override("audio/csound/default_csound_layout")
-	editor_csound_packed_scene = preload("res://editor_csound_instance.tscn")
+	editor_csound_packed_scene = preload("res://addons/csound/editor_csound_instance.tscn")
 
 	save_timer = $SaveTimer
 	csound_hbox = $CsoundScroll/CsoundHBox

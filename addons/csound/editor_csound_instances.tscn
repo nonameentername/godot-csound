@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://n1siyk0vv1gq"]
 
-[ext_resource type="Script" path="res://editor_csound_instances.gd" id="1_8p7ml"]
+[ext_resource type="Script" path="res://addons/csound/editor_csound_instances.gd" id="1_8p7ml"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_761uo"]
 content_margin_left = 4.0

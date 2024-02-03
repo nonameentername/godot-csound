@@ -5,14 +5,14 @@ compatibility_minimum = 4.1
 
 [libraries]
 
-macos.debug = "res://bin/macos/macos.framework/libcsoundgodot.macos.template_debug"
-macos.release = "res://bin/macos/macos.framework/libcsoundgodot.macos.template_release"
-windows.debug.x86_64 = "res://bin/windows/libcsoundgodot.windows.template_debug.dev.x86_64.dll"
-windows.release.x86_64 = "res://bin/windows/libcsoundgodot.windows.template_release.x86_64.dll"
-linux.debug.x86_64 = "res://bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
-linux.release.x86_64 = "res://bin/linux/libcsoundgodot.linux.template_release.x86_64.so"
-web.release.wasm32 = "res://bin/web/libcsoundgodot.web.template_release.wasm32.wasm"
-web.debug.wasm32 = "res://bin/web/libcsoundgodot.web.template_debug.dev.wasm32.wasm"
+macos.debug = "res://addons/csound/bin/macos/macos.framework/libcsoundgodot.macos.template_debug"
+macos.release = "res://addons/csound/bin/macos/macos.framework/libcsoundgodot.macos.template_release"
+windows.debug.x86_64 = "res://addons/csound/bin/windows/libcsoundgodot.windows.template_debug.dev.x86_64.dll"
+windows.release.x86_64 = "res://addons/csound/bin/windows/libcsoundgodot.windows.template_release.x86_64.dll"
+linux.debug.x86_64 = "res://addons/csound/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
+linux.release.x86_64 = "res://addons/csound/bin/linux/libcsoundgodot.linux.template_release.x86_64.so"
+web.release.wasm32 = "res://addons/csound/bin/web/libcsoundgodot.web.template_release.wasm32.wasm"
+web.debug.wasm32 = "res://addons/csound/bin/web/libcsoundgodot.web.template_debug.dev.wasm32.wasm"
 
 [dependencies]
 

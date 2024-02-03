@@ -3,7 +3,7 @@
 dir=$(realpath .)
 src_dir=$dir/modules/csound
 build_dir=$src_dir/build/mingw/release
-prefix=$dir/bin/windows/release
+prefix=$dir/addons/csound/bin/windows/release
 
 mkdir -p $build_dir
 cd $build_dir
@@ -34,9 +34,9 @@ make install
 
 cp $build_dir/csound64.dll $prefix/lib/
 cp $prefix/lib/libcsound64.dll.a $prefix/lib/libcsound64.a
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libstdc++-6.dll $dir/bin/windows/release/lib/
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libgcc_s_seh-1.dll $dir/bin/windows/release/lib/
-cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $dir/bin/windows/release/lib/
+cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libstdc++-6.dll $prefix/lib/
+cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libgcc_s_seh-1.dll $prefix/lib/
+cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $prefix/lib/
 
 cd $dir
 scons platform=windows target=template_release

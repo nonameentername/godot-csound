@@ -5,7 +5,7 @@
 dir=$(realpath .)
 src_dir=$dir/modules/csound
 build_dir=$src_dir/build/web/release
-prefix=$dir/bin/web/release
+prefix=$dir/addons/csound/bin/web/release
 
 mkdir -p $build_dir
 cd $build_dir

@@ -6,7 +6,7 @@ build_dir=$src_dir/build/linux/release
 
 mkdir -p $build_dir
 cd $build_dir
-cmake -DCMAKE_INSTALL_PREFIX:PATH=$dir/bin/linux/release \
+cmake -DCMAKE_INSTALL_PREFIX:PATH=$dir/addons/csound/bin/linux/release \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_JAVA_INTERFACE=OFF \
     -DINSTALL_PYTHON_INTERFACE=OFF \

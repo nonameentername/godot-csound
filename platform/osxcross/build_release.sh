@@ -62,4 +62,4 @@ done
 export OSXCROSS_ROOT=$OSXCROSS_BASE_DIR
 
 cd $dir
-scons platform=macos target=template_release
+scons platform=macos target=template_release osxcross_sdk=$OSXCROSS_TARGET

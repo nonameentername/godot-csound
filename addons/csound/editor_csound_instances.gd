@@ -31,7 +31,11 @@ func _init():
 
 
 func _ready():
-	edited_path = ProjectSettings.get_setting_with_override("audio/csound/default_csound_layout")
+	var layout = ProjectSettings.get_setting_with_override("audio/csound/default_csound_layout")
+	if layout:
+		edited_path = layout
+	else:
+		edited_path = "res://default_csound_layout.tres"
 	editor_csound_packed_scene = preload("res://addons/csound/editor_csound_instance.tscn")
 
 	save_timer = $SaveTimer

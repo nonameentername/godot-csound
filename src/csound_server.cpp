@@ -46,7 +46,7 @@ void CsoundServer::initialize() {
     String default_filename = "res://default_csound_layout.tres";
     String layout_path = ProjectSettings::get_singleton()->get_setting_with_override(name);
 
-    if (layout_path.is_empty()) {
+    if (layout_path.is_empty() || layout_path.get_file() == "<null>") {
         ProjectSettings::get_singleton()->set_setting(name, default_filename);
         Dictionary property_info;
         property_info["name"] = name;

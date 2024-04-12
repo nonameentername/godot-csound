@@ -6,6 +6,7 @@
 
 #include "csound_layout.h"
 #include "csound_server.h"
+#include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/core/error_macros.hpp"
 
 using namespace godot;
@@ -46,7 +47,9 @@ void CsoundServer::initialize() {
     String default_filename = "res://default_csound_layout.tres";
     String layout_path = ProjectSettings::get_singleton()->get_setting_with_override(name);
 
-    if (layout_path.is_empty() || layout_path.get_file() == "<null>") {
+    bool is_editor = godot::Engine::get_singleton()->is_editor_hint();
+
+    if (is_editor && (layout_path.is_empty() || layout_path.get_file() == "<null>")) {
         ProjectSettings::get_singleton()->set_setting(name, default_filename);
         Dictionary property_info;
         property_info["name"] = name;
@@ -501,6 +504,10 @@ bool CsoundServer::is_csound_named_channel_active(int p_csound, int p_channel) c
 bool CsoundServer::load_default_csound_layout() {
     String layout_path =
         ProjectSettings::get_singleton()->get_setting_with_override("audio/csound/default_csound_layout");
+
+    if (layout_path.is_empty() || layout_path.get_file() == "<null>") {
+        layout_path = "res://default_csound_layout.tres";
+    }
 
     if (ResourceLoader::get_singleton()->exists(layout_path)) {
         Ref<CsoundLayout> default_layout = ResourceLoader::get_singleton()->load(layout_path);

@@ -19,7 +19,6 @@ godot-cpp:
 
 format:
 	clang-format -i src/*.cpp src/*.h
-	dotnet format ./CsoundGodot.sln
 	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*')
 
 clean:
@@ -49,6 +48,9 @@ shell-ubuntu: docker-ubuntu
 
 ubuntu:
 	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_release.sh'
+	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
+
+ubuntu-debug:
 	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
 
 docker-web:

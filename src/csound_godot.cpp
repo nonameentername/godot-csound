@@ -77,6 +77,7 @@ void CsoundGodot::start() {
         }
 
         initialized = true;
+        emit_signal("csound_ready");
     }
 }
 
@@ -421,6 +422,46 @@ void CsoundGodot::note_off(int chan, int key) {
     csound->InputMessage(note_off.ascii().get_data());
 }
 
+void CsoundGodot::input_message(String message) {
+    if (!initialized) {
+        return;
+    }
+
+    csound->InputMessage(message.ascii());
+}
+
+void CsoundGodot::compile_orchestra(String orchestra) {
+    if (!initialized) {
+        return;
+    }
+
+    csound->CompileOrc(orchestra.ascii());
+}
+
+void CsoundGodot::instrument_note_on(String instrument, int chan, int key, int vel) {
+    if (!initialized) {
+        return;
+    }
+
+    float instrnum = chan / 100.0 + key / 100000.0;
+    String instrnumstr = vformat("%.6f", instrnum);
+    String note_on = vformat("i\"%s.%s\" 0 -1 %d %d", instrument, instrnumstr.substr(2), key, vel);
+    godot::UtilityFunctions::print("note_on ", note_on);
+    csound->InputMessage(note_on.ascii().get_data());
+}
+
+void CsoundGodot::instrument_note_off(String instrument, int chan, int key) {
+    if (!initialized) {
+        return;
+    }
+
+    float instrnum = chan / 100.0 + key / 100000.0;
+    String instrnumstr = vformat("%.6f", instrnum);
+    String note_off = vformat("i\"-%s.%s\" 0 0 %d", instrument, instrnumstr.substr(2), key);
+    godot::UtilityFunctions::print("note_off ", note_off);
+    csound->InputMessage(note_off.ascii().get_data());
+}
+
 void CsoundGodot::send_control_channel(String channel, float value) {
     if (!initialized) {
         return;
@@ -530,6 +571,18 @@ FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *m
             rewind(fp);
             return fp;
         }
+
+        Ref<SoundFontFileReader> soundfont_file = resource;
+        if (soundfont_file != NULL) {
+            FILE *fp = fmemopen(NULL, soundfont_file->get_array_size(), "w+");
+            char *data = soundfont_file->get_array_data();
+            for (int i = 0; i < soundfont_file->get_array_size(); i++) {
+                fprintf(fp, "%c", data[i]);
+            }
+            fflush(fp);
+            rewind(fp);
+            return fp;
+        }
     }
 
     return NULL;
@@ -592,8 +645,16 @@ double CsoundGodot::get_time_to_next_mix() {
 void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("process", "delta"), &CsoundGodot::process);
     ClassDB::bind_method(D_METHOD("program_select"), &CsoundGodot::program_select);
+
     ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);
     ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);
+
+    ClassDB::bind_method(D_METHOD("input_message", "message"), &CsoundGodot::input_message);
+    ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundGodot::compile_orchestra);
+
+    ClassDB::bind_method(D_METHOD("instrument_note_on"), &CsoundGodot::instrument_note_on);
+    ClassDB::bind_method(D_METHOD("instrument_note_off"), &CsoundGodot::instrument_note_off);
+
     ClassDB::bind_method(D_METHOD("send_control_channel"), &CsoundGodot::send_control_channel);
     ClassDB::bind_method(D_METHOD("pitch_bend"), &CsoundGodot::pitch_bend);
     ClassDB::bind_method(D_METHOD("play_midi"), &CsoundGodot::play_midi);
@@ -615,4 +676,6 @@ void CsoundGodot::_bind_methods() {
 
     ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
+
+    ADD_SIGNAL(MethodInfo("csound_ready"));
 }

@@ -91,8 +91,16 @@ public:
     Ref<MidiFileReader> get_midi_file();
 
     void program_select(int chan, int bank_num, int preset_num);
+
     void note_on(int chan, int key, int vel);
     void note_off(int chan, int key);
+
+    void input_message(String message);
+    void compile_orchestra(String orchestra);
+
+    void instrument_note_on(String instrument, int chan, int key, int vel);
+    void instrument_note_off(String instrument, int chan, int key);
+
     void send_control_channel(String channel, float value);
     // val value (0-16383 with 8192 being center)
     void pitch_bend(int chan, int val);

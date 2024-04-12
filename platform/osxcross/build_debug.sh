@@ -28,7 +28,7 @@ for ARCH in x86_64 arm64; do
     make install
 done
 
-prefix=$dir/addons/csound/bin/macos/release
+prefix=$dir/addons/csound/bin/macos/debug
 prefix_x64=$src_dir/bin/osxcross-x86_64/debug
 prefix_arm64=$src_dir/bin/osxcross-arm64/debug
 

@@ -10,6 +10,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=$dir/addons/csound/bin/linux/debug \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_JAVA_INTERFACE=OFF \
     -DINSTALL_PYTHON_INTERFACE=OFF \
+    -DBUILD_PLUGINS=ON \
     $src_dir
 
 make

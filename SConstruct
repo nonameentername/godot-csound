@@ -58,6 +58,10 @@ if env["platform"] == "web":
     csound_library = "csound"
 elif env["platform"] == "macos":
     csound_library = "CsoundLib64"
+elif env["platform"] == "ios":
+    csound_library = "CsoundLib"
+    env.Append(CPPFLAGS=["-stdlib=libc++"])
+    env.Append(LINKFLAGS=["-stdlib=libc++"])
 else:
     csound_library = "csound64"
     env.Append(LIBS=[csound_library])
@@ -100,6 +104,17 @@ elif env["platform"] == "macos":
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/release/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path../Frameworks"])
         env.Append(CPPPATH=["addons/csound/bin/macos/release/Library/Frameworks/CsoundLib64.framework/Headers"])
+elif env["platform"] == "ios":
+    if env["dev_build"]:
+        env.Append(LINKFLAGS=["-framework", csound_library])
+        env.Append(LINKFLAGS=["-F", "addons/csound/bin/ioscross/debug/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", "@loader_path/../debug/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
+        env.Append(CPPPATH=["addons/csound/bin/ioscross/debug/Library/Frameworks/CsoundLib.framework/Headers"])
+    else:
+        env.Append(LINKFLAGS=["-framework", csound_library])
+        env.Append(LINKFLAGS=["-F", "addons/csound/bin/ioscross/release/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path../Frameworks"])
+        env.Append(CPPPATH=["addons/csound/bin/ioscross/release/Library/Frameworks/CsoundLib.framework/Headers"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

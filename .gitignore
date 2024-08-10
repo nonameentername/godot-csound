@@ -16,6 +16,8 @@ addons/csound/bin/wasm
 addons/csound/bin/web
 addons/csound/bin/windows
 addons/csound/bin/x11/
+addons/csound/bin/ios/
+addons/csound/bin/ioscross/
 build
 build-log.txt
 compile_commands.json

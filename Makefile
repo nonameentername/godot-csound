@@ -83,13 +83,23 @@ osxcross:
 	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_release.sh'
 	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_debug.sh'
 
+docker-ioscross:
+	docker build -t godot-csound-ioscross ./platform/ioscross
+
+shell-ioscross: docker-ioscross
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-ioscross ${SHELL_COMMAND}
+
+ioscross:
+	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_release.sh'
+	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_debug.sh'
+
 docker-windows:
 	docker build -t godot-csound-windows ./platform/windows
 
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
-all: ubuntu web mingw osxcross
+all: ubuntu mingw osxcross ioscross #web 
 
 cgdb:
 	cgdb --args $GODOT4 --editor

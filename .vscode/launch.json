@@ -136,5 +136,25 @@
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,
     },
+    {
+      "name": "🕹: Native Debug Game in Editor (OSX)",
+      "type": "cppdbg",
+      "MIMode": "lldb",
+      "miDebuggerPath": "lldb-mi",
+      "request": "launch",
+      "program": "${env:GODOT4}",
+      "args": ["--editor"],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "visualizerFile": "${workspaceFolder}/godot.natvis",
+      "showDisplayString": true,
+      "environment" : [
+          {
+              "name": "CS_USER_PLUGINDIR",
+              "value": "./addons/csound/bin/macos/debug/Library/Frameworks/CsoundLib64.framework/Versions/7.0/Resources/Opcodes64"
+          }
+      ]
+
+    },
   ]
 }

@@ -102,19 +102,21 @@ elif env["platform"] == "macos":
     else:
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/release/Library/Frameworks"])
-        env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path../Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
         env.Append(CPPPATH=["addons/csound/bin/macos/release/Library/Frameworks/CsoundLib64.framework/Headers"])
 elif env["platform"] == "ios":
+    app_name = 'csoundgodot.app'
+    prefix = "sim_" if env["ios_simulator"] else ""
     if env["dev_build"]:
         env.Append(LINKFLAGS=["-framework", csound_library])
-        env.Append(LINKFLAGS=["-F", "addons/csound/bin/ioscross/debug/Library/Frameworks"])
-        env.Append(LINKFLAGS=["-rpath", "@loader_path/../debug/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
-        env.Append(CPPPATH=["addons/csound/bin/ioscross/debug/Library/Frameworks/CsoundLib.framework/Headers"])
+        env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}debug/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
+        env.Append(CPPPATH=[f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks/CsoundLib.framework/Headers"])
     else:
         env.Append(LINKFLAGS=["-framework", csound_library])
-        env.Append(LINKFLAGS=["-F", "addons/csound/bin/ioscross/release/Library/Frameworks"])
-        env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path../Frameworks"])
-        env.Append(CPPPATH=["addons/csound/bin/ioscross/release/Library/Frameworks/CsoundLib.framework/Headers"])
+        env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}release/Library/Frameworks"])
+        env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}release/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
+        env.Append(CPPPATH=[f"addons/csound/bin/ios/{prefix}release/Library/Frameworks/CsoundLib.framework/Headers"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

@@ -17,6 +17,7 @@ addons/csound/bin/web
 addons/csound/bin/windows
 addons/csound/bin/x11/
 addons/csound/bin/ios/
+addons/csound/bin/ios_sim/
 addons/csound/bin/ioscross/
 build
 build-log.txt

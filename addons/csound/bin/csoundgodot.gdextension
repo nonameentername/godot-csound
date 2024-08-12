@@ -7,6 +7,10 @@ compatibility_minimum = 4.1
 
 macos.debug = "res://addons/csound/bin/macos/macos.framework/libcsoundgodot.macos.template_debug"
 macos.release = "res://addons/csound/bin/macos/macos.framework/libcsoundgodot.macos.template_release"
+ios.debug.simulator = "res://addons/csound/bin/ios/libcsoundgodot.ios.template_debug.dev.universal.simulator.dylib"
+ios.release.simulator = "res://addons/csound/bin/ios/libcsoundgodot.ios.template_release.universal.simulator.dylib"
+ios.debug.arm64 = "res://addons/csound/bin/ios/libcsoundgodot.ios.template_debug.dev.arm64.dylib"
+ios.release.arm64 = "res://addons/csound/bin/ios/libcsoundgodot.ios.template_release.arm64.dylib"
 windows.debug.x86_64 = "res://addons/csound/bin/windows/libcsoundgodot.windows.template_debug.dev.x86_64.dll"
 windows.release.x86_64 = "res://addons/csound/bin/windows/libcsoundgodot.windows.template_release.x86_64.dll"
 linux.debug.x86_64 = "res://addons/csound/bin/linux/libcsoundgodot.linux.template_debug.dev.x86_64.so"
@@ -57,6 +61,18 @@ macos.debug = {
 }
 macos.release = {
 "macos/release/Library/Frameworks/CsoundLib64.framework": ""
+}
+ios.debug.simulator = {
+"ios/sim_debug/Library/Frameworks/CsoundLib.framework": ""
+}
+ios.release.simulator = {
+"ios/sim_release/Library/Frameworks/CsoundLib.framework": ""
+}
+ios.debug.arm64 = {
+"ios/debug/Library/Frameworks/CsoundLib.framework": ""
+}
+ios.release.arm64 = {
+"ios/release/Library/Frameworks/CsoundLib.framework": ""
 }
 
 [icons]

@@ -1,7 +1,7 @@
 godot-csound
 ============
 
-Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.2.1 stable release.
+Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.3 stable release.
 
 How to Install
 --------------

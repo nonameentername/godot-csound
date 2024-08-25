@@ -40,3 +40,7 @@ cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $prefix/lib/
 
 cd $dir
 scons platform=windows target=template_debug dev_build=yes debug_symbols=yes
+
+for dll in $(find $prefix/lib -type f); do
+    cp $dll $prefix/..
+done

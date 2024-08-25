@@ -93,13 +93,25 @@ ioscross:
 	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_release.sh'
 	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_debug.sh'
 
+docker-android:
+	docker build -t godot-csound-android ./platform/android
+
+shell-android: docker-android
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-android ${SHELL_COMMAND}
+
+.PHONY: android
+
+android:
+	$(MAKE) shell-android SHELL_COMMAND='./platform/android/build_release.sh'
+	$(MAKE) shell-android SHELL_COMMAND='./platform/android/build_debug.sh'
+
 docker-windows:
 	docker build -t godot-csound-windows ./platform/windows
 
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
-all: ubuntu mingw osxcross ioscross #web 
+all: ubuntu mingw osxcross ioscross android #web 
 
 cgdb:
 	cgdb --args $GODOT4 --editor

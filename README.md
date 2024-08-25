@@ -33,5 +33,21 @@ git submodule update --init --recursive
 4. Build project using make:
 
 ```bash
+#build all platforms
 make all
+
+#build for ubuntu
+make ubuntu
+
+#build for windows
+make mingw
+
+#build for MacOS
+make osxcross
+
+#build for iOS
+make ioscross
+
+#build for Android
+make android
 ```

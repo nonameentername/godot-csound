@@ -62,6 +62,9 @@ elif env["platform"] == "ios":
     csound_library = "CsoundLib"
     env.Append(CPPFLAGS=["-stdlib=libc++"])
     env.Append(LINKFLAGS=["-stdlib=libc++"])
+elif env["platform"] == "android":
+    csound_library = "csound"
+    env.Append(LIBS=[csound_library])
 else:
     csound_library = "csound64"
     env.Append(LIBS=[csound_library])
@@ -105,7 +108,7 @@ elif env["platform"] == "macos":
         env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
         env.Append(CPPPATH=["addons/csound/bin/macos/release/Library/Frameworks/CsoundLib64.framework/Headers"])
 elif env["platform"] == "ios":
-    app_name = 'csoundgodot.app'
+    app_name = "csoundgodot.app"
     prefix = "sim_" if env["ios_simulator"] else ""
     if env["dev_build"]:
         env.Append(LINKFLAGS=["-framework", csound_library])
@@ -117,6 +120,15 @@ elif env["platform"] == "ios":
         env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}release/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}release/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
         env.Append(CPPPATH=[f"addons/csound/bin/ios/{prefix}release/Library/Frameworks/CsoundLib.framework/Headers"])
+elif env["platform"] == "android":
+    arch_map = { "arm32": "arm", "arm64": "arm64", "x86_32": "x86", "x86_64": "x64" }
+    arch = arch_map[env["arch"]]
+    if env["dev_build"]:
+        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/debug/lib"])
+        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/debug/include/csound"])
+    else:
+        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/release/lib"])
+        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/release/include/csound"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

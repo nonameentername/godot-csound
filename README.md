@@ -50,4 +50,7 @@ make ioscross
 
 #build for Android
 make android
+
+#build for web
+make web
 ```

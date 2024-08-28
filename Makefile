@@ -111,7 +111,7 @@ docker-windows:
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
-all: ubuntu mingw osxcross ioscross android #web 
+all: ubuntu mingw osxcross ioscross android web 
 
 cgdb:
 	cgdb --args $GODOT4 --editor

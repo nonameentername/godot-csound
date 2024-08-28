@@ -56,6 +56,7 @@ env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
 if env["platform"] == "web":
     csound_library = "csound"
+    env.Append(LIBS=[csound_library, "sndfile", "FLAC"])
 elif env["platform"] == "macos":
     csound_library = "CsoundLib64"
 elif env["platform"] == "ios":

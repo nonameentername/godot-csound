@@ -7,6 +7,7 @@
 .mono
 .sconsign.dblite
 .vs
+assets/FluidR3_GM.sf2
 addons/csound/bin/linux
 addons/csound/bin/macos
 addons/csound/bin/wasm

@@ -111,7 +111,18 @@ docker-windows:
 shell-windows: docker-windows
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-windows powershell
 
-all: ubuntu mingw osxcross ioscross android web 
+docker-download:
+	docker build -t godot-csound-download ./platform/download
+
+shell-download: docker-download
+	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-download ${SHELL_COMMAND}
+
+download:
+ifeq (,$(wildcard ./assets/FluidR3_GM.sf2))
+	$(MAKE) shell-download SHELL_COMMAND='cat /usr/share/sounds/sf2/FluidR3_GM.sf2' > assets/FluidR3_GM.sf2
+endif
+
+all: download ubuntu mingw osxcross ioscross android web 
 
 cgdb:
 	cgdb --args $GODOT4 --editor

@@ -61,36 +61,16 @@ for ARCH in x86_64 arm64; do
     fi
 done
 
+$dir/scripts/lipo-dir.py  \
+    $src_dir/build/ioscross-arm64/release \
+    $src_dir/build/ioscross-x86_64/release \
+    $src_dir/build/ioscross-universal/release
+
 prefix=$dir/addons/csound/bin/ios/sim_release
 prefix_x64=$src_dir/bin/ioscross-x86_64/release
 prefix_arm64=$src_dir/bin/ioscross-arm64/release
 
-mkdir -p $prefix
-cp -r $prefix_arm64/* $prefix
-
-for opcode in $(ls $prefix/Library/Frameworks/CsoundLib.framework/Versions/7.0/Resources/Opcodes); do
-    lipo -create \
-        $prefix_x64/Library/Frameworks/CsoundLib.framework/Versions/7.0/Resources/Opcodes/$opcode \
-        $prefix_arm64/Library/Frameworks/CsoundLib.framework/Versions/7.0/Resources/Opcodes/$opcode \
-        -output $prefix/Library/Frameworks/CsoundLib.framework/Versions/7.0/Resources/Opcodes/$opcode
-done
-
-lipo -create \
-    $prefix_x64/Library/Frameworks/CsoundLib.framework/CsoundLib \
-    $prefix_arm64/Library/Frameworks/CsoundLib.framework/CsoundLib \
-    -output $prefix/Library/Frameworks/CsoundLib.framework/CsoundLib
-
-lipo -create \
-    $prefix_x64/lib/libCsoundLib.a \
-    $prefix_arm64/lib/libCsoundLib.a \
-    -output $prefix/lib/libCsoundLib.a
-
-for program in $(cd $prefix/bin && ls */cs*); do
-    lipo -create \
-        $prefix_x64/bin/$program \
-        $prefix_arm64/bin/$program \
-        -output $prefix/bin/$program
-done
+$dir/scripts/lipo-dir.py $prefix_arm64 $prefix_x64 $prefix
 
 $(eval $BASE_DIR/ioscross/arm64/ioscross_conf.sh)
 

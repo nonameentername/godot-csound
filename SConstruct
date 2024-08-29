@@ -54,23 +54,23 @@ env.Alias("compiledb", compilation_db)
 
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
+libraries = [
+    "sndfile",
+    "vorbis",
+    "FLAC++",
+    "FLAC",
+    "mp3lame",
+    "mpg123",
+    "ogg",
+    "opus",
+    "samplerate",
+    "vorbisenc",
+    "vorbisfile"
+]
+
 if env["platform"] == "web":
     csound_library = "csound"
-    env.Append(LIBS=[
-        csound_library, 
-        "FLAC++",
-        "FLAC",
-        "mp3lame",
-        "mpg123",
-        "ogg",
-        "opus",
-        "samplerate",
-        "sndfile",
-        "vorbis",
-        "vorbisenc",
-        "vorbisfile",
-        "z"
-    ])
+    env.Append(LIBS=[csound_library] + libraries)
 elif env["platform"] == "macos":
     csound_library = "CsoundLib64"
 elif env["platform"] == "ios":
@@ -80,19 +80,21 @@ elif env["platform"] == "ios":
 elif env["platform"] == "android":
     csound_library = "csound"
     env.Append(LIBS=[csound_library])
+elif env["platform"] == "windows":
+    csound_library = "csound64"
+    env.Append(LIBS=[csound_library] + libraries + ["shlwapi", "ssp"])
 else:
     csound_library = "csound64"
     env.Append(LIBS=[csound_library])
 
 if env["platform"] == "windows":
     if env["dev_build"]:
-        env.Append(LIBPATH=["addons/csound/bin/windows/debug/lib"])
-        env.Append(CPPPATH=["addons/csound/bin/windows/debug/include/csound"])
+        env.Append(LIBPATH=["addons/csound/bin/windows/debug/lib", "modules/csound/build/mingw/debug/vcpkg_installed/x64-mingw-static/lib"])
+        env.Append(CPPPATH=["addons/csound/bin/windows/debug/include/csound", "modules/csound/build/mingw/debug/vcpkg_installed/x64-mingw-static/include"])
     else:
-        env.Append(LIBPATH=["addons/csound/bin/windows/release/lib"])
-        env.Append(CPPPATH=["addons/csound/bin/windows/release/include/csound"])
+        env.Append(LIBPATH=["addons/csound/bin/windows/release/lib", "modules/csound/build/mingw/release/vcpkg_installed/x64-mingw-static/lib"])
+        env.Append(CPPPATH=["addons/csound/bin/windows/release/include/csound", "modules/csound/build/mingw/release/vcpkg_installed/x64-mingw-static/include"])
     env.Append(CPPFLAGS=["-DMINGW"])
-    #env.Append(RPATH=["addons/csound/bin/csound/bin", "."])
 elif env["platform"] == "web":
     if env["dev_build"]:
         env.Append(LIBPATH=["addons/csound/bin/web/debug/lib", "modules/csound/build/web/debug/vcpkg_installed/wasm32-emscripten/lib"])
@@ -114,11 +116,17 @@ elif env["platform"] == "linux":
         env.Append(CPPPATH=["addons/csound/bin/linux/release/include/csound"])
 elif env["platform"] == "macos":
     if env["dev_build"]:
+        env.Append(LIBPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/univeral-osxcross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/univeral-osxcross/include"])
+
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/debug/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", "@loader_path/../debug/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
         env.Append(CPPPATH=["addons/csound/bin/macos/debug/Library/Frameworks/CsoundLib64.framework/Headers"])
     else:
+        env.Append(LIBPATH=["modules/csound/build/osxcross/release/vcpkg_installed/univeral-osxcross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/osxcross/release/vcpkg_installed/univeral-osxcross/include"])
+
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/release/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", "@loader_path/../release/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
@@ -127,11 +135,17 @@ elif env["platform"] == "ios":
     app_name = "csoundgodot.app"
     prefix = "sim_" if env["ios_simulator"] else ""
     if env["dev_build"]:
+        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/univeral-ioscross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/univeral-ioscross/include"])
+
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}debug/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
         env.Append(CPPPATH=[f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks/CsoundLib.framework/Headers"])
     else:
+        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/univeral-ioscross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/univeral-ioscross/include"])
+
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}release/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}release/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
@@ -140,11 +154,11 @@ elif env["platform"] == "android":
     arch_map = { "arm32": "arm", "arm64": "arm64", "x86_32": "x86", "x86_64": "x64" }
     arch = arch_map[env["arch"]]
     if env["dev_build"]:
-        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/debug/lib"])
-        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/debug/include/csound"])
+        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/debug/lib", f"modules/csound/build/android-{arch}/debug/vcpkg_installed/{arch}-android/lib"])
+        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/debug/include/csound", f"modules/csound/build/android-{arch}/debug/vcpkg_installed/{arch}-android/include"])
     else:
-        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/release/lib"])
-        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/release/include/csound"])
+        env.Append(LIBPATH=[f"addons/csound/bin/android-{arch}/release/lib", f"modules/csound/build/android-{arch}/release/vcpkg_installed/{arch}-android/lib"])
+        env.Append(CPPPATH=[f"addons/csound/bin/android-{arch}/release/include/csound", f"modules/csound/build/android-{arch}/release/vcpkg_installed/{arch}-android/include"])
 
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")

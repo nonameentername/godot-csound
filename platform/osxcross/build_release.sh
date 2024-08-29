@@ -28,36 +28,16 @@ for ARCH in x86_64 arm64; do
     make install
 done
 
+$dir/scripts/lipo-dir.py  \
+    $dir/modules/csound/build/osxcross-arm64/release \
+    $dir/modules/csound/build/osxcross-x86_64/release \
+    $dir/modules/csound/build/osxcross/release
+
 prefix=$dir/addons/csound/bin/macos/release
 prefix_x64=$src_dir/bin/osxcross-x86_64/release
 prefix_arm64=$src_dir/bin/osxcross-arm64/release
 
-mkdir -p $prefix
-cp -r $prefix_arm64/* $prefix
-
-for opcode in $(ls $prefix/Library/Frameworks/CsoundLib64.framework/Versions/7.0/Resources/Opcodes64); do
-    lipo -create \
-        $prefix_x64/Library/Frameworks/CsoundLib64.framework/Versions/7.0/Resources/Opcodes64/$opcode \
-        $prefix_arm64/Library/Frameworks/CsoundLib64.framework/Versions/7.0/Resources/Opcodes64/$opcode \
-        -output $prefix/Library/Frameworks/CsoundLib64.framework/Versions/7.0/Resources/Opcodes64/$opcode
-done
-
-lipo -create \
-    $prefix_x64/Library/Frameworks/CsoundLib64.framework/Versions/7.0/CsoundLib64 \
-    $prefix_arm64/Library/Frameworks/CsoundLib64.framework/Versions/7.0/CsoundLib64 \
-    -output $prefix/Library/Frameworks/CsoundLib64.framework/Versions/7.0/CsoundLib64
-
-lipo -create \
-    $prefix_x64/lib/libCsoundLib64.a \
-    $prefix_arm64/lib/libCsoundLib64.a \
-    -output $prefix/lib/libCsoundLib64.a
-
-for program in $(ls $prefix/bin); do
-    lipo -create \
-        $prefix_x64/bin/$program \
-        $prefix_arm64/bin/$program \
-        -output $prefix/bin/$program
-done
+$dir/scripts/lipo-dir.py $prefix_arm64 $prefix_x64 $prefix
 
 export OSXCROSS_ROOT=$OSXCROSS_BASE_DIR
 

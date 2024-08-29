@@ -7,9 +7,6 @@
 .mono
 .sconsign.dblite
 .vs
-assets/example.mid
-assets/example.sf2
-assets/example2.mid
 addons/csound/bin/linux
 addons/csound/bin/macos
 addons/csound/bin/wasm

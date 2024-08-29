@@ -99,6 +99,20 @@ instr 5
     outs	a1, a2
 endin
 
+instr 6
+    iskptim  = .3
+    ibufsize = 64
+    ar1, ar2 mp3in "assets/hello.mp3", iskptim, 0, 0, ibufsize
+             outs ar1 * 2, ar2 * 2
+endin
+
+instr 7
+
+ktrans linseg 1, 5, 2, 10, -2
+a1, a2 diskin2 "assets/hello.mp3", ktrans, 0, 1, 0, 32
+       outs a1, a2
+
+endin
 
 </CsInstruments>
 <CsScore>
@@ -109,10 +123,14 @@ i1 + 1 62 <
 i1 + 1 65 <
 i1 + 1 69 10
 
+i6 4 1 60 100
+
 i2 5 1 60 100
 i2 + 1 62 <
 i2 7 1 65 <
 i2 7 1 69 10
+
+i7 8 1 60 100
 
 ;i3 0 3600
 

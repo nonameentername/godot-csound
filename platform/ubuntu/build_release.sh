@@ -10,6 +10,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=$dir/addons/csound/bin/linux/release \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_JAVA_INTERFACE=OFF \
     -DINSTALL_PYTHON_INTERFACE=OFF \
+    -DBUILD_PLUGINS=OFF \
     $src_dir
 
 make

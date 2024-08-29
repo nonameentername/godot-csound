@@ -1,6 +1,7 @@
 #include "csound_godot.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/classes/audio_stream_mp3.hpp"
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
@@ -35,6 +36,7 @@ void CsoundGodot::_ready() {
     csound->SetHostImplementedAudioIO(1, 0);
 
     csound->SetOpenFileCallback(open_file);
+	csound->SetOpenSoundFileCallback(open_sound_file);
 
     // csound->SetHostImplementedMIDIIO(true);
     // csound->SetExternalMidiWriteCallback(write_midi_data);
@@ -583,12 +585,72 @@ FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *m
             rewind(fp);
             return fp;
         }
+
+        Ref<AudioStreamMP3> mp3_file = resource;
+        if (mp3_file != NULL) {
+            FILE *fp = fmemopen(NULL, mp3_file->get_data().size(), "w+");
+            char *data = (char *)mp3_file->get_data().ptr();
+            for (int i = 0; i < mp3_file->get_data().size(); i++) {
+                fprintf(fp, "%c", data[i]);
+            }
+            fflush(fp);
+            rewind(fp);
+            return fp;
+        }
     }
 
     return NULL;
 }
 
-void *CsoundGodot::open_sound_file(CSOUND *csound, const char *pathname, int mode, void *userdata) {
+void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mode, void *userdata) {
+    String node_path = filename;
+    SFLIB_INFO *sfinfo = (SFLIB_INFO*) userdata;
+
+    if (ResourceLoader::get_singleton()->exists(node_path)) {
+        Variant resource = ResourceLoader::get_singleton()->load(node_path);
+
+        Ref<AudioStreamMP3> mp3_file = resource;
+
+        if (mp3_file != NULL) {
+			int size = mp3_file->get_data().size();
+			PackedByteArray byte_array = mp3_file->get_data();
+            char* txt = (char*) calloc(size, sizeof(char)); 
+
+            for (int i = 0; i < size; i++) {
+                txt[i] = byte_array.ptr()[i];
+            }
+
+            MemoryFile *file = new MemoryFile {txt, (sf_count_t)size, 0};
+			SF_VIRTUAL_IO *vio = new SF_VIRTUAL_IO;
+			vio->get_filelen = vio_get_filelen;
+			vio->seek = vio_seek;
+			vio->read = vio_read;
+			vio->write = vio_write;
+			vio->tell = vio_tell;
+
+            SNDFILE *handle;
+            SF_INFO *info = new SF_INFO;
+
+            if(mode == SFM_WRITE) {
+                info->samplerate = sfinfo->samplerate;
+                info->channels = sfinfo->channels;
+                info->format = sfinfo->format;
+            }
+            handle = sf_open_virtual(vio, mode, info, file);
+
+            int error = sf_error(handle);
+
+            if(mode == SFM_READ) {
+                sfinfo->samplerate = info->samplerate;
+                sfinfo->channels = info->channels;
+                sfinfo->format = info->format;
+                sfinfo->frames  = info->frames;
+            }
+
+            return handle;
+        }
+    }
+
     return NULL;
 }
 
@@ -640,6 +702,52 @@ double CsoundGodot::get_time_to_next_mix() {
     double total = get_time_since_last_mix();
     double mix_buffer = last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
     return mix_buffer - total;
+}
+
+sf_count_t  CsoundGodot::vio_get_filelen(void *user_data) {
+    MemoryFile *file = (MemoryFile*) user_data;
+    return file->length;
+}
+
+sf_count_t CsoundGodot::vio_seek(sf_count_t offset, int whence, void *user_data) {
+    MemoryFile *file = (MemoryFile*) user_data;
+    sf_count_t newpos = 0;
+    switch (whence) {
+        case SEEK_SET:
+            newpos = offset;
+            break;
+        case SEEK_CUR:
+            newpos = file->curpos + offset;
+            break;
+        case SEEK_END:
+            newpos = file->length - offset;
+            break;
+    }
+    if ((newpos >= 0) && (newpos < file->length)) {
+        file->curpos = newpos;
+    }
+    return file->curpos;
+}
+
+sf_count_t CsoundGodot::vio_read(void *ptr, sf_count_t count, void *user_data) {
+    MemoryFile *file = (MemoryFile*) user_data;
+    if (count + file->curpos > file->length) {
+        count = file->length - file->curpos;
+    }
+    if (count > 0) {
+        memcpy(ptr, file->buffer + file->curpos, count);
+    }
+    file->curpos += count;
+    return count;
+}
+
+sf_count_t CsoundGodot::vio_write(const void *ptr, sf_count_t count, void *user_data) {
+    return 0;
+}
+
+sf_count_t CsoundGodot::vio_tell(void *user_data) {
+    MemoryFile *file = (MemoryFile*) user_data;
+    return file->curpos;
 }
 
 void CsoundGodot::_bind_methods() {

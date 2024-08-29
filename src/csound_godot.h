@@ -1,7 +1,9 @@
 #ifndef CSOUNDGODOT_H
 #define CSOUNDGODOT_H
 
+#define USE_LIBSNDFILE 1
 #include <csound.hpp>
+#include <soundfile.h>
 
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_server.hpp>
@@ -70,6 +72,18 @@ private:
     HashMap<String, int> named_channels;
 
     void initialize_channels(int p_frames);
+
+    struct MemoryFile {
+        char* buffer;
+        sf_count_t length;
+        sf_count_t curpos;
+    };
+
+	static sf_count_t vio_get_filelen(void *user_data);
+	static sf_count_t vio_seek(sf_count_t offset, int whence, void *user_data);
+	static sf_count_t vio_read(void *ptr, sf_count_t count, void *user_data);
+	static sf_count_t vio_write(const void *ptr, sf_count_t count, void *user_data);
+	static sf_count_t vio_tell(void *user_data);
 
 protected:
     static void _bind_methods();

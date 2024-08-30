@@ -117,13 +117,9 @@ docker-download:
 shell-download: docker-download
 	@docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-download ${SHELL_COMMAND}
 
-.ONESHELL:
-SHELL = /usr/bin/bash
-download:
+download: docker-download
 ifeq (,$(wildcard ./assets/FluidR3_GM.sf2))
-	@id=$$(docker create godot-csound-download)
-	@docker cp $$id:/usr/share/sounds/sf2/FluidR3_GM.sf2 assets/FluidR3_GM.sf2
-	@docker rm -v $$id
+	./scripts/download.sh
 endif
 
 all: download ubuntu mingw osxcross ioscross android web 

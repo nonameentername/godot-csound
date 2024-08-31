@@ -31,12 +31,13 @@ void CsoundGodot::_ready() {
     finished = false;
     csound = new Csound();
 
-    csound->CreateMessageBuffer(0);
+    // csound->CreateMessageBuffer(0);
     csound->SetDebug(false);
     csound->SetHostImplementedAudioIO(1, 0);
 
     csound->SetOpenFileCallback(open_file);
-	csound->SetOpenSoundFileCallback(open_sound_file);
+    csound->SetOpenSoundFileCallback(open_sound_file);
+    csound->SetMessageCallback(set_message);
 
     // csound->SetHostImplementedMIDIIO(true);
     // csound->SetExternalMidiWriteCallback(write_midi_data);
@@ -547,10 +548,12 @@ void CsoundGodot::process(double delta) {
         }
     }
 
+    /*
     for (int i = 0; i < csound->GetMessageCnt(); i++) {
         godot::UtilityFunctions::printraw(csound->GetFirstMessage());
         csound->PopFirstMessage();
     }
+    */
 }
 
 int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
@@ -559,6 +562,17 @@ int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned 
 
 int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
     return 0;
+}
+
+void CsoundGodot::set_message(CSOUND *, int attr, const char *format, va_list valist) {
+    std::string message;
+    va_list valist_copy;
+    va_copy(valist_copy, valist);
+    size_t len = vsnprintf(0, 0, format, valist_copy);
+    message.resize(len + 1);
+    vsnprintf(&message[0], len + 1, format, valist);
+    message.resize(len);
+    godot::UtilityFunctions::print(message.c_str());
 }
 
 FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *mode) {
@@ -604,7 +618,7 @@ FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *m
 
 void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mode, void *userdata) {
     String node_path = filename;
-    SFLIB_INFO *sfinfo = (SFLIB_INFO*) userdata;
+    SFLIB_INFO *sfinfo = (SFLIB_INFO *)userdata;
 
     if (ResourceLoader::get_singleton()->exists(node_path)) {
         Variant resource = ResourceLoader::get_singleton()->load(node_path);
@@ -612,26 +626,26 @@ void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mod
         Ref<AudioStreamMP3> mp3_file = resource;
 
         if (mp3_file != NULL) {
-			int size = mp3_file->get_data().size();
-			PackedByteArray byte_array = mp3_file->get_data();
-            char* txt = (char*) calloc(size, sizeof(char)); 
+            int size = mp3_file->get_data().size();
+            PackedByteArray byte_array = mp3_file->get_data();
+            char *txt = (char *)calloc(size, sizeof(char));
 
             for (int i = 0; i < size; i++) {
                 txt[i] = byte_array.ptr()[i];
             }
 
-            MemoryFile *file = new MemoryFile {txt, (sf_count_t)size, 0};
-			SF_VIRTUAL_IO *vio = new SF_VIRTUAL_IO;
-			vio->get_filelen = vio_get_filelen;
-			vio->seek = vio_seek;
-			vio->read = vio_read;
-			vio->write = vio_write;
-			vio->tell = vio_tell;
+            MemoryFile *file = new MemoryFile{txt, (sf_count_t)size, 0};
+            SF_VIRTUAL_IO *vio = new SF_VIRTUAL_IO;
+            vio->get_filelen = vio_get_filelen;
+            vio->seek = vio_seek;
+            vio->read = vio_read;
+            vio->write = vio_write;
+            vio->tell = vio_tell;
 
             SNDFILE *handle;
             SF_INFO *info = new SF_INFO;
 
-            if(mode == SFM_WRITE) {
+            if (mode == SFM_WRITE) {
                 info->samplerate = sfinfo->samplerate;
                 info->channels = sfinfo->channels;
                 info->format = sfinfo->format;
@@ -640,11 +654,11 @@ void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mod
 
             int error = sf_error(handle);
 
-            if(mode == SFM_READ) {
+            if (mode == SFM_READ) {
                 sfinfo->samplerate = info->samplerate;
                 sfinfo->channels = info->channels;
                 sfinfo->format = info->format;
-                sfinfo->frames  = info->frames;
+                sfinfo->frames = info->frames;
             }
 
             return handle;
@@ -704,24 +718,24 @@ double CsoundGodot::get_time_to_next_mix() {
     return mix_buffer - total;
 }
 
-sf_count_t  CsoundGodot::vio_get_filelen(void *user_data) {
-    MemoryFile *file = (MemoryFile*) user_data;
+sf_count_t CsoundGodot::vio_get_filelen(void *user_data) {
+    MemoryFile *file = (MemoryFile *)user_data;
     return file->length;
 }
 
 sf_count_t CsoundGodot::vio_seek(sf_count_t offset, int whence, void *user_data) {
-    MemoryFile *file = (MemoryFile*) user_data;
+    MemoryFile *file = (MemoryFile *)user_data;
     sf_count_t newpos = 0;
     switch (whence) {
-        case SEEK_SET:
-            newpos = offset;
-            break;
-        case SEEK_CUR:
-            newpos = file->curpos + offset;
-            break;
-        case SEEK_END:
-            newpos = file->length - offset;
-            break;
+    case SEEK_SET:
+        newpos = offset;
+        break;
+    case SEEK_CUR:
+        newpos = file->curpos + offset;
+        break;
+    case SEEK_END:
+        newpos = file->length - offset;
+        break;
     }
     if ((newpos >= 0) && (newpos < file->length)) {
         file->curpos = newpos;
@@ -730,7 +744,7 @@ sf_count_t CsoundGodot::vio_seek(sf_count_t offset, int whence, void *user_data)
 }
 
 sf_count_t CsoundGodot::vio_read(void *ptr, sf_count_t count, void *user_data) {
-    MemoryFile *file = (MemoryFile*) user_data;
+    MemoryFile *file = (MemoryFile *)user_data;
     if (count + file->curpos > file->length) {
         count = file->length - file->curpos;
     }
@@ -746,7 +760,7 @@ sf_count_t CsoundGodot::vio_write(const void *ptr, sf_count_t count, void *user_
 }
 
 sf_count_t CsoundGodot::vio_tell(void *user_data) {
-    MemoryFile *file = (MemoryFile*) user_data;
+    MemoryFile *file = (MemoryFile *)user_data;
     return file->curpos;
 }
 

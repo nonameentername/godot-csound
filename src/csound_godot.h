@@ -74,16 +74,16 @@ private:
     void initialize_channels(int p_frames);
 
     struct MemoryFile {
-        char* buffer;
+        char *buffer;
         sf_count_t length;
         sf_count_t curpos;
     };
 
-	static sf_count_t vio_get_filelen(void *user_data);
-	static sf_count_t vio_seek(sf_count_t offset, int whence, void *user_data);
-	static sf_count_t vio_read(void *ptr, sf_count_t count, void *user_data);
-	static sf_count_t vio_write(const void *ptr, sf_count_t count, void *user_data);
-	static sf_count_t vio_tell(void *user_data);
+    static sf_count_t vio_get_filelen(void *user_data);
+    static sf_count_t vio_seek(sf_count_t offset, int whence, void *user_data);
+    static sf_count_t vio_read(void *ptr, sf_count_t count, void *user_data);
+    static sf_count_t vio_write(const void *ptr, sf_count_t count, void *user_data);
+    static sf_count_t vio_tell(void *user_data);
 
 protected:
     static void _bind_methods();
@@ -132,6 +132,7 @@ public:
 
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
+    static void set_message(CSOUND *, int attr, const char *format, va_list valist);
 
     static FILE *open_file(CSOUND *csound, const char *filename, const char *mode);
     static void *open_sound_file(CSOUND *csound, const char *pathname, int mode, void *userdata);

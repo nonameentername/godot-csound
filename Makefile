@@ -119,7 +119,7 @@ shell-download: docker-download
 
 download: docker-download
 ifeq (,$(wildcard ./assets/FluidR3_GM.sf2))
-	./scripts/download.sh
+	#./scripts/download.sh
 endif
 
 all: download ubuntu mingw osxcross ioscross android web 

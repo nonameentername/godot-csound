@@ -1,0 +1,14 @@
+[remap]
+
+importer="soundfont"
+type="SoundFontFileReader"
+uid="uid://bejf3ys5rql4o"
+path="res://.godot/imported/000-003-Honky_Tonk.sf2-a3ae079c0c3b390382cb3832171923f0.sf2str"
+
+[deps]
+
+source_file="res://assets/000-003-Honky_Tonk.sf2"
+dest_files=["res://.godot/imported/000-003-Honky_Tonk.sf2-a3ae079c0c3b390382cb3832171923f0.sf2str"]
+
+[params]
+

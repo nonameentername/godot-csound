@@ -12,10 +12,16 @@ nchnls = 2
 chnset 1, "cutoff"
 
 ;load soundfonts
-isf	sfload	"assets/FluidR3_GM.sf2"
+;isf	sfload	"assets/FluidR3_GM.sf2"
 	;sfplist isf
 	;sfplist ir
-	sfpassign	0, isf	
+;	sfpassign	0, isf	
+
+isf1 sfload "assets/000-001-Bright_Yamaha_Grand.sf2"
+	sfpassign	0, isf1
+
+isf1 sfload "assets/000-003-Honky_Tonk.sf2"
+	sfpassign	3, isf1
 
 instr 1	; play guitar from score and midi keyboard - preset index = 0
     prints "hello world\n"

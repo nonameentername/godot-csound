@@ -1,4 +1,5 @@
 #include "csound_godot.h"
+#include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
@@ -33,10 +34,10 @@ void CsoundGodot::_ready() {
 
     // csound->CreateMessageBuffer(0);
     csound->SetDebug(false);
-    csound->SetHostImplementedAudioIO(1, 0);
+    csound->SetHostAudioIO();
 
-    csound->SetOpenFileCallback(open_file);
-    csound->SetOpenSoundFileCallback(open_sound_file);
+    csoundSetOpenFileCallback(csound->GetCsound(), open_file);
+    csoundSetOpenSoundFileCallback(csound->GetCsound(), open_sound_file);
     csound->SetMessageCallback(set_message);
 
     // csound->SetHostImplementedMIDIIO(true);
@@ -64,11 +65,11 @@ void CsoundGodot::start() {
 
         int frame_size = 512 + csound->GetKsmps();
 
-        if (output_channels.size() != csound->GetNchnls()) {
-            input_channels.resize(csound->GetNchnls());
-            output_channels.resize(csound->GetNchnls());
+        if (output_channels.size() != csound->GetChannels(0)) {
+            input_channels.resize(csound->GetChannels(0));
+            output_channels.resize(csound->GetChannels(0));
 
-            for (int j = 0; j < csound->GetNchnls(); j++) {
+            for (int j = 0; j < csound->GetChannels(0); j++) {
                 input_channels.write[j].resize(frame_size);
                 output_channels.write[j].buffer.resize(frame_size);
 
@@ -88,7 +89,7 @@ void CsoundGodot::stop() {
     initialized = false;
 
     if (csound != NULL) {
-        csound->Stop();
+        //csound->Stop();
     }
 }
 
@@ -187,7 +188,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
     int to_fill = p_frames;
 
     MYFLT *spin = csound->GetSpin();
-    MYFLT *spout = csound->GetSpout();
+    const MYFLT *spout = csound->GetSpout();
     MYFLT scale = csound->Get0dBFS();
 
     initialize_channels(p_frames);
@@ -222,8 +223,8 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
 
     while (to_fill > 0) {
         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-            for (int channel = 0; channel < csound->GetNchnls(); channel++) {
-                spin[frame * csound->GetNchnls() + channel] =
+            for (int channel = 0; channel < csound->GetChannels(0); channel++) {
+                spin[frame * csound->GetChannels(0) + channel] =
                     input_channels[channel][ksmps_buffer_index + frame] * scale;
                 input_channels.write[channel].write[ksmps_buffer_index + frame] = 0;
             }
@@ -242,7 +243,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
             finished = true;
         }
 
-        for (int i = 0; i < csound->GetKsmps() * csound->GetNchnls(); i = i + csound->GetNchnls()) {
+        for (int i = 0; i < csound->GetKsmps() * csound->GetChannels(0); i = i + csound->GetChannels(0)) {
             if (bypass) {
                 p_buffer[buffer_index].left = spin[i] * scale;
                 p_buffer[buffer_index].right = spin[i + 1] * scale;
@@ -256,16 +257,17 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
         }
 
         if (bypass) {
-            for (int channel = 0; channel < csound->GetNchnls(); channel++) {
+            for (int channel = 0; channel < csound->GetChannels(0); channel++) {
                 for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                     output_channels.write[channel].buffer.write[ksmps_buffer_index + frame] =
                         input_channels[channel][ksmps_buffer_index + frame];
                 }
             }
         } else {
-            for (int channel = 0; channel < csound->GetNchnls(); channel++) {
+            for (int channel = 0; channel < csound->GetChannels(0); channel++) {
                 for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                    float value = csound->GetSpoutSample(frame, channel) / scale * volume;
+                    int index = (frame * csound->GetChannels(0)) + channel;
+                    float value = spout[index] / scale * volume;
                     float p = ABS(value);
                     if (p > channel_peak[channel]) {
                         channel_peak.write[channel] = p;
@@ -412,7 +414,7 @@ void CsoundGodot::note_on(int chan, int key, int vel) {
 
     float instrnum = chan + chan / 100.0 + key / 100000.0;
     String note_on = vformat("i%f 0 -1 %d %d", instrnum, key, vel);
-    csound->InputMessage(note_on.ascii().get_data());
+    csound->EventString(note_on.ascii().get_data(), 0);
 }
 
 void CsoundGodot::note_off(int chan, int key) {
@@ -422,7 +424,7 @@ void CsoundGodot::note_off(int chan, int key) {
 
     float instrnum = chan + chan / 100.0 + key / 100000.0;
     String note_off = vformat("i-%f 0 0 %d", instrnum, key);
-    csound->InputMessage(note_off.ascii().get_data());
+    csound->EventString(note_off.ascii().get_data(), 0);
 }
 
 void CsoundGodot::input_message(String message) {
@@ -430,7 +432,8 @@ void CsoundGodot::input_message(String message) {
         return;
     }
 
-    csound->InputMessage(message.ascii());
+    //TODO: what should this call? EvalCode?
+    //csound->CompileCSD(message.ascii(), 1);
 }
 
 void CsoundGodot::compile_orchestra(String orchestra) {
@@ -438,7 +441,7 @@ void CsoundGodot::compile_orchestra(String orchestra) {
         return;
     }
 
-    csound->CompileOrc(orchestra.ascii());
+    csound->CompileCSD(orchestra.ascii(), 1);
 }
 
 void CsoundGodot::instrument_note_on(String instrument, int chan, int key, int vel) {
@@ -450,7 +453,7 @@ void CsoundGodot::instrument_note_on(String instrument, int chan, int key, int v
     String instrnumstr = vformat("%.6f", instrnum);
     String note_on = vformat("i\"%s.%s\" 0 -1 %d %d", instrument, instrnumstr.substr(2), key, vel);
     godot::UtilityFunctions::print("note_on ", note_on);
-    csound->InputMessage(note_on.ascii().get_data());
+    csound->EventString(note_on.ascii().get_data(), 0);
 }
 
 void CsoundGodot::instrument_note_off(String instrument, int chan, int key) {
@@ -462,7 +465,7 @@ void CsoundGodot::instrument_note_off(String instrument, int chan, int key) {
     String instrnumstr = vformat("%.6f", instrnum);
     String note_off = vformat("i\"-%s.%s\" 0 0 %d", instrument, instrnumstr.substr(2), key);
     godot::UtilityFunctions::print("note_off ", note_off);
-    csound->InputMessage(note_off.ascii().get_data());
+    csound->EventString(note_off.ascii().get_data(), 0);
 }
 
 void CsoundGodot::send_control_channel(String channel, float value) {
@@ -688,7 +691,7 @@ Ref<CsoundFileReader> CsoundGodot::get_csound_script() {
 
 int CsoundGodot::get_channel_count() {
     if (csound != NULL) {
-        return csound->GetNchnls();
+        return csound->GetChannels(0);
     } else {
         return 2;
     }

@@ -3,6 +3,7 @@
 
 #define USE_LIBSNDFILE 1
 #include <csound.hpp>
+#include <csound_files.h>
 #include <soundfile.h>
 
 #include <godot_cpp/classes/audio_frame.hpp>

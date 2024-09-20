@@ -117,6 +117,8 @@ public:
     void instrument_note_off(String instrument, int chan, int key);
 
     void send_control_channel(String channel, float value);
+    float get_control_channel(String channel);
+
     // val value (0-16383 with 8192 being center)
     void pitch_bend(int chan, int val);
     void play_midi(Ref<MidiFileReader> p_midi_file);

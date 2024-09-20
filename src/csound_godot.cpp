@@ -476,6 +476,14 @@ void CsoundGodot::send_control_channel(String channel, float value) {
     csound->SetControlChannel(channel.ascii().get_data(), value);
 }
 
+float CsoundGodot::get_control_channel(String channel) {
+    if (!initialized) {
+        return 0;
+    }
+
+    return csound->GetControlChannel(channel.ascii().get_data());
+}
+
 void CsoundGodot::pitch_bend(int chan, int val) {
 }
 
@@ -780,7 +788,9 @@ void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("instrument_note_on"), &CsoundGodot::instrument_note_on);
     ClassDB::bind_method(D_METHOD("instrument_note_off"), &CsoundGodot::instrument_note_off);
 
-    ClassDB::bind_method(D_METHOD("send_control_channel"), &CsoundGodot::send_control_channel);
+    ClassDB::bind_method(D_METHOD("send_control_channel", "value"), &CsoundGodot::send_control_channel);
+    ClassDB::bind_method(D_METHOD("get_control_channel"), &CsoundGodot::get_control_channel);
+
     ClassDB::bind_method(D_METHOD("pitch_bend"), &CsoundGodot::pitch_bend);
     ClassDB::bind_method(D_METHOD("play_midi"), &CsoundGodot::play_midi);
     ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundGodot::set_soundfont);

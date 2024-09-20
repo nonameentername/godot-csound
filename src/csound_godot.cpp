@@ -413,7 +413,7 @@ void CsoundGodot::note_on(int chan, int key, int vel) {
     }
 
     float instrnum = chan + chan / 100.0 + key / 100000.0;
-    String note_on = vformat("i%f 0 -1 %d %d", instrnum, key, vel);
+    String note_on = vformat("i%f 0 -1 %d %d %d", instrnum, chan, key, vel);
     csound->EventString(note_on.ascii().get_data(), 0);
 }
 
@@ -423,7 +423,7 @@ void CsoundGodot::note_off(int chan, int key) {
     }
 
     float instrnum = chan + chan / 100.0 + key / 100000.0;
-    String note_off = vformat("i-%f 0 0 %d", instrnum, key);
+    String note_off = vformat("i-%f 0 %d 0 %d", chan, instrnum, key);
     csound->EventString(note_off.ascii().get_data(), 0);
 }
 
@@ -451,8 +451,8 @@ void CsoundGodot::instrument_note_on(String instrument, int chan, int key, int v
 
     float instrnum = chan / 100.0 + key / 100000.0;
     String instrnumstr = vformat("%.6f", instrnum);
-    String note_on = vformat("i\"%s.%s\" 0 -1 %d %d", instrument, instrnumstr.substr(2), key, vel);
-    godot::UtilityFunctions::print("note_on ", note_on);
+    String note_on = vformat("i\"%s.%s\" 0 -1 %d %d %d", instrument, instrnumstr.substr(2), chan, key, vel);
+    //godot::UtilityFunctions::print("note_on ", note_on);
     csound->EventString(note_on.ascii().get_data(), 0);
 }
 
@@ -463,8 +463,8 @@ void CsoundGodot::instrument_note_off(String instrument, int chan, int key) {
 
     float instrnum = chan / 100.0 + key / 100000.0;
     String instrnumstr = vformat("%.6f", instrnum);
-    String note_off = vformat("i\"-%s.%s\" 0 0 %d", instrument, instrnumstr.substr(2), key);
-    godot::UtilityFunctions::print("note_off ", note_off);
+    String note_off = vformat("i\"-%s.%s\" 0 %d 0 %d", instrument, instrnumstr.substr(2), chan, key);
+    //godot::UtilityFunctions::print("note_off ", note_off);
     csound->EventString(note_off.ascii().get_data(), 0);
 }
 

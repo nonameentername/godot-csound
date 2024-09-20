@@ -2,14 +2,25 @@
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/project_settings.hpp>
 #include <godot_cpp/classes/resource_loader.hpp>
+#include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
 #include "csound_layout.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/engine.hpp"
+#include "godot_cpp/classes/input_event_midi.hpp"
 #include "godot_cpp/core/error_macros.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/val.h>
+#endif
+
 using namespace godot;
+
+#ifdef __EMSCRIPTEN__
+using namespace emscripten;
+#endif
 
 CsoundServer *CsoundServer::singleton = NULL;
 
@@ -620,7 +631,95 @@ CsoundGodot *CsoundServer::get_csound_(const Variant &p_variant) {
         return csound_instances.get(index);
     }
 
+
     return NULL;
+}
+
+
+extern "C" {
+#ifdef __EMSCRIPTEN__
+    EMSCRIPTEN_KEEPALIVE
+#endif
+    void dynCall_midi_note_on(int note, int velocity) {
+        Ref<InputEventMIDI> event;
+        event.instantiate();
+        event->set_device(0);
+        event->set_channel(0);
+
+        event->set_message(MIDIMessage::MIDI_MESSAGE_NOTE_ON);
+        event->set_pitch(note);
+        event->set_velocity(velocity);
+
+        Input::get_singleton()->parse_input_event(event);
+
+        printf("note_on: note = %d velocity = %d\n", note, velocity);
+    }
+#ifdef __EMSCRIPTEN__
+    EMSCRIPTEN_KEEPALIVE
+#endif
+    void dynCall_midi_note_off(int note) {
+        Ref<InputEventMIDI> event;
+        event.instantiate();
+        event->set_device(0);
+        event->set_channel(0);
+
+        event->set_message(MIDIMessage::MIDI_MESSAGE_NOTE_OFF);
+        event->set_pitch(note);
+        event->set_velocity(0);
+
+        Input::get_singleton()->parse_input_event(event);
+
+        printf("note_off: note = %d\n", note);
+    }
+}
+
+#ifdef __EMSCRIPTEN__
+EM_JS(void, open_midi_input, (), {
+
+function onMIDIMessage (message) {
+    var command = message.data[0];
+    var note = message.data[1];
+    var velocity = (message.data.length > 2) ? message.data[2] : 0;
+    switch (command) {
+        case 144: // noteOn
+            if (velocity > 0) {
+                Module.dynCall_midi_note_on(note, velocity);
+            } else {
+                Module.dynCall_midi_note_off(note);
+            }
+            break;
+        case 128: // noteOff
+			Module.dynCall_midi_note_off(note);
+            break;
+    }
+}
+
+function failure () {
+    alert('No access to your midi devices.')
+}
+
+function success (midi) {
+    var inputs = midi.inputs.values();
+    for (var input = inputs.next(); input && !input.done; input = inputs.next()) {
+        input.value.onmidimessage = onMIDIMessage;
+    }
+}
+
+if (navigator.requestMIDIAccess) {
+    navigator.requestMIDIAccess().then(success, failure);
+} else {
+    alert('no midi support, you cannot play');
+}
+
+});
+
+#endif
+
+
+void CsoundServer::open_web_midi_inputs() {
+#ifdef __EMSCRIPTEN__
+    open_midi_input();
+#endif
 }
 
 void CsoundServer::_bind_methods() {
@@ -694,6 +793,8 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("generate_csound_layout"), &CsoundServer::generate_csound_layout);
 
     ClassDB::bind_method(D_METHOD("get_csound", "csound_name"), &CsoundServer::get_csound);
+
+    ClassDB::bind_method(D_METHOD("open_web_midi_inputs"), &CsoundServer::open_web_midi_inputs);
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "csound_count"), "set_csound_count", "get_csound_count");
 

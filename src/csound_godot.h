@@ -1,6 +1,9 @@
 #ifndef CSOUNDGODOT_H
 #define CSOUNDGODOT_H
 
+#include "godot_cpp/classes/global_constants.hpp"
+#include "godot_cpp/classes/input_event_midi.hpp"
+#include <queue>
 #define USE_LIBSNDFILE 1
 #include <csound.hpp>
 #include <csound_files.h>
@@ -33,6 +36,16 @@ class CsoundGodot : public Node {
     GDCLASS(CsoundGodot, Node);
     friend class CsoundServer;
 
+public:
+    struct MidiEvent {
+        int message;
+        int channel;
+        int note;
+        int velocity;
+        MidiEvent() {
+        }
+    };
+
 private:
     uint64_t last_mix_time;
     int last_mix_frames;
@@ -51,6 +64,7 @@ private:
     int tab;
     bool initialized;
     Ref<CsoundFileReader> script;
+    std::queue<MidiEvent> midi_queue;
     Vector<Ref<CsoundInstrument>> instruments;
 
     struct Channel {
@@ -113,9 +127,6 @@ public:
     void input_message(String message);
     void compile_orchestra(String orchestra);
 
-    void instrument_note_on(String instrument, int chan, int key, int vel);
-    void instrument_note_off(String instrument, int chan, int key);
-
     void send_control_channel(String channel, float value);
     float get_control_channel(String channel);
 
@@ -133,6 +144,7 @@ public:
 
     void process(double delta);
 
+    static int open_midi_device(CSOUND *csound, void **userData, const char *dev);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
     static void set_message(CSOUND *, int attr, const char *format, va_list valist);

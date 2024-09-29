@@ -109,6 +109,7 @@ public:
     void unlock();
 
     CsoundGodot *get_csound(const String &p_name);
+    CsoundGodot *get_csound_by_index(int p_index);
     CsoundGodot *get_csound_(const Variant &p_name);
 
     void open_web_midi_inputs();

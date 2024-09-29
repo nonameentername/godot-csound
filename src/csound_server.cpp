@@ -620,6 +620,10 @@ CsoundGodot *CsoundServer::get_csound(const String &p_name) {
     return NULL;
 }
 
+CsoundGodot *CsoundServer::get_csound_by_index(int p_index) {
+    return csound_instances.get(p_index);
+}
+
 CsoundGodot *CsoundServer::get_csound_(const Variant &p_variant) {
     if (p_variant.get_type() == Variant::STRING) {
         String str = p_variant;
@@ -640,7 +644,7 @@ extern "C" {
 #ifdef __EMSCRIPTEN__
     EMSCRIPTEN_KEEPALIVE
 #endif
-    void dynCall_midi_note_on(int note, int velocity) {
+    void dynCall_midi_note_on(int channel, int note, int velocity) {
         Ref<InputEventMIDI> event;
         event.instantiate();
         event->set_device(0);
@@ -657,7 +661,7 @@ extern "C" {
 #ifdef __EMSCRIPTEN__
     EMSCRIPTEN_KEEPALIVE
 #endif
-    void dynCall_midi_note_off(int note) {
+    void dynCall_midi_note_off(int channel, int note) {
         Ref<InputEventMIDI> event;
         event.instantiate();
         event->set_device(0);
@@ -677,19 +681,20 @@ extern "C" {
 EM_JS(void, open_midi_input, (), {
 
 function onMIDIMessage (message) {
-    var command = message.data[0];
+    var channel = message.data[0] & 0xf;
+    var command = message.data[0] >> 4;
     var note = message.data[1];
     var velocity = (message.data.length > 2) ? message.data[2] : 0;
     switch (command) {
-        case 144: // noteOn
+        case 9: // noteOn
             if (velocity > 0) {
-                Module.dynCall_midi_note_on(note, velocity);
+                Module.dynCall_midi_note_on(channel, note, velocity);
             } else {
-                Module.dynCall_midi_note_off(note);
+                Module.dynCall_midi_note_off(channel, note);
             }
             break;
-        case 128: // noteOff
-			Module.dynCall_midi_note_off(note);
+        case 8: // noteOff
+			Module.dynCall_midi_note_off(channel, note);
             break;
     }
 }

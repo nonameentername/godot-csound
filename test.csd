@@ -120,9 +120,24 @@ a1, a2 diskin2 "assets/hello.mp3", ktrans, 0, 1, 0, 32
 
 endin
 
+instr 8
+
+kstatus, kchan, kdata1, kdata2 midiin
+
+prints "hello world\n"
+
+endin
+
+massign 0, 0
+massign 1, 1
+massign 2, 2
+massign 3, 3
+
 </CsInstruments>
 <CsScore>
 f0 3600
+
+i8 0 -1
 
 i1 0 1 60 100
 i1 + 1 62 <

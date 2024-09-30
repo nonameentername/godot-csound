@@ -429,7 +429,12 @@ void CsoundGodot::note_on(int chan, int key, int vel) {
     }
 
     MidiEvent event;
-    event.message = MIDIMessage::MIDI_MESSAGE_NOTE_ON;
+
+    if (vel > 0) {
+        event.message = MIDIMessage::MIDI_MESSAGE_NOTE_ON;
+    } else {
+        event.message = MIDIMessage::MIDI_MESSAGE_NOTE_OFF;
+    }
     event.channel = chan;
     event.note = key;
     event.velocity = vel;

@@ -745,6 +745,8 @@ void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_csound_name", "csound_idx"), &CsoundServer::get_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_index", "csound_name"), &CsoundServer::get_csound_index);
 
+    ClassDB::bind_method(D_METHOD("get_csound_name_options"), &CsoundServer::get_csound_name_options);
+
     ClassDB::bind_method(D_METHOD("get_csound_channel_count", "csound_idx"), &CsoundServer::get_csound_channel_count);
     ClassDB::bind_method(D_METHOD("get_csound_named_channel_count", "csound_idx"),
                          &CsoundServer::get_csound_named_channel_count);

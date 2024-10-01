@@ -9,7 +9,10 @@
 #include "csound_server.h"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/input_event_midi.hpp"
+#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/core/error_macros.hpp"
+#include "godot_cpp/core/memory.hpp"
+#include "godot_cpp/variant/callable_method_pointer.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -25,9 +28,10 @@ using namespace emscripten;
 CsoundServer *CsoundServer::singleton = NULL;
 
 CsoundServer::CsoundServer() {
+    initialized = false;
     edited = false;
-    set_process_internal(true);
     singleton = this;
+    exit_thread = false;
     call_deferred("initialize");
 }
 
@@ -52,8 +56,6 @@ CsoundServer *CsoundServer::get_singleton() {
 }
 
 void CsoundServer::initialize() {
-    Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop())->get_root()->add_child(this);
-
     String name = "audio/csound/default_csound_layout";
     String default_filename = "res://default_csound_layout.tres";
     String layout_path = ProjectSettings::get_singleton()->get_setting_with_override(name);
@@ -78,26 +80,31 @@ void CsoundServer::initialize() {
     }
 
     set_edited(false);
+    initialized = true;
 }
 
-void CsoundServer::process(double delta) {
-    bool use_solo = false;
-    for (int i = 0; i < csound_instances.size(); i++) {
-        if (csound_instances[i]->solo == true) {
-            use_solo = true;
+void CsoundServer::thread_func() {
+    int msdelay = 1000;
+    while (!exit_thread) {
+        if (!initialized) {
+            continue;
         }
-    }
 
-    if (use_solo != solo_mode) {
-        solo_mode = use_solo;
-    }
-}
+        lock();
 
-void CsoundServer::_notification(int p_what) {
-    switch (p_what) {
-    case NOTIFICATION_INTERNAL_PROCESS: {
-        process(get_process_delta_time());
-    }
+        bool use_solo = false;
+        for (int i = 0; i < csound_instances.size(); i++) {
+            if (csound_instances[i]->solo == true) {
+                use_solo = true;
+            }
+        }
+
+        if (use_solo != solo_mode) {
+            solo_mode = use_solo;
+        }
+
+        unlock();
+        OS::get_singleton()->delay_usec(msdelay * 1000);
     }
 }
 
@@ -107,7 +114,6 @@ void CsoundServer::set_csound_count(int p_count) {
 
     edited = true;
 
-    lock();
     int cb = csound_instances.size();
 
     if (p_count < csound_instances.size()) {
@@ -153,15 +159,15 @@ void CsoundServer::set_csound_count(int p_count) {
         csound_instances[i]->script = Ref<CsoundFileReader>();
 
         csound_map[attempt] = csound_instances[i];
-        call_deferred("add_child", csound_instances[i]);
     }
-
-    unlock();
 
     emit_signal("csound_layout_changed");
 }
 
 int CsoundServer::get_csound_count() const {
+    if (!initialized) {
+        return 0;
+    }
     return csound_instances.size();
 }
 
@@ -171,11 +177,9 @@ void CsoundServer::remove_csound(int p_index) {
 
     edited = true;
 
-    lock();
     csound_map.erase(csound_instances[p_index]->csound_name);
     memdelete(csound_instances[p_index]);
     csound_instances.remove_at(p_index);
-    unlock();
 
     emit_signal("csound_layout_changed");
 }
@@ -222,7 +226,6 @@ void CsoundServer::add_csound(int p_at_pos) {
     csound_godot->script = Ref<CsoundFileReader>();
 
     csound_map[attempt] = csound_godot;
-    call_deferred("add_child", csound_godot);
 
     if (p_at_pos == -1) {
         csound_instances.push_back(csound_godot);
@@ -265,10 +268,7 @@ void CsoundServer::set_csound_name(int p_csound, const String &p_name) {
 
     edited = true;
 
-    lock();
-
     if (csound_instances[p_csound]->csound_name == p_name) {
-        unlock();
         return;
     }
 
@@ -294,7 +294,6 @@ void CsoundServer::set_csound_name(int p_csound, const String &p_name) {
     csound_map.erase(csound_instances[p_csound]->csound_name);
     csound_instances[p_csound]->csound_name = attempt;
     csound_map[attempt] = csound_instances[p_csound];
-    unlock();
 
     emit_signal("csound_layout_changed");
 }
@@ -428,8 +427,6 @@ void CsoundServer::add_csound_instrument(int p_csound, const Ref<CsoundInstrumen
 
     edited = true;
 
-    lock();
-
     if (p_at_pos >= csound_instances[p_csound]->instruments.size() || p_at_pos < 0) {
         csound_instances[p_csound]->instruments.push_back(p_instrument);
     } else {
@@ -438,7 +435,6 @@ void CsoundServer::add_csound_instrument(int p_csound, const Ref<CsoundInstrumen
 
     //_update_csound_instruments(p_csound);
 
-    unlock();
     emit_signal("csound_layout_changed");
 }
 
@@ -447,12 +443,9 @@ void CsoundServer::remove_csound_instrument(int p_csound, int p_instrument) {
 
     edited = true;
 
-    lock();
-
     csound_instances[p_csound]->instruments.remove_at(p_instrument);
     //_update_csound_instruments(p_csound);
 
-    unlock();
     emit_signal("csound_layout_changed");
 }
 
@@ -476,11 +469,9 @@ void CsoundServer::swap_csound_instruments(int p_csound, int p_instrument, int p
 
     edited = true;
 
-    lock();
     SWAP(csound_instances.write[p_csound]->instruments.write[p_instrument],
          csound_instances.write[p_csound]->instruments.write[p_by_instrument]);
     //_update_csound_instruments(p_csound);
-    unlock();
     emit_signal("csound_layout_changed");
 }
 
@@ -534,11 +525,10 @@ bool CsoundServer::load_default_csound_layout() {
 void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
     ERR_FAIL_COND(p_csound_layout.is_null() || p_csound_layout->csounds.size() == 0);
 
-    lock();
     int prev_size = csound_instances.size();
     for (int i = prev_size; i < csound_instances.size(); i++) {
         csound_instances[i]->stop();
-        csound_instances[i]->queue_free();
+        memdelete(csound_instances[i]);
     }
     csound_instances.resize(p_csound_layout->csounds.size());
     csound_map.clear();
@@ -572,13 +562,11 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound_instances.write[i] = csound;
 
         if (i >= prev_size) {
-            call_deferred("add_child", csound_instances[i]);
         } else {
             csound->start();
         }
     }
     edited = false;
-    unlock();
 }
 
 Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
@@ -604,12 +592,31 @@ Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
     return state;
 }
 
+Error CsoundServer::start() {
+    thread_exited = false;
+    thread.instantiate();
+    mutex.instantiate();
+    thread->start(callable_mp(this, &CsoundServer::thread_func), Thread::PRIORITY_NORMAL);
+    return OK;
+}
+
 void CsoundServer::lock() {
-    AudioServer::get_singleton()->lock();
+    if (thread.is_null() || mutex.is_null()) {
+        return;
+    }
+    mutex->lock();
 }
 
 void CsoundServer::unlock() {
-    AudioServer::get_singleton()->unlock();
+    if (thread.is_null() || mutex.is_null()) {
+        return;
+    }
+    mutex->unlock();
+}
+
+void CsoundServer::finish() {
+    exit_thread = true;
+    thread->wait_to_finish();
 }
 
 CsoundGodot *CsoundServer::get_csound(const String &p_name) {
@@ -729,7 +736,6 @@ void CsoundServer::open_web_midi_inputs() {
 
 void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("initialize"), &CsoundServer::initialize);
-    ClassDB::bind_method(D_METHOD("process", "delta"), &CsoundServer::process);
 
     ClassDB::bind_method(D_METHOD("set_edited", "edited"), &CsoundServer::set_edited);
     ClassDB::bind_method(D_METHOD("get_edited"), &CsoundServer::get_edited);

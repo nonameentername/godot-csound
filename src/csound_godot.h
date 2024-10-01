@@ -1,11 +1,12 @@
 #ifndef CSOUNDGODOT_H
 #define CSOUNDGODOT_H
 
-#include "godot_cpp/classes/global_constants.hpp"
-#include "godot_cpp/classes/input_event_midi.hpp"
+#include "godot_cpp/classes/mutex.hpp"
+#include "godot_cpp/classes/thread.hpp"
 #include <queue>
 #define USE_LIBSNDFILE 1
 #include <csound.hpp>
+#include <csPerfThread.hpp>
 #include <csound_files.h>
 #include <soundfile.h>
 
@@ -32,8 +33,8 @@ static const float AUDIO_MIN_PEAK_DB = -200.0f;
 
 namespace godot {
 
-class CsoundGodot : public Node {
-    GDCLASS(CsoundGodot, Node);
+class CsoundGodot : public Object {
+    GDCLASS(CsoundGodot, Object);
     friend class CsoundServer;
 
 public:
@@ -107,8 +108,6 @@ public:
     CsoundGodot();
     ~CsoundGodot();
 
-    virtual void _ready() override;
-
     void start();
     void stop();
     void reset();
@@ -142,8 +141,6 @@ public:
     void set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
 
-    void process(double delta);
-
     static int open_midi_device(CSOUND *csound, void **userData, const char *dev);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
@@ -151,8 +148,6 @@ public:
 
     static FILE *open_file(CSOUND *csound, const char *filename, const char *mode);
     static void *open_sound_file(CSOUND *csound, const char *pathname, int mode, void *userdata);
-
-    void _notification(int p_what);
 
     void set_csound_name(const String &name);
     const String &get_csound_name();
@@ -168,6 +163,9 @@ public:
     double get_time_to_next_mix();
 
     static void csound_message_callback(CSOUND *csound, int attr, const char *format, va_list args);
+
+    void thread_func();
+    void initialize();
 };
 } // namespace godot
 

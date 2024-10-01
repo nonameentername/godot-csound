@@ -1,6 +1,6 @@
 <CsoundSynthesizer>
 <CsOptions>
--+rtmidi=NULL -M0 --midi-key-cps=4 --midi-velocity-amp=5 -n
+-+rtmidi=NULL -M0 --midi-key=5 --midi-velocity=6 -n
 </CsOptions>
 <CsInstruments>
 

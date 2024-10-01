@@ -23,18 +23,7 @@ CsoundGodot::CsoundGodot() {
     csound = NULL;
     initialized = false;
     active = false;
-}
 
-CsoundGodot::~CsoundGodot() {
-    global_midi_queue.erase(csound_name);
-
-    if (csound != NULL) {
-        delete csound;
-        csound = NULL;
-    }
-}
-
-void CsoundGodot::_ready() {
     finished = false;
     csound = new Csound();
 
@@ -46,16 +35,25 @@ void CsoundGodot::_ready() {
     csoundSetOpenSoundFileCallback(csound->GetCsound(), open_sound_file);
     csound->SetMessageCallback(set_message);
 
-    global_midi_queue.insert(csound_name, midi_queue);
-
     csound->SetHostMIDIIO();
     csound->SetExternalMidiInOpenCallback(open_midi_device);
     csound->SetExternalMidiWriteCallback(write_midi_data);
     csound->SetExternalMidiReadCallback(read_midi_data);
+    csound->SetHostData((void *) this);
 
-    set_process_internal(true);
+    CsoundPerformanceThread *m_pt;
+    m_pt = new CsoundPerformanceThread(csound);
 
-    start();
+    call_deferred("initialize");
+}
+
+CsoundGodot::~CsoundGodot() {
+    global_midi_queue.erase(csound_name);
+
+    if (csound != NULL) {
+        delete csound;
+        csound = NULL;
+    }
 }
 
 void CsoundGodot::start() {
@@ -522,65 +520,66 @@ void CsoundGodot::play_midi(Ref<MidiFileReader> p_midi_file) {
     }
 }
 
-void CsoundGodot::_notification(int p_what) {
-    switch (p_what) {
-    case NOTIFICATION_INTERNAL_PROCESS: {
-        process(get_process_delta_time());
-    }
-    }
-}
 
-void CsoundGodot::process(double delta) {
-    if (!initialized) {
-        return;
-    }
+//void CsoundGodot::process(double delta) {
+void CsoundGodot::thread_func() {
+    int msdelay = 1000;
+    bool exit_thread = false;
+    while (!exit_thread) {
+        if (!initialized) {
+            continue;
+        }
 
-    if (active) {
-        double total = get_time_since_last_mix();
-        double mix_buffer = 2 * last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
-        double time_to_future_mix = mix_buffer - total;
+        /*
 
-        if (time_to_future_mix < 0) {
-            active = false;
+        if (active) {
+            double total = get_time_since_last_mix();
+            double mix_buffer = 2 * last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
+            double time_to_future_mix = mix_buffer - total;
 
-            for (int channel = 0; channel < input_channels.size(); channel++) {
-                for (int frame = 0; frame < last_mix_frames; frame++) {
-                    input_channels.write[channel].write[frame] = 0;
+            if (time_to_future_mix < 0) {
+                active = false;
+
+                for (int channel = 0; channel < input_channels.size(); channel++) {
+                    for (int frame = 0; frame < last_mix_frames; frame++) {
+                        input_channels.write[channel].write[frame] = 0;
+                    }
                 }
-            }
 
-            for (int channel = 0; channel < output_channels.size(); channel++) {
-                output_channels.write[channel].active = false;
-                output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+                for (int channel = 0; channel < output_channels.size(); channel++) {
+                    output_channels.write[channel].active = false;
+                    output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
 
-                for (int frame = 0; frame < last_mix_frames; frame++) {
-                    output_channels.write[channel].buffer.write[frame] = 0;
+                    for (int frame = 0; frame < last_mix_frames; frame++) {
+                        output_channels.write[channel].buffer.write[frame] = 0;
+                    }
                 }
-            }
 
-            for (KeyValue<String, Vector<MYFLT>> &E : input_named_channels_buffer) {
-                for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                    input_named_channels_buffer.get(E.key).write[frame] = 0;
+                for (KeyValue<String, Vector<MYFLT>> &E : input_named_channels_buffer) {
+                    for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+                        input_named_channels_buffer.get(E.key).write[frame] = 0;
+                    }
                 }
-            }
 
-            for (int channel = 0; channel < output_named_channels.size(); channel++) {
-                output_named_channels.write[channel].active = false;
-                output_named_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+                for (int channel = 0; channel < output_named_channels.size(); channel++) {
+                    output_named_channels.write[channel].active = false;
+                    output_named_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
 
-                for (int frame = 0; frame < last_mix_frames; frame++) {
-                    output_named_channels.write[channel].buffer.write[frame] = 0;
+                    for (int frame = 0; frame < last_mix_frames; frame++) {
+                        output_named_channels.write[channel].buffer.write[frame] = 0;
+                    }
                 }
             }
         }
-    }
+        */
 
-    /*
-    for (int i = 0; i < csound->GetMessageCnt(); i++) {
-        godot::UtilityFunctions::printraw(csound->GetFirstMessage());
-        csound->PopFirstMessage();
+        OS::get_singleton()->delay_usec(msdelay * 1000);
     }
-    */
+}
+
+void CsoundGodot::initialize() {
+    global_midi_queue.insert(csound_name, midi_queue);
+    start();
 }
 
 int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *dev) {
@@ -826,7 +825,7 @@ sf_count_t CsoundGodot::vio_tell(void *user_data) {
 }
 
 void CsoundGodot::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("process", "delta"), &CsoundGodot::process);
+    ClassDB::bind_method(D_METHOD("initialize"), &CsoundGodot::initialize);
     ClassDB::bind_method(D_METHOD("program_select"), &CsoundGodot::program_select);
 
     ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);

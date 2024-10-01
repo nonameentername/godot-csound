@@ -23,7 +23,6 @@
 #include "csound_layout.h"
 #include "csound_server.h"
 #include "editor_audio_meter_notches_csound.h"
-#include "godot_cpp/classes/editor_plugin.hpp"
 #include "midi_file_reader.h"
 #include "soundfont_file_reader.h"
 
@@ -41,6 +40,7 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<CsoundLayout>();
         ClassDB::register_class<CsoundInstrument>();
         csound_module = memnew(CsoundServer);
+        csound_module->start();
         Engine::get_singleton()->register_singleton("CsoundServer", CsoundServer::get_singleton());
 
         ClassDB::register_class<MidiFileReader>();
@@ -72,6 +72,7 @@ void uninitialize_csoundgodot_module(ModuleInitializationLevel p_level) {
 
     if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
         Engine::get_singleton()->unregister_singleton("Csound");
+        csound_module->finish();
         memdelete(csound_module);
     }
 }

@@ -17,23 +17,31 @@
 #include "csound_godot.h"
 #include "csound_instrument.h"
 #include "csound_layout.h"
+#include "godot_cpp/classes/mutex.hpp"
+#include "godot_cpp/classes/thread.hpp"
 
 namespace godot {
 
-class CsoundServer : public Node {
-    GDCLASS(CsoundServer, Node);
+class CsoundServer : public Object {
+    GDCLASS(CsoundServer, Object);
 
 private:
-    bool solo_mode;
+    bool initialized;
     bool edited;
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
 
-    Vector<CsoundGodot *> csound_instances;
     HashMap<String, CsoundGodot *> csound_map;
 
+    bool thread_exited;
+    mutable bool exit_thread;
+    Ref<Thread> thread;
+    Ref<Mutex> mutex;
+
 protected:
+    bool solo_mode;
+    Vector<CsoundGodot *> csound_instances;
     static void _bind_methods();
     static CsoundServer *singleton;
 
@@ -48,8 +56,7 @@ public:
 
     static CsoundServer *get_singleton();
     void initialize();
-    void process(double delta);
-    void _notification(int p_what);
+    void thread_func();
 
     void set_csound_count(int p_count);
     int get_csound_count() const;
@@ -105,8 +112,10 @@ public:
     void set_csound_layout(const Ref<CsoundLayout> &p_csound_layout);
     Ref<CsoundLayout> generate_csound_layout() const;
 
+    Error start();
     void lock();
     void unlock();
+    void finish();
 
     CsoundGodot *get_csound(const String &p_name);
     CsoundGodot *get_csound_by_index(int p_index);

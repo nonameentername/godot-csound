@@ -1,8 +1,6 @@
 #ifndef CSOUNDGODOT_H
 #define CSOUNDGODOT_H
 
-#include "godot_cpp/classes/mutex.hpp"
-#include "godot_cpp/classes/thread.hpp"
 #include <queue>
 #define USE_LIBSNDFILE 1
 #include <csound.hpp>
@@ -21,6 +19,8 @@
 #include <godot_cpp/templates/hash_map.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include "godot_cpp/classes/mutex.hpp"
+#include "godot_cpp/classes/thread.hpp"
 
 #include "csound_file_reader.h"
 #include "csound_instrument.h"
@@ -67,6 +67,12 @@ private:
     Ref<CsoundFileReader> script;
     std::queue<MidiEvent> midi_queue;
     Vector<Ref<CsoundInstrument>> instruments;
+    double previous_next_mix;
+
+    bool thread_exited;
+    mutable bool exit_thread;
+    Ref<Thread> thread;
+    Ref<Mutex> mutex;
 
     struct Channel {
         String name;
@@ -83,6 +89,7 @@ private:
 
     HashMap<String, Vector<MYFLT>> input_named_channels_buffer;
     Vector<MYFLT> temp_buffer;
+    Vector<MYFLT> output_buffer;
 
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;
@@ -166,6 +173,12 @@ public:
 
     void thread_func();
     void initialize();
+
+    Error start_thread();
+    void lock();
+    void unlock();
+    void finish();
+
 };
 } // namespace godot
 

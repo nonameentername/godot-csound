@@ -135,7 +135,7 @@ massign 3, 3
 
 </CsInstruments>
 <CsScore>
-f0 3600
+f0 z
 
 i8 0 -1
 

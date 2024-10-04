@@ -8,6 +8,7 @@
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
 #include <cstdio>
+#include <cstdlib>
 #include <queue>
 #ifdef MINGW
 #include "win_fmemopen.h"
@@ -27,6 +28,14 @@ CsoundGodot::CsoundGodot() {
     finished = false;
     csound = new Csound();
 
+    configure_csound();
+
+    mutex.instantiate();
+
+    call_deferred("initialize");
+}
+
+void CsoundGodot::configure_csound() {
     // csound->CreateMessageBuffer(0);
     csound->SetDebug(false);
     csound->SetHostAudioIO();
@@ -40,8 +49,6 @@ CsoundGodot::CsoundGodot() {
     csound->SetExternalMidiWriteCallback(write_midi_data);
     csound->SetExternalMidiReadCallback(read_midi_data);
     csound->SetHostData((void *) this);
-
-    call_deferred("initialize");
 }
 
 CsoundGodot::~CsoundGodot() {
@@ -90,15 +97,16 @@ void CsoundGodot::start() {
             }
         }
 
-        //initialize_channels(p_frames);
-
         initialized = true;
+        start_thread();
+
         emit_signal("csound_ready");
     }
 }
 
 void CsoundGodot::stop() {
     initialized = false;
+    stop_thread();
 
     if (csound != NULL) {
         //csound->Stop();
@@ -107,9 +115,11 @@ void CsoundGodot::stop() {
 
 void CsoundGodot::reset() {
     initialized = false;
+    stop_thread();
 
     if (csound != NULL) {
         csound->Reset();
+        configure_csound();
     }
     input_channels.clear();
     output_channels.clear();
@@ -213,6 +223,7 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
         return;
     }
 
+    lock();
     for (int frame = 0; frame < p_frames; frame += 1) {
         if (has_left_channel) {
             input_channels.write[left].write[frame] = p_buffer[frame].left;
@@ -221,6 +232,7 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
             input_channels.write[right].write[frame] = p_buffer[frame].right;
         }
     }
+    unlock();
 }
 
 int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
@@ -229,6 +241,7 @@ int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_fr
     bool has_right_channel =
         right >= 0 && right < output_channels.size() && p_frames <= output_channels[right].buffer.size();
 
+    lock();
     for (int frame = 0; frame < p_frames; frame += 1) {
         if (has_left_channel && active) {
             p_buffer[frame].left = output_channels[left].buffer[frame];
@@ -241,6 +254,7 @@ int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_fr
             p_buffer[frame].right = 0;
         }
     }
+    unlock();
 
     return p_frames;
 }
@@ -254,6 +268,7 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
         return;
     }
 
+    lock();
     for (int frame = 0; frame < p_frames; frame += 1) {
         if (has_left_channel) {
             input_named_channels_buffer.getptr(left)->write[frame] = p_buffer[frame].left;
@@ -262,12 +277,14 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
             input_named_channels_buffer.getptr(right)->write[frame] = p_buffer[frame].right;
         }
     }
+    unlock();
 }
 
 int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
     bool has_left_channel = named_channels.has(left);
     bool has_right_channel = named_channels.has(right);
 
+    lock();
     for (int frame = 0; frame < p_frames; frame += 1) {
         if (has_left_channel && active) {
             p_buffer[frame].left = output_named_channels[named_channels[left]].buffer[frame];
@@ -280,6 +297,7 @@ int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, in
             p_buffer[frame].right = 0;
         }
     }
+    unlock();
 
     return p_frames;
 }
@@ -603,11 +621,20 @@ void CsoundGodot::thread_func() {
 }
 
 Error CsoundGodot::start_thread() {
-    thread_exited = false;
-    thread.instantiate();
-    mutex.instantiate();
-    thread->start(callable_mp(this, &CsoundGodot::thread_func), Thread::PRIORITY_NORMAL);
+    if (thread.is_null()) {
+        thread.instantiate();
+        exit_thread = false;
+        thread->start(callable_mp(this, &CsoundGodot::thread_func), Thread::PRIORITY_NORMAL);
+    }
     return OK;
+}
+
+void CsoundGodot::stop_thread() {
+    if (thread.is_valid()) {
+        exit_thread = true;
+        thread->wait_to_finish();
+        thread.unref();
+    }
 }
 
 void CsoundGodot::lock() {
@@ -624,15 +651,9 @@ void CsoundGodot::unlock() {
     mutex->unlock();
 }
 
-void CsoundGodot::finish() {
-    exit_thread = true;
-    thread->wait_to_finish();
-}
-
 void CsoundGodot::initialize() {
     global_midi_queue.insert(csound_name, midi_queue);
     start();
-    start_thread();
 }
 
 int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *dev) {

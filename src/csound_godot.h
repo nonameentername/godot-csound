@@ -3,9 +3,11 @@
 
 #include <queue>
 #define USE_LIBSNDFILE 1
+//#include <sndfile.h>
 #include <csound.hpp>
 #include <csPerfThread.hpp>
 #include <csound_files.h>
+//need to remove once pr 1981 is merged
 #include <soundfile.h>
 
 #include <godot_cpp/classes/audio_frame.hpp>
@@ -108,6 +110,13 @@ private:
     static sf_count_t vio_write(const void *ptr, sf_count_t count, void *user_data);
     static sf_count_t vio_tell(void *user_data);
 
+    void configure_csound();
+
+    Error start_thread();
+    void stop_thread();
+    void lock();
+    void unlock();
+
 protected:
     static void _bind_methods();
 
@@ -173,12 +182,6 @@ public:
 
     void thread_func();
     void initialize();
-
-    Error start_thread();
-    void lock();
-    void unlock();
-    void finish();
-
 };
 } // namespace godot
 

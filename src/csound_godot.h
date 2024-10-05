@@ -5,6 +5,7 @@
 #define USE_LIBSNDFILE 1
 //#include <sndfile.h>
 #include <csound.hpp>
+#include <csound_circular_buffer.h>
 #include <csPerfThread.hpp>
 #include <csound_files.h>
 //need to remove once pr 1981 is merged
@@ -87,7 +88,7 @@ private:
         }
     };
 
-    Vector<Vector<MYFLT>> input_channels;
+    Vector<void*> input_channels;
     Vector<Channel> output_channels;
 
     HashMap<String, Vector<MYFLT>> input_named_channels_buffer;

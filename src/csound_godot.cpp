@@ -88,11 +88,10 @@ void CsoundGodot::start() {
             output_channels.resize(csound->GetChannels(0));
 
             for (int j = 0; j < csound->GetChannels(0); j++) {
-                input_channels.write[j].resize(frame_size);
+                input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
                 output_channels.write[j].buffer.resize(frame_size);
 
                 for (int frame = 0; frame < frame_size; frame++) {
-                    input_channels.write[j].write[frame] = 0;
                     output_channels.write[j].buffer.write[frame] = 0;
                 }
             }
@@ -122,6 +121,11 @@ void CsoundGodot::reset() {
         csound->Reset();
         configure_csound();
     }
+
+    for (int channel = 0; channel < input_channels.size(); channel++) {
+        csoundDestroyCircularBuffer(csound->GetCsound(), input_channels[channel]);
+    }
+
     input_channels.clear();
     output_channels.clear();
     input_named_channels_buffer.clear();
@@ -225,14 +229,15 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
     }
 
     lock();
-    for (int frame = 0; frame < p_frames; frame += 1) {
-        if (has_left_channel) {
-            input_channels.write[left].write[frame] = p_buffer[frame].left;
-        }
-        if (has_right_channel) {
-            input_channels.write[right].write[frame] = p_buffer[frame].right;
-        }
+
+    if (has_left_channel) {
+        csoundWriteCircularBuffer(csound->GetCsound(), input_channels.write[left], p_buffer, p_frames);
     }
+
+    if (has_right_channel) {
+        csoundWriteCircularBuffer(csound->GetCsound(), input_channels.write[right], p_buffer, p_frames);
+    }
+
     unlock();
 }
 
@@ -463,11 +468,13 @@ void CsoundGodot::thread_func() {
             }
 
             while (to_fill > 0) {
-                for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                    for (int channel = 0; channel < csound->GetChannels(0); channel++) {
-                        spin[frame * csound->GetChannels(0) + channel] =
-                            input_channels[channel][ksmps_buffer_index + frame] * scale;
-                        input_channels.write[channel].write[ksmps_buffer_index + frame] = 0;
+                for (int channel = 0; channel < csound->GetChannels(0); channel++) {
+                    csoundReadCircularBuffer(csound->GetCsound(), input_channels[channel], temp_buffer.ptrw(), csound->GetKsmps());
+                    for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+                        spin[frame * csound->GetChannels(0) + channel] = temp_buffer[frame] * scale;
+                        if (bypass) {
+                            output_channels.write[channel].buffer.write[ksmps_buffer_index + frame] = temp_buffer.write[frame] / scale * volume;
+                        }
                     }
                 }
 
@@ -493,18 +500,10 @@ void CsoundGodot::thread_func() {
                         output_buffer.write[buffer_index++] = spout[i + 1] / scale * volume;
                     }
 
-                    //buffer_index = buffer_index + 2;
                     to_fill = to_fill - 1;
                 }
 
-                if (bypass) {
-                    for (int channel = 0; channel < csound->GetChannels(0); channel++) {
-                        for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                            output_channels.write[channel].buffer.write[ksmps_buffer_index + frame] =
-                                input_channels[channel][ksmps_buffer_index + frame];
-                        }
-                    }
-                } else {
+                if (!bypass) {
                     for (int channel = 0; channel < csound->GetChannels(0); channel++) {
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                             int index = (frame * csound->GetChannels(0)) + channel;
@@ -576,7 +575,7 @@ void CsoundGodot::thread_func() {
         if (!active && !channels_cleared) {
             for (int channel = 0; channel < input_channels.size(); channel++) {
                 for (int frame = 0; frame < last_mix_frames; frame++) {
-                    input_channels.write[channel].write[frame] = 0;
+                    //input_channels.write[channel].write[frame] = 0;
                 }
             }
 

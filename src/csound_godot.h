@@ -72,6 +72,7 @@ private:
     std::queue<MidiEvent> midi_queue;
     Vector<Ref<CsoundInstrument>> instruments;
     double previous_next_mix;
+    double mix_rate;
 
     bool thread_exited;
     mutable bool exit_thread;
@@ -91,14 +92,14 @@ private:
     Vector<void*> input_channels;
     Vector<Channel> output_channels;
 
-    HashMap<String, Vector<MYFLT>> input_named_channels_buffer;
+    HashMap<String, void*> input_named_channels_buffer;
     Vector<MYFLT> temp_buffer;
     Vector<MYFLT> output_buffer;
 
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;
 
-    void initialize_channels(int p_frames);
+    void update_named_channels(int p_frames);
 
     struct MemoryFile {
         char *buffer;

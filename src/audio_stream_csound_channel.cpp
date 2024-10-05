@@ -1,7 +1,7 @@
 #include "audio_stream_csound_channel.h"
 #include "audio_stream_player_csound_channel.h"
+#include "csound_godot.h"
 #include "csound_server.h"
-#include "godot_cpp/classes/resource.hpp"
 #include "godot_cpp/core/property_info.hpp"
 #include "godot_cpp/variant/string_name.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
@@ -41,6 +41,11 @@ float AudioStreamCsoundChannel::get_length() const {
 }
 
 Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const {
+    if (!CsoundServer::get_singleton()->get_csound(get_csound_name())->is_active()) {
+        godot::UtilityFunctions::push_error("Cannot play AudioStreamCsoundChannel.  AudioStreamCsound has not been started.");
+        return NULL;
+    }
+
     Ref<AudioStreamPlaybackCsoundChannel> talking_tree;
     talking_tree.instantiate();
     talking_tree->base = Ref<AudioStreamCsoundChannel>(this);

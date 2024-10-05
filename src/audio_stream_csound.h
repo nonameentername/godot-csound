@@ -1,7 +1,7 @@
 #ifndef AUDIOSTREAMCSOUND_H
 #define AUDIOSTREAMCSOUND_H
 
-#include "csound.hpp"
+#include "csound_godot.h"
 
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_stream.hpp>
@@ -18,6 +18,8 @@ private:
     friend class AudioStreamPlaybackCsound;
     String csound_name;
 
+    CsoundGodot *get_csound_godot();
+
 public:
     virtual String get_stream_name() const;
     virtual float get_length() const;
@@ -30,6 +32,9 @@ public:
     virtual Ref<AudioStreamPlayback> _instantiate_playback() const override;
     void set_csound_name(const String &name);
     const String &get_csound_name() const;
+
+    void set_active(bool active);
+    bool is_active();
 
     bool _set(const StringName &p_name, const Variant &p_value);
     bool _get(const StringName &p_name, Variant &r_ret) const;

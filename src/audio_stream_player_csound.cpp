@@ -1,6 +1,5 @@
 #include "audio_stream_player_csound.h"
 #include "audio_stream_csound.h"
-#include "godot_cpp/classes/audio_stream_playback_resampled.hpp"
 
 using namespace godot;
 
@@ -8,14 +7,17 @@ AudioStreamPlaybackCsound::AudioStreamPlaybackCsound() : active(false) {
 }
 
 AudioStreamPlaybackCsound::~AudioStreamPlaybackCsound() {
+    _stop();
 }
 
 void AudioStreamPlaybackCsound::_stop() {
     active = false;
+    base->set_active(active);
 }
 
 void AudioStreamPlaybackCsound::_start(double p_from_pos) {
     active = true;
+    base->set_active(active);
 }
 
 void AudioStreamPlaybackCsound::_seek(double p_time) {

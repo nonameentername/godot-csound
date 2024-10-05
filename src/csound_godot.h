@@ -53,6 +53,7 @@ private:
     uint64_t last_mix_time;
     int last_mix_frames;
     bool active;
+    bool channels_cleared;
 
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;
@@ -182,6 +183,9 @@ public:
 
     void thread_func();
     void initialize();
+
+    void set_active(bool active);
+    bool is_active();
 };
 } // namespace godot
 

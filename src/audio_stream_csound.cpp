@@ -19,6 +19,22 @@ Ref<AudioStreamPlayback> AudioStreamCsound::_instantiate_playback() const {
     return talking_tree;
 }
 
+void AudioStreamCsound::set_active(bool active) {
+    CsoundGodot *csound_godot = get_csound_godot();
+    if (csound_godot != NULL) {
+        csound_godot->set_active(active);
+    }
+}
+
+
+bool AudioStreamCsound::is_active() {
+    CsoundGodot *csound_godot = get_csound_godot();
+    if (csound_godot != NULL) {
+        return csound_godot->is_active();
+    }
+    return false;
+}
+
 void AudioStreamCsound::set_csound_name(const String &name) {
     csound_name = name;
 }
@@ -62,13 +78,19 @@ void AudioStreamCsound::csound_layout_changed() {
     notify_property_list_changed();
 }
 
-int AudioStreamCsound::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+CsoundGodot *AudioStreamCsound::get_csound_godot() {
     CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
     if (csound_server != NULL) {
         CsoundGodot *csound_godot = csound_server->get_csound(get_csound_name());
-        if (csound_godot != NULL) {
-            return csound_godot->process_sample(p_buffer, p_rate, p_frames);
-        }
+        return csound_godot;
+    }
+    return NULL;
+}
+
+int AudioStreamCsound::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+    CsoundGodot *csound_godot = get_csound_godot();
+    if (csound_godot != NULL) {
+        return csound_godot->process_sample(p_buffer, p_rate, p_frames);
     }
 
     for (int frame = 0; frame < p_frames; frame += 1) {

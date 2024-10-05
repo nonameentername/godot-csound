@@ -24,6 +24,7 @@ CsoundGodot::CsoundGodot() {
     csound = NULL;
     initialized = false;
     active = false;
+    channels_cleared = false;
 
     finished = false;
     csound = new Csound();
@@ -219,7 +220,7 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
     bool has_left_channel = left >= 0 && left < input_channels.size();
     bool has_right_channel = right >= 0 && right < input_channels.size();
 
-    if (!has_left_channel && !has_right_channel) {
+    if (!has_left_channel && !has_right_channel && !active) {
         return;
     }
 
@@ -264,7 +265,7 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
     bool has_left_channel = input_named_channels_buffer.has(left);
     bool has_right_channel = input_named_channels_buffer.has(right);
 
-    if (!has_left_channel && !has_right_channel) {
+    if (!has_left_channel && !has_right_channel && !active) {
         return;
     }
 
@@ -425,9 +426,6 @@ void CsoundGodot::thread_func() {
         if (time_to_future_mix > previous_next_mix) {
             lock();
 
-            active = true;
-
-
             int buffer_index = 0;
             int to_fill = p_frames;
 
@@ -574,49 +572,40 @@ void CsoundGodot::thread_func() {
 
         previous_next_mix = time_to_future_mix;
 
-
-        /*
-
-        if (active) {
-            double total = get_time_since_last_mix();
-            double mix_buffer = 2 * last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
-            double time_to_future_mix = mix_buffer - total;
-
-            if (time_to_future_mix < 0) {
-                active = false;
-
-                for (int channel = 0; channel < input_channels.size(); channel++) {
-                    for (int frame = 0; frame < last_mix_frames; frame++) {
-                        input_channels.write[channel].write[frame] = 0;
-                    }
-                }
-
-                for (int channel = 0; channel < output_channels.size(); channel++) {
-                    output_channels.write[channel].active = false;
-                    output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
-
-                    for (int frame = 0; frame < last_mix_frames; frame++) {
-                        output_channels.write[channel].buffer.write[frame] = 0;
-                    }
-                }
-
-                for (KeyValue<String, Vector<MYFLT>> &E : input_named_channels_buffer) {
-                    for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                        input_named_channels_buffer.get(E.key).write[frame] = 0;
-                    }
-                }
-
-                for (int channel = 0; channel < output_named_channels.size(); channel++) {
-                    output_named_channels.write[channel].active = false;
-                    output_named_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
-
-                    for (int frame = 0; frame < last_mix_frames; frame++) {
-                        output_named_channels.write[channel].buffer.write[frame] = 0;
-                    }
+        //TODO: can I remove this now that it's running on a thread?
+        if (!active && !channels_cleared) {
+            for (int channel = 0; channel < input_channels.size(); channel++) {
+                for (int frame = 0; frame < last_mix_frames; frame++) {
+                    input_channels.write[channel].write[frame] = 0;
                 }
             }
+
+            for (int channel = 0; channel < output_channels.size(); channel++) {
+                output_channels.write[channel].active = false;
+                output_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+
+                for (int frame = 0; frame < last_mix_frames; frame++) {
+                    output_channels.write[channel].buffer.write[frame] = 0;
+                }
+            }
+
+            for (KeyValue<String, Vector<MYFLT>> &E : input_named_channels_buffer) {
+                for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+                    input_named_channels_buffer.get(E.key).write[frame] = 0;
+                }
+            }
+
+            for (int channel = 0; channel < output_named_channels.size(); channel++) {
+                output_named_channels.write[channel].active = false;
+                output_named_channels.write[channel].peak_volume = AUDIO_MIN_PEAK_DB;
+
+                for (int frame = 0; frame < last_mix_frames; frame++) {
+                    output_named_channels.write[channel].buffer.write[frame] = 0;
+                }
+            }
+
+            channels_cleared = true;
         }
-        */
     }
 }
 
@@ -896,6 +885,15 @@ sf_count_t CsoundGodot::vio_write(const void *ptr, sf_count_t count, void *user_
 sf_count_t CsoundGodot::vio_tell(void *user_data) {
     MemoryFile *file = (MemoryFile *)user_data;
     return file->curpos;
+}
+
+void CsoundGodot::set_active(bool p_active) {
+    active = p_active;
+    channels_cleared = false;
+}
+
+bool CsoundGodot::is_active() {
+    return active;
 }
 
 void CsoundGodot::_bind_methods() {

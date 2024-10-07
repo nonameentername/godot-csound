@@ -38,6 +38,8 @@ private:
     mutable bool exit_thread;
     Ref<Thread> thread;
     Ref<Mutex> mutex;
+    
+    void csound_ready(String csound_name);
 
 protected:
     bool solo_mode;

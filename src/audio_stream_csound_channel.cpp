@@ -22,13 +22,17 @@ void AudioStreamCsoundChannel::set_csound_name(const String &name) {
 }
 
 const String &AudioStreamCsoundChannel::get_csound_name() const {
+    static const String default_name = "Main";
+    if (csound_name.length() == 0) {
+        return default_name;
+    }
+
     for (int i = 0; i < CsoundServer::get_singleton()->get_csound_count(); i++) {
         if (CsoundServer::get_singleton()->get_csound_name(i) == csound_name) {
             return csound_name;
         }
     }
 
-    static const String default_name = "Main";
     return default_name;
 }
 
@@ -41,9 +45,9 @@ float AudioStreamCsoundChannel::get_length() const {
 }
 
 Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const {
-    if (!CsoundServer::get_singleton()->get_csound(get_csound_name())->is_active()) {
-        godot::UtilityFunctions::push_error("Cannot play AudioStreamCsoundChannel.  AudioStreamCsound has not been started.");
-        return NULL;
+    CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound(get_csound_name());
+    if (csound_godot == NULL || !csound_godot->is_active()) {
+        godot::UtilityFunctions::push_warning("Csound is not active. AudioStreamCsound should be started before AudioStreamCsoundChannel.");
     }
 
     Ref<AudioStreamPlaybackCsoundChannel> talking_tree;
@@ -53,12 +57,9 @@ Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const
 }
 
 int AudioStreamCsoundChannel::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
-    CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
-    if (csound_server != NULL) {
-        CsoundGodot *csound_godot = csound_server->get_csound(get_csound_name());
-        if (csound_godot != NULL) {
-            return csound_godot->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right);
-        }
+    CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound(get_csound_name());
+    if (csound_godot != NULL && csound_godot->is_active()) {
+        return csound_godot->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right);
     }
 
     for (int frame = 0; frame < p_frames; frame += 1) {

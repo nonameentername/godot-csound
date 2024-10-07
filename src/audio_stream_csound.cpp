@@ -1,11 +1,14 @@
 #include "audio_stream_csound.h"
 #include "audio_stream_player_csound.h"
 #include "csound_server.h"
+#include "godot_cpp/classes/audio_stream.hpp"
 
 using namespace godot;
 
 AudioStreamCsound::AudioStreamCsound() {
     CsoundServer::get_singleton()->connect("csound_layout_changed", Callable(this, "csound_layout_changed"));
+    CsoundServer::get_singleton()->connect("csound_ready", Callable(this, "csound_ready"));
+    active = false;
 }
 
 AudioStreamCsound::~AudioStreamCsound() {
@@ -19,13 +22,14 @@ Ref<AudioStreamPlayback> AudioStreamCsound::_instantiate_playback() const {
     return talking_tree;
 }
 
-void AudioStreamCsound::set_active(bool active) {
+void AudioStreamCsound::set_active(bool p_active) {
+    active = p_active;
+
     CsoundGodot *csound_godot = get_csound_godot();
     if (csound_godot != NULL) {
         csound_godot->set_active(active);
     }
 }
-
 
 bool AudioStreamCsound::is_active() {
     CsoundGodot *csound_godot = get_csound_godot();
@@ -40,13 +44,17 @@ void AudioStreamCsound::set_csound_name(const String &name) {
 }
 
 const String &AudioStreamCsound::get_csound_name() const {
+    static const String default_name = "Main";
+    if (csound_name.length() == 0) {
+        return default_name;
+    }
+
     for (int i = 0; i < CsoundServer::get_singleton()->get_csound_count(); i++) {
         if (CsoundServer::get_singleton()->get_csound_name(i) == csound_name) {
             return csound_name;
         }
     }
 
-    static const String default_name = "Main";
     return default_name;
 }
 
@@ -76,6 +84,15 @@ bool AudioStreamCsound::_get(const StringName &p_name, Variant &r_ret) const {
 
 void AudioStreamCsound::csound_layout_changed() {
     notify_property_list_changed();
+}
+
+void AudioStreamCsound::csound_ready(String p_csound_name) {
+    if (get_csound_name() == p_csound_name) {
+        CsoundGodot *csound_godot = get_csound_godot();
+        if (csound_godot != NULL) {
+            csound_godot->set_active(active);
+        }
+    }
 }
 
 CsoundGodot *AudioStreamCsound::get_csound_godot() {
@@ -111,4 +128,5 @@ void AudioStreamCsound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioStreamCsound::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioStreamCsound::get_csound_name);
     ClassDB::bind_method(D_METHOD("csound_layout_changed"), &AudioStreamCsound::csound_layout_changed);
+    ClassDB::bind_method(D_METHOD("csound_ready"), &AudioStreamCsound::csound_ready);
 }

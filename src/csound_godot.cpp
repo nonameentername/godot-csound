@@ -85,6 +85,7 @@ void CsoundGodot::start() {
 
         output_buffer.resize(2 * p_frames);
 
+        //TODO: check input and output channels separately
         if (output_channels.size() != csound->GetChannels(0)) {
             input_channels.resize(csound->GetChannels(0));
             output_channels.resize(csound->GetChannels(0));
@@ -102,7 +103,7 @@ void CsoundGodot::start() {
         initialized = true;
         start_thread();
 
-        emit_signal("csound_ready");
+        emit_signal("csound_ready", csound_name);
     }
 }
 
@@ -937,5 +938,5 @@ void CsoundGodot::_bind_methods() {
     ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
 
-    ADD_SIGNAL(MethodInfo("csound_ready"));
+    ADD_SIGNAL(MethodInfo("csound_ready", PropertyInfo(Variant::STRING, "csound_name")));
 }

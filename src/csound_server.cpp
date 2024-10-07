@@ -561,12 +561,16 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
 
-        if (i >= prev_size) {
+        if (i >= prev_size && prev_size != 0) {
         } else {
-            csound->start();
+            csound->connect("csound_ready", Callable(this, "csound_ready"));
         }
     }
     edited = false;
+}
+
+void CsoundServer::csound_ready(String csound_name) {
+    emit_signal("csound_ready", csound_name);
 }
 
 Ref<CsoundLayout> CsoundServer::generate_csound_layout() const {
@@ -809,7 +813,10 @@ void CsoundServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("open_web_midi_inputs"), &CsoundServer::open_web_midi_inputs);
 
+    ClassDB::bind_method(D_METHOD("csound_ready", "csound_name"), &CsoundServer::csound_ready);
+
     ADD_PROPERTY(PropertyInfo(Variant::INT, "csound_count"), "set_csound_count", "get_csound_count");
 
     ADD_SIGNAL(MethodInfo("csound_layout_changed"));
+    ADD_SIGNAL(MethodInfo("csound_ready", PropertyInfo(Variant::STRING, "csound_name")));
 }

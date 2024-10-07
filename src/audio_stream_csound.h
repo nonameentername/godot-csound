@@ -17,8 +17,11 @@ class AudioStreamCsound : public AudioStream {
 private:
     friend class AudioStreamPlaybackCsound;
     String csound_name;
+    bool active;
 
     CsoundGodot *get_csound_godot();
+    void csound_layout_changed();
+    void csound_ready(String csound_name);
 
 public:
     virtual String get_stream_name() const;
@@ -39,8 +42,6 @@ public:
     bool _set(const StringName &p_name, const Variant &p_value);
     bool _get(const StringName &p_name, Variant &r_ret) const;
     void _get_property_list(List<PropertyInfo> *p_list) const;
-
-    void csound_layout_changed();
 
 protected:
     static void _bind_methods();

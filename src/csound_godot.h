@@ -33,6 +33,7 @@
 
 static const float AUDIO_PEAK_OFFSET = 0.0000000001f;
 static const float AUDIO_MIN_PEAK_DB = -200.0f;
+static const int BUFFER_FRAME_SIZE = 512;
 
 namespace godot {
 
@@ -84,8 +85,18 @@ private:
         bool used = false;
         bool active = false;
         float peak_volume = AUDIO_MIN_PEAK_DB;
-        Vector<MYFLT> buffer;
+        void *buffer;
         Channel() {
+        }
+    };
+
+    struct ChannelTemp {
+        String name;
+        bool used = false;
+        bool active = false;
+        float peak_volume = AUDIO_MIN_PEAK_DB;
+        Vector<MYFLT> buffer;
+        ChannelTemp() {
         }
     };
 
@@ -96,7 +107,7 @@ private:
     Vector<MYFLT> temp_buffer;
     Vector<MYFLT> output_buffer;
 
-    Vector<Channel> output_named_channels;
+    Vector<ChannelTemp> output_named_channels;
     HashMap<String, int> named_channels;
 
     void update_named_channels(int p_frames);

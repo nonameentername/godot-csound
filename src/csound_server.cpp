@@ -177,6 +177,7 @@ void CsoundServer::remove_csound(int p_index) {
 
     edited = true;
 
+    csound_instances[p_index]->stop();
     csound_map.erase(csound_instances[p_index]->csound_name);
     memdelete(csound_instances[p_index]);
     csound_instances.remove_at(p_index);
@@ -561,8 +562,8 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         csound_map[csound->csound_name] = csound;
         csound_instances.write[i] = csound;
 
-        if (i >= prev_size && prev_size != 0) {
-        } else {
+        csound->call_deferred("initialize");
+        if (!csound->is_connected("csound_ready", Callable(this, "csound_ready"))) {
             csound->connect("csound_ready", Callable(this, "csound_ready"));
         }
     }

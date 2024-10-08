@@ -90,16 +90,6 @@ private:
         }
     };
 
-    struct ChannelTemp {
-        String name;
-        bool used = false;
-        bool active = false;
-        float peak_volume = AUDIO_MIN_PEAK_DB;
-        Vector<MYFLT> buffer;
-        ChannelTemp() {
-        }
-    };
-
     Vector<void*> input_channels;
     Vector<Channel> output_channels;
 
@@ -107,7 +97,7 @@ private:
     Vector<MYFLT> temp_buffer;
     Vector<MYFLT> output_buffer;
 
-    Vector<ChannelTemp> output_named_channels;
+    Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;
 
     void update_named_channels(int p_frames);
@@ -130,6 +120,7 @@ private:
     void stop_thread();
     void lock();
     void unlock();
+    void cleanup_channels();
 
 protected:
     static void _bind_methods();

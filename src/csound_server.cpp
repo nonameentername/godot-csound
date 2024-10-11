@@ -492,6 +492,10 @@ float CsoundServer::get_csound_named_channel_peak_volume_db(int p_csound, int p_
 
 bool CsoundServer::is_csound_channel_active(int p_csound, int p_channel) const {
     ERR_FAIL_INDEX_V(p_csound, csound_instances.size(), false);
+    if (p_channel >= csound_instances[p_csound]->output_channels.size()) {
+        return false;
+    }
+
     ERR_FAIL_INDEX_V(p_channel, csound_instances[p_csound]->output_channels.size(), false);
 
     return csound_instances[p_csound]->output_channels[p_channel].active;

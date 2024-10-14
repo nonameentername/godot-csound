@@ -4,6 +4,7 @@
 #include "godot_cpp/classes/audio_server.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 #include "godot_cpp/classes/os.hpp"
+#include "godot_cpp/classes/project_settings.hpp"
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
@@ -41,8 +42,11 @@ void CsoundGodot::configure_csound() {
     csound->SetDebug(false);
     csound->SetHostAudioIO();
 
-    csoundSetOpenFileCallback(csound->GetCsound(), open_file);
-    csoundSetOpenSoundFileCallback(csound->GetCsound(), open_sound_file);
+    if (ProjectSettings::get_singleton()->get_setting("audio/csound/use_resource_files", true)) {
+        csoundSetOpenFileCallback(csound->GetCsound(), open_file);
+        csoundSetOpenSoundFileCallback(csound->GetCsound(), open_sound_file);
+    }
+
     csound->SetMessageCallback(set_message);
 
     csound->SetHostMIDIIO();

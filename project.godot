@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 general/ios/session_category=3
 csound/default_csound_layout="res://default_csound_layout.tres"
+csound/use_resource_files=true
 
 [display]
 

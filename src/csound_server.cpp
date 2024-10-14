@@ -55,25 +55,28 @@ CsoundServer *CsoundServer::get_singleton() {
     return singleton;
 }
 
-void CsoundServer::initialize() {
-    String name = "audio/csound/default_csound_layout";
-    String default_filename = "res://default_csound_layout.tres";
-    String layout_path = ProjectSettings::get_singleton()->get_setting_with_override(name);
-
-    bool is_editor = godot::Engine::get_singleton()->is_editor_hint();
-
-    if (is_editor && (layout_path.is_empty() || layout_path.get_file() == "<null>")) {
-        ProjectSettings::get_singleton()->set_setting(name, default_filename);
+void CsoundServer::add_property(String name, String default_value, GDExtensionVariantType extension_type, PropertyHint hint) {
+    if (godot::Engine::get_singleton()->is_editor_hint() && !ProjectSettings::get_singleton()->has_setting(name)) {
+        ProjectSettings::get_singleton()->set_setting(name, default_value);
         Dictionary property_info;
         property_info["name"] = name;
-        property_info["type"] = GDEXTENSION_VARIANT_TYPE_STRING;
-        property_info["hint"] = PROPERTY_HINT_FILE;
+        property_info["type"] = extension_type;
+        property_info["hint"] = hint;
         property_info["hint_string"] = "";
         ProjectSettings::get_singleton()->add_property_info(property_info);
-        ProjectSettings::get_singleton()->set_initial_value(name, default_filename);
+        ProjectSettings::get_singleton()->set_initial_value(name, default_value);
         Error error = ProjectSettings::get_singleton()->save();
         ERR_FAIL_COND_MSG(error != OK, "Could not save project settings");
     }
+}
+
+void CsoundServer::initialize() {
+    add_property("audio/csound/default_csound_layout", "res://default_csound_layout.tres",
+            GDEXTENSION_VARIANT_TYPE_STRING,
+            PROPERTY_HINT_FILE);
+    add_property("audio/csound/use_resource_files", "true",
+            GDEXTENSION_VARIANT_TYPE_BOOL,
+            PROPERTY_HINT_NONE);
 
     if (!load_default_csound_layout()) {
         set_csound_count(1);

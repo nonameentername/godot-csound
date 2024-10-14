@@ -175,6 +175,20 @@ Ref<MidiFileReader> CsoundGodot::get_midi_file() {
     return midi_file;
 }
 
+void CsoundGodot::add_named_channel(String name) {
+    if (!input_named_channels_buffer.has(name)) {
+        input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT)));
+    }
+
+    if (!named_channels.has(name)) {
+        int index = output_named_channels.size();
+        output_named_channels.resize(index + 1);
+        output_named_channels.write[index].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
+        output_named_channels.write[index].name = name;
+        named_channels.insert(name, index);
+    }
+}
+
 void CsoundGodot::update_named_channels(int p_frames) {
     if (!initialized) {
         return;
@@ -190,16 +204,7 @@ void CsoundGodot::update_named_channels(int p_frames) {
         int type = tmp[channel].type;
         if ((type & CSOUND_CHANNEL_TYPE_MASK) == CSOUND_AUDIO_CHANNEL &&
             (type & (CSOUND_INPUT_CHANNEL | CSOUND_OUTPUT_CHANNEL))) {
-            if (!input_named_channels_buffer.has(name)) {
-                input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT)));
-            }
-            if (!named_channels.has(name)) {
-                int index = output_named_channels.size();
-                output_named_channels.resize(index + 1);
-                output_named_channels.write[index].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
-                output_named_channels.write[index].name = name;
-                named_channels.insert(name, index);
-            }
+            add_named_channel(name);
         }
     }
 
@@ -289,11 +294,21 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
     bool has_left_channel = input_named_channels_buffer.has(left);
     bool has_right_channel = input_named_channels_buffer.has(right);
 
-    if (!has_left_channel && !has_right_channel && !active) {
+    if (!active) {
         return;
     }
 
     lock();
+
+    if (!has_left_channel) {
+        add_named_channel(left);
+        has_left_channel = true;
+    }
+
+    if (!has_right_channel) {
+        add_named_channel(right);
+        has_right_channel = true;
+    }
 
     if (has_left_channel) {
         csoundWriteCircularBuffer(csound->GetCsound(), input_named_channels_buffer[left], p_buffer, p_frames);
@@ -313,6 +328,15 @@ int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, in
     bool has_right_channel = named_channels.has(right);
 
     lock();
+
+    if (!has_left_channel) {
+        add_named_channel(left);
+    }
+
+    if (!has_right_channel) {
+        add_named_channel(right);
+    }
+
     if (has_left_channel && active) {
         csoundReadCircularBuffer(csound->GetCsound(), output_named_channels[named_channels[left]].buffer, temp_buffer, p_frames);
         for (int frame = 0; frame < p_frames; frame++) {
@@ -461,7 +485,8 @@ void CsoundGodot::thread_func() {
         if (time_to_future_mix > previous_next_mix) {
             lock();
 
-            update_named_channels(p_frames);
+            //TODO: enable after fixing memory leak
+            //update_named_channels(p_frames);
 
             int buffer_index = 0;
             int to_fill = p_frames;

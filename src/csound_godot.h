@@ -100,6 +100,7 @@ private:
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;
 
+    void add_named_channel(String name);
     void update_named_channels(int p_frames);
 
     struct MemoryFile {

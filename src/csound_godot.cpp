@@ -10,7 +10,6 @@
 #include "godot_cpp/variant/variant.hpp"
 #include <cstdio>
 #include <cstdlib>
-#include <queue>
 #ifdef MINGW
 #include "win_fmemopen.h"
 #else
@@ -18,8 +17,6 @@
 #endif
 
 using namespace godot;
-
-HashMap<String, std::queue<CsoundGodot::MidiEvent>> global_midi_queue;
 
 CsoundGodot::CsoundGodot() {
     csound = NULL;
@@ -35,6 +32,8 @@ CsoundGodot::CsoundGodot() {
     mutex.instantiate();
 
     mix_rate = AudioServer::get_singleton()->get_mix_rate();
+
+    midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
 }
 
 void CsoundGodot::configure_csound() {
@@ -57,7 +56,7 @@ void CsoundGodot::configure_csound() {
 }
 
 CsoundGodot::~CsoundGodot() {
-    global_midi_queue.erase(csound_name);
+    csoundDestroyCircularBuffer(csound->GetCsound(), midi_buffer);
 
     if (csound != NULL) {
         delete csound;
@@ -381,7 +380,7 @@ void CsoundGodot::note_on(int chan, int key, int vel) {
     event.note = key;
     event.velocity = vel;
 
-    global_midi_queue.get(csound_name).push(event);
+    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
 
     //float instrnum = chan + chan / 100.0 + key / 100000.0;
     //String note_on = vformat("i%f 0 -1 %d %d %d", instrnum, chan, key, vel);
@@ -399,7 +398,7 @@ void CsoundGodot::note_off(int chan, int key) {
     event.note = key;
     event.velocity = 0;
 
-    global_midi_queue.get(csound_name).push(event);
+    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
 
     //float instrnum = chan + chan / 100.0 + key / 100000.0;
     //String note_off = vformat("i-%f 0 %d 0 %d", chan, instrnum, key);
@@ -703,9 +702,6 @@ void CsoundGodot::unlock() {
 }
 
 void CsoundGodot::initialize() {
-    if (!global_midi_queue.has(csound_name)) {
-        global_midi_queue.insert(csound_name, midi_queue);
-    }
     start();
 }
 
@@ -713,7 +709,7 @@ int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *d
     for (int i = 0; i < CsoundServer::get_singleton()->get_csound_count(); i++) {
         CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound_by_index(i);
         if (csound_godot->csound != NULL && csound_godot->csound->GetCsound() == csound) {
-            *userData = (void*) &csound_godot->csound_name;
+            *userData = (void*) csound_godot;
             return 0;
         }
     }
@@ -727,15 +723,20 @@ int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned 
 }
 
 int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
-    String *csound_name = (String*) userData;
+    CsoundGodot *csound_godot = (CsoundGodot *) userData;
+
+    if (!csound_godot->initialized) {
+        return 0;
+    }
 
     int bytesLeft = nbytes;
     int bytesRead = 0;
 
-    while(!global_midi_queue.get(*csound_name).empty() && bytesRead < nbytes) {
-        MidiEvent midi_event = global_midi_queue.get(*csound_name).front();
-        global_midi_queue.get(*csound_name).pop();
+    MidiEvent midi_event;
 
+    int32_t read = csoundReadCircularBuffer(csound, csound_godot->midi_buffer, &midi_event, 4);
+
+    while(read > 0 && bytesRead < nbytes) {
         int channel = midi_event.channel;
         int byte1 = midi_event.message << 4 | midi_event.channel % 16;
         int byte2 = 0x80 | midi_event.channel / 16;
@@ -746,6 +747,8 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
         mbuf[bytesRead++] = byte2;
         mbuf[bytesRead++] = byte3;
         mbuf[bytesRead++] = byte4;
+
+        read = csoundReadCircularBuffer(csound, csound_godot->midi_buffer, &midi_event, 4);
     }
 
     return bytesRead;

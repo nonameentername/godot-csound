@@ -19,7 +19,7 @@ godot-cpp:
 
 format:
 	clang-format -i src/*.cpp src/*.h
-	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*')
+	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*' ! -path './modules/godot/*')
 
 clean:
 	rm -f src/*.os

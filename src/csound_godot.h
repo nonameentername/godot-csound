@@ -70,7 +70,6 @@ private:
     int tab;
     bool initialized;
     Ref<CsoundFileReader> script;
-    std::queue<MidiEvent> midi_queue;
     Vector<Ref<CsoundInstrument>> instruments;
     double previous_next_mix;
     double mix_rate;
@@ -89,6 +88,8 @@ private:
         Channel() {
         }
     };
+
+    void *midi_buffer;
 
     Vector<void*> input_channels;
     Vector<Channel> output_channels;

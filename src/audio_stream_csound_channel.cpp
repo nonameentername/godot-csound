@@ -47,7 +47,8 @@ float AudioStreamCsoundChannel::get_length() const {
 Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const {
     CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound(get_csound_name());
     if (csound_godot == NULL || !csound_godot->is_active()) {
-        godot::UtilityFunctions::push_warning("Csound is not active. AudioStreamCsound should be started before AudioStreamCsoundChannel.");
+        godot::UtilityFunctions::push_warning(
+            "Csound is not active. AudioStreamCsound should be started before AudioStreamCsoundChannel.");
     }
 
     Ref<AudioStreamPlaybackCsoundChannel> talking_tree;

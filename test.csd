@@ -24,6 +24,7 @@ isf1 sfload "assets/000-003-Honky_Tonk.sf2"
 	sfpassign	3, isf1
 
 instr 1	; play guitar from score and midi keyboard - preset index = 0
+    DictionarySetValue 1, 2
     prints "hello world\n"
 
 	mididefault	60, p3

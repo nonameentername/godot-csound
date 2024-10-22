@@ -1,16 +1,18 @@
 #ifndef CSOUNDGODOT_H
 #define CSOUNDGODOT_H
 
-#include <queue>
+#include "csound_godot_data.h"
 #define USE_LIBSNDFILE 1
-//#include <sndfile.h>
+// #include <sndfile.h>
 #include <csound.hpp>
 #include <csound_circular_buffer.h>
 #include <csPerfThread.hpp>
 #include <csound_files.h>
-//need to remove once pr 1981 is merged
+// need to remove once pr 1981 is merged
 #include <soundfile.h>
 
+#include "godot_cpp/classes/mutex.hpp"
+#include "godot_cpp/classes/thread.hpp"
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/engine.hpp>
@@ -22,8 +24,6 @@
 #include <godot_cpp/templates/hash_map.hpp>
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
-#include "godot_cpp/classes/mutex.hpp"
-#include "godot_cpp/classes/thread.hpp"
 
 #include "csound_file_reader.h"
 #include "csound_instrument.h"
@@ -91,15 +91,17 @@ private:
 
     void *midi_buffer;
 
-    Vector<void*> input_channels;
+    Vector<void *> input_channels;
     Vector<Channel> output_channels;
 
-    HashMap<String, void*> input_named_channels_buffer;
+    HashMap<String, void *> input_named_channels_buffer;
     Vector<MYFLT> temp_buffer;
     Vector<MYFLT> output_buffer;
 
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;
+
+    HashMap<double, double> csound_data;
 
     void add_named_channel(String name);
     void update_named_channels(int p_frames);
@@ -192,6 +194,9 @@ public:
 
     void set_active(bool active);
     bool is_active();
+
+    void set_value(double key, double value);
+    const double get_value(double key);
 };
 } // namespace godot
 

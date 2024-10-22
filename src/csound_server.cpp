@@ -1,8 +1,8 @@
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
+#include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/project_settings.hpp>
 #include <godot_cpp/classes/resource_loader.hpp>
-#include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 
 #include "csound_layout.h"
@@ -55,7 +55,8 @@ CsoundServer *CsoundServer::get_singleton() {
     return singleton;
 }
 
-void CsoundServer::add_property(String name, String default_value, GDExtensionVariantType extension_type, PropertyHint hint) {
+void CsoundServer::add_property(String name, String default_value, GDExtensionVariantType extension_type,
+                                PropertyHint hint) {
     if (godot::Engine::get_singleton()->is_editor_hint() && !ProjectSettings::get_singleton()->has_setting(name)) {
         ProjectSettings::get_singleton()->set_setting(name, default_value);
         Dictionary property_info;
@@ -72,11 +73,8 @@ void CsoundServer::add_property(String name, String default_value, GDExtensionVa
 
 void CsoundServer::initialize() {
     add_property("audio/csound/default_csound_layout", "res://default_csound_layout.tres",
-            GDEXTENSION_VARIANT_TYPE_STRING,
-            PROPERTY_HINT_FILE);
-    add_property("audio/csound/use_resource_files", "true",
-            GDEXTENSION_VARIANT_TYPE_BOOL,
-            PROPERTY_HINT_NONE);
+                 GDEXTENSION_VARIANT_TYPE_STRING, PROPERTY_HINT_FILE);
+    add_property("audio/csound/use_resource_files", "true", GDEXTENSION_VARIANT_TYPE_BOOL, PROPERTY_HINT_NONE);
 
     if (!load_default_csound_layout()) {
         set_csound_count(1);
@@ -654,10 +652,8 @@ CsoundGodot *CsoundServer::get_csound_(const Variant &p_variant) {
         return csound_instances.get(index);
     }
 
-
     return NULL;
 }
-
 
 extern "C" {
 #ifdef __EMSCRIPTEN__
@@ -738,7 +734,6 @@ if (navigator.requestMIDIAccess) {
 });
 
 #endif
-
 
 void CsoundServer::open_web_midi_inputs() {
 #ifdef __EMSCRIPTEN__

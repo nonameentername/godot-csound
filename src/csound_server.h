@@ -38,7 +38,7 @@ private:
     mutable bool exit_thread;
     Ref<Thread> thread;
     Ref<Mutex> mutex;
-    
+
     void csound_ready(String csound_name);
     void add_property(String name, String default_value, GDExtensionVariantType extension_type, PropertyHint hint);
 

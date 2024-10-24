@@ -98,8 +98,8 @@ void CsoundGodot::start() {
             output_channels.resize(csound->GetChannels(0));
 
             for (int j = 0; j < csound->GetChannels(0); j++) {
-                input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
-                output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
+                input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+                output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
             }
         }
 
@@ -182,14 +182,14 @@ Ref<MidiFileReader> CsoundGodot::get_midi_file() {
 
 void CsoundGodot::add_named_channel(String name) {
     if (!input_named_channels_buffer.has(name)) {
-        input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT)));
+        input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT)));
     }
 
     if (!named_channels.has(name)) {
         int index = output_named_channels.size();
         output_named_channels.resize(index + 1);
         output_named_channels.write[index].buffer =
-            csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(MYFLT));
+            csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
         output_named_channels.write[index].name = name;
         named_channels.insert(name, index);
     }
@@ -475,8 +475,6 @@ void CsoundGodot::play_midi(Ref<MidiFileReader> p_midi_file) {
 void CsoundGodot::thread_func() {
     int p_frames = 512;
 
-    previous_next_mix = AudioServer::get_singleton()->get_time_since_last_mix();
-
     while (!exit_thread) {
         if (!initialized) {
             continue;
@@ -484,11 +482,7 @@ void CsoundGodot::thread_func() {
 
         last_mix_frames = p_frames;
 
-        double total = get_time_since_last_mix();
-        double mix_buffer = 2 * last_mix_frames / mix_rate;
-        double time_to_future_mix = mix_buffer - total;
-
-        if (time_to_future_mix > previous_next_mix) {
+        if (previous_next_mix != last_mix_time) {
             lock();
 
             // TODO: enable after fixing memory leak
@@ -640,14 +634,13 @@ void CsoundGodot::thread_func() {
                 }
             }
 
+            previous_next_mix = last_mix_time;
             unlock();
 
         } else {
             int msdelay = 10;
             OS::get_singleton()->delay_usec(msdelay);
         }
-
-        previous_next_mix = time_to_future_mix;
 
         // TODO: can I remove this now that it's running on a thread?
         if (!active && !channels_cleared) {

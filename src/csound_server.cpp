@@ -75,6 +75,7 @@ void CsoundServer::initialize() {
     add_property("audio/csound/default_csound_layout", "res://default_csound_layout.tres",
                  GDEXTENSION_VARIANT_TYPE_STRING, PROPERTY_HINT_FILE);
     add_property("audio/csound/use_resource_files", "true", GDEXTENSION_VARIANT_TYPE_BOOL, PROPERTY_HINT_NONE);
+    add_property("audio/csound/hide_csound_logs", "true", GDEXTENSION_VARIANT_TYPE_BOOL, PROPERTY_HINT_NONE);
 
     if (!load_default_csound_layout()) {
         set_csound_count(1);

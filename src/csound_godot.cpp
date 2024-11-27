@@ -74,8 +74,9 @@ void CsoundGodot::start() {
         csound->SetOption("-n");
         csound->SetOption("-d");
 
-        // no output
-        csound->SetOption("-m16");
+        if (ProjectSettings::get_singleton()->get_setting("audio/csound/hide_csound_logs", true)) {
+            csound->SetOption("-m16");
+        }
 
         if (script.is_valid()) {
             int error = csound->Compile(script->get_path().get_file().ascii());

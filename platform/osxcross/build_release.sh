@@ -22,6 +22,7 @@ for ARCH in x86_64 arm64; do
         -DOSXCROSS_SDK=${OSXCROSS_SDK} \
         -DOSXCROSS_TARGET=${OSXCROSS_TARGET} \
         -DCMAKE_OSX_ARCHITECTURES=${ARCH} \
+        -DBUILD_PLUGINS=OFF \
         $src_dir
 
     make

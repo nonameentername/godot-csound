@@ -148,7 +148,7 @@ public:
     void note_on(int chan, int key, int vel);
     void note_off(int chan, int key);
 
-    void input_message(String message);
+    void event_string(String message);
     void compile_orchestra(String orchestra);
 
     void send_control_channel(String channel, float value);

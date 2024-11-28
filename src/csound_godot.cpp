@@ -415,13 +415,12 @@ void CsoundGodot::note_off(int chan, int key) {
     // csound->EventString(note_off.ascii().get_data(), 0);
 }
 
-void CsoundGodot::input_message(String message) {
+void CsoundGodot::event_string(String message) {
     if (!initialized) {
         return;
     }
 
-    // TODO: what should this call? EvalCode?
-    // csound->CompileCSD(message.ascii(), 1);
+    csound->EventString(message.ascii());
 }
 
 void CsoundGodot::compile_orchestra(String orchestra) {
@@ -988,7 +987,7 @@ void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);
     ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);
 
-    ClassDB::bind_method(D_METHOD("input_message", "message"), &CsoundGodot::input_message);
+    ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundGodot::event_string);
     ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundGodot::compile_orchestra);
 
     ClassDB::bind_method(D_METHOD("send_control_channel", "value"), &CsoundGodot::send_control_channel);

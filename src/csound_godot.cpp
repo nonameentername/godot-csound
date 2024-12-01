@@ -78,36 +78,44 @@ void CsoundGodot::start() {
             csound->SetOption("-m16");
         }
 
-        if (script.is_valid()) {
+        bool csound_error = false;
+
+        if (script.is_null()) {
+            godot::UtilityFunctions::push_error("csound script not specified.");
+            csound_error = true;
+        } else if (script.is_valid()) {
             int error = csound->Compile(script->get_path().get_file().ascii());
             if (error != 0) {
                 godot::UtilityFunctions::push_error("Could not compile csound script: ", script->get_path().get_file());
+                csound_error = true;
             }
         }
 
-        int p_frames = 512;
+        if (!csound_error) {
+            int p_frames = 512;
 
-        csound->Start();
+            csound->Start();
 
-        int frame_size = p_frames + csound->GetKsmps();
+            int frame_size = p_frames + csound->GetKsmps();
 
-        output_buffer.resize(2 * p_frames);
+            output_buffer.resize(2 * p_frames);
 
-        // TODO: check input and output channels separately
-        if (output_channels.size() != csound->GetChannels(0)) {
-            input_channels.resize(csound->GetChannels(0));
-            output_channels.resize(csound->GetChannels(0));
+            // TODO: check input and output channels separately
+            if (output_channels.size() != csound->GetChannels(0)) {
+                input_channels.resize(csound->GetChannels(0));
+                output_channels.resize(csound->GetChannels(0));
 
-            for (int j = 0; j < csound->GetChannels(0); j++) {
-                input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
-                output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+                for (int j = 0; j < csound->GetChannels(0); j++) {
+                    input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+                    output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+                }
             }
+
+            initialized = true;
+            start_thread();
+
+            emit_signal("csound_ready", csound_name);
         }
-
-        initialized = true;
-        start_thread();
-
-        emit_signal("csound_ready", csound_name);
     }
 }
 

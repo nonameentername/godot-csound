@@ -149,6 +149,8 @@ public:
     void note_off(int chan, int key);
 
     void event_string(String message);
+    double evaluate_code(String message);
+    void compile_csd(String orchestra);
     void compile_orchestra(String orchestra);
 
     void send_control_channel(String channel, float value);

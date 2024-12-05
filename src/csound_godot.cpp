@@ -431,14 +431,28 @@ void CsoundGodot::event_string(String message) {
     csound->EventString(message.ascii());
 }
 
-void CsoundGodot::compile_orchestra(String orchestra) {
+double CsoundGodot::evaluate_code(String message) {
+    if (!initialized) {
+        return 0;
+    }
+
+    return csound->EvalCode(message.ascii());
+}
+
+void CsoundGodot::compile_csd(String orchestra) {
     if (!initialized) {
         return;
     }
 
     csound->CompileCSD(orchestra.ascii(), 1);
+}
 
-    int p_frames = 512;
+void CsoundGodot::compile_orchestra(String orchestra) {
+    if (!initialized) {
+        return;
+    }
+
+    csound->CompileOrc(orchestra.ascii(), 1);
 }
 
 void CsoundGodot::send_control_channel(String channel, float value) {
@@ -996,6 +1010,8 @@ void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);
 
     ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundGodot::event_string);
+    ClassDB::bind_method(D_METHOD("evaluate_code", "message"), &CsoundGodot::evaluate_code);
+    ClassDB::bind_method(D_METHOD("compile_csd", "orchestra"), &CsoundGodot::compile_csd);
     ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundGodot::compile_orchestra);
 
     ClassDB::bind_method(D_METHOD("send_control_channel", "value"), &CsoundGodot::send_control_channel);

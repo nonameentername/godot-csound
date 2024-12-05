@@ -8,6 +8,7 @@ Project running in the browser [godot-csound](https://nonameentername.github.io/
 Projects using godot-csound
 ---------------------------
 
+* [godot-csound-example](https://github.com/nonameentername/godot-csound-example) - Simple godot-csound example.
 * [godot-synths](https://github.com/nonameentername/godot-synths) - Music synths for Godot.  ([demo](https://nonameentername.github.io/godot-synths/godot-synths.html))
 
 How to Install

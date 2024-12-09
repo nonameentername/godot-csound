@@ -1,0 +1,43 @@
+name: docker_builds
+
+on:
+#  pull_request:
+#    branches:
+#      - develop
+  workflow_dispatch:
+
+jobs:
+  build-and-push-linux-image:
+    name: Linux (Ubuntu)
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-ubuntu:${{ env.VERSION }} platform/ubuntu
+          docker save godot-csound-ubuntu:${{ env.VERSION }} > godot-csound-ubuntu-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-ubuntu-${{ env.VERSION }}
+          path: godot-csound-ubuntu-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}

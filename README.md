@@ -1,6 +1,8 @@
 godot-csound
 ============
 
+[![docker_builds](https://github.com/nonameentername/godot-csound/actions/workflows/build_images.yml/badge.svg)](https://github.com/nonameentername/godot-csound/actions/workflows/build_images.yml)
+
 Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.3 stable release.
 
 Project running in the browser [godot-csound](https://nonameentername.github.io/godot-csound/csoundgodot.html)

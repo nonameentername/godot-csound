@@ -133,8 +133,12 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -t godot-csound-ioscross:${{ env.VERSION }} platform/ioscross
+          echo $IOSCROSS_PASSWORD > secret
+          docker build --build-arg="DOWNLOAD_URL=$IOSCROSS_DOWNLOAD_URL" --secret id=secret,src=secret -t godot-csound-ioscross:${{ env.VERSION }} platform/ioscross
           docker save godot-csound-ioscross:${{ env.VERSION }} > godot-csound-ioscross-${{ env.VERSION }}.tar
+        env:
+          IOSCROSS_PASSWORD: ${{ secrets.IOSCROSS_PASSWORD }}
+          IOSCROSS_DOWNLOAD_URL: ${{ vars.IOSCROSS_DOWNLOAD_URL }}
 
       - name: Upload image
         uses: actions/upload-artifact@v4

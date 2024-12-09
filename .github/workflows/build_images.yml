@@ -41,3 +41,178 @@ jobs:
           gh variable set GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID --body ${{ github.run_id }}
         env:
           GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+
+  build-and-push-windows-image:
+    name: Windows (MinGW)
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-mingw:${{ env.VERSION }} platform/mingw
+          docker save godot-csound-mingw:${{ env.VERSION }} > godot-csound-mingw-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-mingw-${{ env.VERSION }}
+          path: godot-csound-mingw-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+
+  build-and-push-macos-image:
+    name: MacOS (osxcross)
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-osxcross:${{ env.VERSION }} platform/osxcross
+          docker save godot-csound-osxcross:${{ env.VERSION }} > godot-csound-osxcross-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-osxcross-${{ env.VERSION }}
+          path: godot-csound-osxcross-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+
+  build-and-push-ios-image:
+    name: iOS (ioscross)
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-ioscross:${{ env.VERSION }} platform/ioscross
+          docker save godot-csound-ioscross:${{ env.VERSION }} > godot-csound-ioscross-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-ioscross-${{ env.VERSION }}
+          path: godot-csound-ioscross-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+
+  build-and-push-android-image:
+    name: Android
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-android:${{ env.VERSION }} platform/android
+          docker save godot-csound-android:${{ env.VERSION }} > godot-csound-android-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-android-${{ env.VERSION }}
+          path: godot-csound-android-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+
+  build-and-push-wasm-image:
+    name: Wasm (emscripten)
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: |
+          docker build -t godot-csound-wasm:${{ env.VERSION }} platform/web
+          docker save godot-csound-wasm:${{ env.VERSION }} > godot-csound-wasm-${{ env.VERSION }}.tar
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-csound-wasm-${{ env.VERSION }}
+          path: godot-csound-wasm-${{ env.VERSION }}.tar
+
+      - name: Update workflow_run_id
+        if: ${{ success() }}
+        run: |
+          gh variable set GODOT_CSOUND_WASM_WORKFLOW_RUN_ID --body ${{ github.run_id }}
+        env:
+          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}

@@ -10,9 +10,60 @@ on:
   workflow_dispatch:
 
 jobs:
+  linux_build:
+    name: Linux/Ubuntu build
+    if: vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-ubuntu-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-ubuntu-${{ env.VERSION }}.tar
+          rm godot-csound-ubuntu-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-ubuntu:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/ubuntu/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-ubuntu:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/ubuntu/build_release.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin/linux
+          key: linux-artifacts
+
   ios_build:
-    name: iOS build (ioscross/vcpkg)
-    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID 
+    name: iOS build
+    #disable for now
+    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID && 0
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -53,3 +104,18 @@ jobs:
           options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
           run: |
             ./platform/ioscross/build_release.sh
+
+  publish_artifacts:
+    name: Publish Artifacts
+    runs-on: ubuntu-latest
+    needs:
+      - linux_build
+    steps:
+      - name: Restore cached linux artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin/linux
+          key: linux-artifacts
+
+      - name: List files
+        run: ls addons

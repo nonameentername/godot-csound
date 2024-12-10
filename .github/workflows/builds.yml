@@ -31,7 +31,7 @@ jobs:
         with:
           name: godot-csound-ioscross-${{ env.VERSION }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ vars.IOSCROSS_WORKFLOW_RUN_ID }}
+          run-id: ${{ vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID }}
 
       - name: Load image
         run: |

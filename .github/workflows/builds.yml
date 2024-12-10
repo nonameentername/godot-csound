@@ -1,0 +1,55 @@
+name: builds
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ios_build:
+    name: iOS build (ioscross/vcpkg)
+    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-ioscross-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.IOSCROSS_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-ioscross-${{ env.VERSION }}.tar
+          rm godot-csound-ioscross-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-ioscross:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/ioscross/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-ioscross:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/ioscross/build_release.sh

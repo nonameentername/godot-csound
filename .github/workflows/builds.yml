@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  linux_build:
+  linux-build:
     name: Linux/Ubuntu build
     if: vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID 
     runs-on: ubuntu-latest
@@ -57,12 +57,117 @@ jobs:
       - name: Create cache for build
         uses: actions/cache@v4
         with:
-          path: addons/csound/bin/linux
+          path: addons/csound/bin
           key: linux-artifacts
 
-  ios_build:
+  windows-build:
+    name: Windows build
+    if: vars.GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-mingw-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-mingw-${{ env.VERSION }}.tar
+          rm godot-csound-mingw-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-mingw:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/mingw/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-mingw:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/mingw/build_release.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin
+          key: windows-artifacts
+
+  macos-build:
+    name: MacOS build
+    if: vars.GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          docker-images: false
+
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-osxcross-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-osxcross-${{ env.VERSION }}.tar
+          rm godot-csound-osxcross-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-osxcross:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/osxcross/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-osxcross:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/osxcross/build_release.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin
+          key: macos-artifacts
+
+  ios-build:
     name: iOS build
-    #disable for now
+    #skip for now
     if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID && 0
     runs-on: ubuntu-latest
     env:
@@ -105,17 +210,152 @@ jobs:
           run: |
             ./platform/ioscross/build_release.sh
 
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin
+          key: ios-artifacts
+
+  android-build:
+    name: Android build
+    if: vars.GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-android-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-android-${{ env.VERSION }}.tar
+          rm godot-csound-android-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-android:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/android/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-android:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/android/build_release.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin
+          key: android-artifacts
+
+  web-build:
+    name: Web build
+    if: vars.GODOT_CSOUND_WASM_WORKFLOW_RUN_ID 
+    runs-on: ubuntu-latest
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Download image
+        uses: actions/download-artifact@v4
+        with:
+          name: godot-csound-wasm-${{ env.VERSION }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ vars.GODOT_CSOUND_WASM_WORKFLOW_RUN_ID }}
+
+      - name: Load image
+        run: |
+          docker load --input godot-csound-wasm-${{ env.VERSION }}.tar
+          rm godot-csound-wasm-${{ env.VERSION }}.tar
+
+      - name: Build Csound (Debug)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-wasm:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/web/build_debug.sh
+
+      - name: Build Csound (Relase)
+        uses: addnab/docker-run-action@v3
+        with:
+          image: godot-csound-wasm:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ./platform/web/build_release.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: addons/csound/bin
+          key: web-artifacts
+
   publish_artifacts:
     name: Publish Artifacts
     runs-on: ubuntu-latest
-    needs:
-      - linux_build
+    needs: [linux-build, windows-build, macos-build, ios-build, android-build, web-build]
     steps:
-      - name: Restore cached linux artifacts
+      - name: Restore cached Linux artifacts
         uses: actions/cache/restore@v4
         with:
-          path: addons/csound/bin/linux
+          path: addons/csound/bin
           key: linux-artifacts
 
+      - name: Restore cached Windows artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: windows-artifacts
+
+      - name: Restore cached MacOS artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: macos-artifacts
+
+      - name: Restore cached iOS artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: ios-artifacts
+
+      - name: Restore cached Android artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: android-artifacts
+
+      - name: Restore cached Web artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: web-artifacts
+
       - name: List files
-        run: ls addons
+        run: find addons

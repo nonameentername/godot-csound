@@ -3,7 +3,7 @@
     url = https://github.com/nonameentername/godot-cpp.git
 [submodule "modules/csound"]
 	path = modules/csound
-	url = https://github.com/csound/csound.git
+	url = https://github.com/nonameentername/csound.git
 [submodule "modules/godot"]
 	path = modules/godot
 	url = https://github.com/godotengine/godot.git

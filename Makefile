@@ -84,7 +84,9 @@ osxcross:
 	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_debug.sh'
 
 docker-ioscross:
-	docker build -t godot-csound-ioscross ./platform/ioscross
+	@echo ${IOSCROSS_PASSWORD} > secret
+	docker build --secret id=secret,src=secret -t godot-csound-ioscross ./platform/ioscross
+	@rm -rf secret
 
 shell-ioscross: docker-ioscross
 	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-ioscross ${SHELL_COMMAND}

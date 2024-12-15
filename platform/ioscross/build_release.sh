@@ -1,6 +1,6 @@
 #!/bin/bash
 
-$(eval $BASE_DIR/ioscross/arm64/ioscross_conf.sh)
+$(eval /ioscross/arm64/ioscross_conf.sh)
 
 dir=$(realpath .)
 src_dir=$dir/modules/csound
@@ -31,7 +31,7 @@ make install
 arm-apple-${OSXCROSS_TARGET}-install_name_tool -id @rpath/CsoundLib.framework/CsoundLib $prefix/Library/Frameworks/CsoundLib.framework/CsoundLib
 
 for ARCH in x86_64 arm64; do
-    $(eval $BASE_DIR/ioscross/${ARCH}_sim/ioscross_conf.sh)
+    $(eval /ioscross/${ARCH}_sim/ioscross_conf.sh)
     build_dir=$src_dir/build/ioscross-$ARCH/release
     prefix=$src_dir/bin/ioscross-$ARCH/release
 
@@ -72,15 +72,15 @@ prefix_arm64=$src_dir/bin/ioscross-arm64/release
 
 $dir/scripts/lipo-dir.py $prefix_arm64 $prefix_x64 $prefix
 
-$(eval $BASE_DIR/ioscross/arm64/ioscross_conf.sh)
+$(eval /ioscross/arm64/ioscross_conf.sh)
 
 cd $dir
 scons platform=ios arch=arm64 target=template_release IOS_SDK_PATH=$OSXCROSS_SDK IOS_TOOLCHAIN_PATH=$OSXCROSS_TARGET_DIR ios_triple="arm-apple-$OSXCROSS_TARGET-"
 
-$(eval $BASE_DIR/ioscross/arm64_sim/ioscross_conf.sh)
+$(eval /ioscross/arm64_sim/ioscross_conf.sh)
 scons platform=ios arch=arm64 ios_simulator=yes target=template_release IOS_SDK_PATH=$OSXCROSS_SDK IOS_TOOLCHAIN_PATH=$OSXCROSS_TARGET_DIR ios_triple="arm-apple-$OSXCROSS_TARGET-"
 
-$(eval $BASE_DIR/ioscross/x86_64_sim/ioscross_conf.sh)
+$(eval /ioscross/x86_64_sim/ioscross_conf.sh)
 scons platform=ios arch=x86_64 ios_simulator=yes target=template_release IOS_SDK_PATH=$OSXCROSS_SDK IOS_TOOLCHAIN_PATH=$OSXCROSS_TARGET_DIR ios_triple="x86_64-apple-$OSXCROSS_TARGET-"
 
 lipo -create \

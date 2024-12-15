@@ -77,6 +77,7 @@ elif env["platform"] == "ios":
     csound_library = "CsoundLib"
     env.Append(CPPFLAGS=["-stdlib=libc++"])
     env.Append(LINKFLAGS=["-stdlib=libc++"])
+    env['ENV']['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH']
 elif env["platform"] == "android":
     csound_library = "csound"
     env.Append(LIBS=[csound_library])

@@ -46,7 +46,7 @@ jobs:
           run: |
             ./platform/ubuntu/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-ubuntu:${{ env.VERSION }}
@@ -96,7 +96,7 @@ jobs:
           run: |
             ./platform/mingw/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-mingw:${{ env.VERSION }}
@@ -151,7 +151,7 @@ jobs:
           run: |
             ./platform/osxcross/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-osxcross:${{ env.VERSION }}
@@ -167,8 +167,7 @@ jobs:
 
   ios-build:
     name: iOS build
-    #skip for now
-    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID && 0
+    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -202,7 +201,7 @@ jobs:
           run: |
             ./platform/ioscross/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-ioscross:${{ env.VERSION }}
@@ -252,7 +251,7 @@ jobs:
           run: |
             ./platform/android/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-android:${{ env.VERSION }}
@@ -302,7 +301,7 @@ jobs:
           run: |
             ./platform/web/build_debug.sh
 
-      - name: Build Csound (Relase)
+      - name: Build Csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: godot-csound-wasm:${{ env.VERSION }}

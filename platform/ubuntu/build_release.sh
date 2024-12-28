@@ -6,8 +6,12 @@ build_dir=$src_dir/build/linux/release
 
 mkdir -p $build_dir
 cd $build_dir
-cmake -DCMAKE_INSTALL_PREFIX:PATH=$dir/addons/csound/bin/linux/release \
+
+cmake -DCUSTOM_CMAKE=$src_dir/platform/linux/custom.cmake \
+    -DCMAKE_INSTALL_PREFIX:PATH=$dir/addons/csound/bin/linux/release \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_VERBOSE_MAKEFILE=1 \
+    -DUSE_VCPKG=1 \
     -DBUILD_JAVA_INTERFACE=OFF \
     -DINSTALL_PYTHON_INTERFACE=OFF \
     -DBUILD_PLUGINS=OFF \

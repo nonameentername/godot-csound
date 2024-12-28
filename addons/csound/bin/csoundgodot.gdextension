@@ -29,13 +29,13 @@ android.release.x86_64 = "res://addons/csound/bin/android/libcsoundgodot.android
 [dependencies]
 
 linux.editor.x86_64  = {
-"linux/debug/lib/libcsound64.so.7.0": ""
+"linux/debug/lib64/libcsound64.so.7.0": ""
 }
 linux.debug.x86_64  = {
-"linux/debug/lib/libcsound64.so.7.0": ""
+"linux/debug/lib64/libcsound64.so.7.0": ""
 }
 linux.release.x86_64 = {
-"linux/release/lib/libcsound64.so.7.0": ""
+"linux/release/lib64/libcsound64.so.7.0": ""
 }
 windows.editor.x86_64  = {
 "windows/debug/lib/csound64.dll": "",

@@ -135,6 +135,7 @@ public:
 
     void start();
     void stop();
+    void finish();
     void reset();
 
     void set_soundfont(Ref<SoundFontFileReader> p_soundfont);

@@ -1,0 +1,30 @@
+extends SceneTree
+
+var main_csound: CsoundGodot
+var csound: CsoundGodot
+
+
+func _init():
+	var main_scene = preload("res://main.tscn")
+	var main = main_scene.instantiate()
+
+	CsoundServer.connect("csound_layout_changed", csound_layout_changed)
+
+	change_scene_to_packed(main_scene)
+
+	await create_timer(2.0).timeout
+
+	var result = csound.evaluate_code('return 2 + 2')
+
+	print(result)
+
+	main_csound.finish()
+	csound.finish()
+
+	unload_current_scene()
+	quit()
+
+
+func csound_layout_changed():
+	main_csound = CsoundServer.get_csound("Main")
+	csound = CsoundServer.get_csound("Csound")

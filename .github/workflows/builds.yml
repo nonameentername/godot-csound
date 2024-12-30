@@ -12,7 +12,7 @@ on:
 jobs:
   linux-build:
     name: Linux/Ubuntu build
-    if: vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID 
+    if: vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -58,11 +58,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: linux-artifacts
+          key: linux-artifacts-${{github.run_id}}
 
   windows-build:
     name: Windows build
-    if: vars.GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID 
+    if: vars.GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -108,11 +108,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: windows-artifacts
+          key: windows-artifacts-${{github.run_id}}
 
   macos-build:
     name: MacOS build
-    if: vars.GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID 
+    if: vars.GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -163,7 +163,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: macos-artifacts
+          key: macos-artifacts-${{github.run_id}}
 
   ios-build:
     name: iOS build
@@ -213,11 +213,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: ios-artifacts
+          key: ios-artifacts-${{github.run_id}}
 
   android-build:
     name: Android build
-    if: vars.GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID 
+    if: vars.GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -263,11 +263,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: android-artifacts
+          key: android-artifacts-${{github.run_id}}
 
   web-build:
     name: Web build
-    if: vars.GODOT_CSOUND_WASM_WORKFLOW_RUN_ID 
+    if: vars.GODOT_CSOUND_WASM_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -313,48 +313,78 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: web-artifacts
+          key: web-artifacts-${{github.run_id}}
+
+  verify-linux-build:
+    name: Verify Linux/Ubuntu build
+    runs-on: ubuntu-latest
+    needs: linux-build
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Restore cached Linux artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: linux-artifacts-${{github.run_id}}
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify godot-csound
+        run: |
+          godot --headless --import
+          godot --headless --import
+          godot --headless -s csound_run_scene.gd
 
   publish_artifacts:
     name: Publish Artifacts
     runs-on: ubuntu-latest
-    needs: [linux-build, windows-build, macos-build, ios-build, android-build, web-build]
+    needs: [verify-linux-build, windows-build, macos-build, ios-build, android-build, web-build]
     steps:
       - name: Restore cached Linux artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: linux-artifacts
+          key: linux-artifacts-${{github.run_id}}
 
       - name: Restore cached Windows artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: windows-artifacts
+          key: windows-artifacts-${{github.run_id}}
 
       - name: Restore cached MacOS artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: macos-artifacts
+          key: macos-artifacts-${{github.run_id}}
 
       - name: Restore cached iOS artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: ios-artifacts
+          key: ios-artifacts-${{github.run_id}}
 
       - name: Restore cached Android artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: android-artifacts
+          key: android-artifacts-${{github.run_id}}
 
       - name: Restore cached Web artifacts
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: web-artifacts
+          key: web-artifacts-${{github.run_id}}
 
       - name: List files
         run: find addons

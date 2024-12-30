@@ -108,13 +108,13 @@ elif env["platform"] == "web":
         env.Append(CPPPATH=["addons/csound/bin/web/release/include/csound", "modules/csound/build/web/release/vcpkg_installed/wasm32-emscripten/include"])
 elif env["platform"] == "linux":
     if env["dev_build"]:
-        env.Append(LIBPATH=["addons/csound/bin/linux/debug/lib"])
-        env.Append(RPATH=["addons/csound/bin/linux/debug/lib", "."])
-        env.Append(CPPPATH=["addons/csound/bin/linux/debug/include/csound"])
+        env.Append(LIBPATH=["addons/csound/bin/linux/debug/lib64", "modules/csound/build/linux/debug/vcpkg_installed/x64-linux/lib"])
+        env.Append(CPPPATH=["addons/csound/bin/linux/debug/include/csound", "modules/csound/build/linux/debug/vcpkg_installed/x64-linux/include"])
+        env.Append(RPATH=["addons/csound/bin/linux/debug/lib64", "."])
     else:
-        env.Append(LIBPATH=["addons/csound/bin/linux/release/lib"])
-        env.Append(RPATH=["addons/csound/bin/linux/release/lib", "."])
-        env.Append(CPPPATH=["addons/csound/bin/linux/release/include/csound"])
+        env.Append(LIBPATH=["addons/csound/bin/linux/release/lib64", "modules/csound/build/linux/release/vcpkg_installed/x64-linux/lib"])
+        env.Append(CPPPATH=["addons/csound/bin/linux/release/include/csound", "modules/csound/build/linux/release/vcpkg_installed/x64-linux/include"])
+        env.Append(RPATH=["addons/csound/bin/linux/release/lib64", "."])
 elif env["platform"] == "macos":
     if env["dev_build"]:
         env.Append(LIBPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/univeral-osxcross/lib"])

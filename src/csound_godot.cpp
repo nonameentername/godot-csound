@@ -129,6 +129,11 @@ void CsoundGodot::stop() {
     }
 }
 
+void CsoundGodot::finish() {
+    stop();
+    finished = true;
+}
+
 void CsoundGodot::reset() {
     initialized = false;
     stop_thread();
@@ -228,6 +233,10 @@ void CsoundGodot::update_named_channels(int p_frames) {
 }
 
 int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+    if (finished) {
+        return 0;
+    }
+
     lock();
 
     if (Time::get_singleton()) {
@@ -277,6 +286,10 @@ int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_fr
 
     bool has_left_channel = left >= 0 && left < output_channels.size();
     bool has_right_channel = right >= 0 && right < output_channels.size();
+
+    if (finished) {
+        return 0;
+    }
 
     lock();
     if (has_left_channel && active) {
@@ -337,6 +350,10 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
 }
 
 int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
+    if (finished) {
+        return 0;
+    }
+
     MYFLT temp_buffer[BUFFER_FRAME_SIZE];
 
     bool has_left_channel = named_channels.has(left);
@@ -1005,6 +1022,7 @@ const double CsoundGodot::get_value(double key) {
 void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("initialize"), &CsoundGodot::initialize);
     ClassDB::bind_method(D_METHOD("program_select"), &CsoundGodot::program_select);
+    ClassDB::bind_method(D_METHOD("finish"), &CsoundGodot::finish);
 
     ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);
     ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);

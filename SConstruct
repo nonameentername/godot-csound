@@ -88,6 +88,8 @@ else:
     csound_library = "csound64"
     env.Append(LIBS=[csound_library])
 
+#env.Append(CPPFLAGS=["-Wall", "-Werror"])
+
 if env["platform"] == "windows":
     if env["dev_build"]:
         env.Append(LIBPATH=["addons/csound/bin/windows/debug/lib", "modules/csound/build/mingw/debug/vcpkg_installed/x64-mingw-static/lib"])

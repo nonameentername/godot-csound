@@ -53,6 +53,9 @@ ubuntu:
 ubuntu-debug:
 	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
 
+ubuntu-release:
+	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_release.sh'
+
 docker-web:
 	docker build -t godot-csound-web ./platform/web
 

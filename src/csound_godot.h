@@ -13,6 +13,7 @@
 
 #include "godot_cpp/classes/mutex.hpp"
 #include "godot_cpp/classes/thread.hpp"
+#include "godot_cpp/classes/semaphore.hpp"
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_server.hpp>
 #include <godot_cpp/classes/engine.hpp>
@@ -71,13 +72,13 @@ private:
     bool initialized;
     Ref<CsoundFileReader> script;
     Vector<Ref<CsoundInstrument>> instruments;
-    double previous_next_mix;
     double mix_rate;
 
     bool thread_exited;
     mutable bool exit_thread;
     Ref<Thread> thread;
     Ref<Mutex> mutex;
+    Ref<Semaphore> semaphore;
 
     struct Channel {
         String name;
@@ -96,7 +97,9 @@ private:
 
     HashMap<String, void *> input_named_channels_buffer;
     Vector<MYFLT> temp_buffer;
-    Vector<MYFLT> output_buffer;
+
+    Channel output_left_channel;
+    Channel output_right_channel;
 
     Vector<Channel> output_named_channels;
     HashMap<String, int> named_channels;

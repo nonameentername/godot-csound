@@ -21,4 +21,4 @@ make
 make install
 
 cd $dir
-scons platform=linux target=template_release
+scons platform=linux target=template_release optimize=none

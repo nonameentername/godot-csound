@@ -35,6 +35,7 @@
 static const float AUDIO_PEAK_OFFSET = 0.0000000001f;
 static const float AUDIO_MIN_PEAK_DB = -200.0f;
 static const int BUFFER_FRAME_SIZE = 512;
+static const int CIRCULAR_BUFFER_SIZE = BUFFER_FRAME_SIZE * 2 + 10;
 
 namespace godot {
 
@@ -96,7 +97,12 @@ private:
     Vector<Channel> output_channels;
 
     HashMap<String, void *> input_named_channels_buffer;
-    Vector<MYFLT> temp_buffer;
+
+    MYFLT temp_buffer[BUFFER_FRAME_SIZE];
+
+    Vector<MYFLT> ksmps_temp_buffer;
+    Vector<MYFLT> ksmps_left_buffer;
+    Vector<MYFLT> ksmps_right_buffer;
 
     Channel output_left_channel;
     Channel output_right_channel;

@@ -40,6 +40,8 @@ prefix_arm64=$src_dir/bin/osxcross-arm64/release
 
 $dir/scripts/lipo-dir.py $prefix_arm64 $prefix_x64 $prefix
 
+zsign -a -s $dir/addons/csound/bin/macos/release/Library/Frameworks/CsoundLib64.framework/Versions/Current/CsoundLib64
+
 export OSXCROSS_ROOT=$OSXCROSS_BASE_DIR
 
 cd $dir

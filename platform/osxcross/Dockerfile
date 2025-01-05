@@ -43,5 +43,21 @@ RUN ln -s /osxcross/target/bin/x86_64-apple-darwin23-otool /osxcross/target/bin/
 
 RUN rm -rf /osxcross/tarballs/$OSX_SDK.tar.xz
 
+RUN git clone https://github.com/zhlynn/zsign.git
+
+WORKDIR /zsign
+
+RUN mkdir build
+
+WORKDIR /zsign/build
+
+RUN cmake ..
+
+RUN make
+
+RUN cp /zsign/build/zsign /usr/local/bin
+
+RUN rm -r /zsign
+
 FROM ubuntu:22.04
 COPY --from=base-image / /

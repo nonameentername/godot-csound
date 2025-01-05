@@ -16,7 +16,7 @@ func _init():
 
 	var result = csound.evaluate_code('return 2 + 2')
 
-	print(result)
+	print("output result is ", result)
 
 	main_csound.finish()
 	csound.finish()

@@ -3,7 +3,7 @@
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
-#include "godot_cpp/classes/os.hpp"
+//#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/project_settings.hpp"
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
@@ -31,10 +31,15 @@ CsoundGodot::CsoundGodot() {
     configure_csound();
 
     mutex.instantiate();
+    semaphore.instantiate();
 
     mix_rate = AudioServer::get_singleton()->get_mix_rate();
 
     midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
+
+    for (int i = 0; i < BUFFER_FRAME_SIZE; i++) {
+        temp_buffer[i] = 0;
+    }
 }
 
 void CsoundGodot::configure_csound() {
@@ -69,7 +74,7 @@ CsoundGodot::~CsoundGodot() {
 
 void CsoundGodot::start() {
     if (csound != NULL) {
-        int processor_count = OS::get_singleton()->get_processor_count();
+        //int processor_count = OS::get_singleton()->get_processor_count();
         // csound->SetOption(vformat("-j%d", processor_count).ascii());
         csound->SetOption("-n");
         csound->SetOption("-d");
@@ -92,13 +97,14 @@ void CsoundGodot::start() {
         }
 
         if (!csound_error) {
-            int p_frames = 512;
+            //int p_frames = 512;
 
             csound->Start();
 
-            int frame_size = p_frames + csound->GetKsmps();
+            //int frame_size = p_frames + csound->GetKsmps();
 
-            output_buffer.resize(2 * p_frames);
+            output_left_channel.buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
+            output_right_channel.buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
 
             // TODO: check input and output channels separately
             if (output_channels.size() != csound->GetChannels(0)) {
@@ -106,9 +112,24 @@ void CsoundGodot::start() {
                 output_channels.resize(csound->GetChannels(0));
 
                 for (int j = 0; j < csound->GetChannels(0); j++) {
-                    input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
-                    output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+                    input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
+                    output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
                 }
+            }
+
+            if (ksmps_temp_buffer.size() != csound->GetKsmps()) {
+                ksmps_temp_buffer.resize(csound->GetKsmps());
+                ksmps_temp_buffer.fill(0);
+            }
+
+            if (ksmps_left_buffer.size() != csound->GetKsmps()) {
+                ksmps_left_buffer.resize(csound->GetKsmps());
+                ksmps_left_buffer.fill(0);
+            }
+
+            if (ksmps_right_buffer.size() != csound->GetKsmps()) {
+                ksmps_right_buffer.resize(csound->GetKsmps());
+                ksmps_right_buffer.fill(0);
             }
 
             initialized = true;
@@ -146,6 +167,9 @@ void CsoundGodot::reset() {
 }
 
 void CsoundGodot::cleanup_channels() {
+    csoundDestroyCircularBuffer(csound->GetCsound(), output_left_channel.buffer);
+    csoundDestroyCircularBuffer(csound->GetCsound(), output_right_channel.buffer);
+
     for (int channel = 0; channel < input_channels.size(); channel++) {
         csoundDestroyCircularBuffer(csound->GetCsound(), input_channels[channel]);
     }
@@ -196,14 +220,14 @@ Ref<MidiFileReader> CsoundGodot::get_midi_file() {
 
 void CsoundGodot::add_named_channel(String name) {
     if (!input_named_channels_buffer.has(name)) {
-        input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT)));
+        input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT)));
     }
 
     if (!named_channels.has(name)) {
         int index = output_named_channels.size();
         output_named_channels.resize(index + 1);
         output_named_channels.write[index].buffer =
-            csoundCreateCircularBuffer(csound->GetCsound(), 1024, sizeof(MYFLT));
+            csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
         output_named_channels.write[index].name = name;
         named_channels.insert(name, index);
     }
@@ -214,7 +238,7 @@ void CsoundGodot::update_named_channels(int p_frames) {
         return;
     }
 
-    int frame_size = p_frames + csound->GetKsmps();
+    //int frame_size = p_frames + csound->GetKsmps();
 
     controlChannelInfo_t *tmp;
     int num_channels = csound->ListChannels(tmp);
@@ -239,23 +263,32 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
 
     lock();
 
+    int read = p_frames;
+
     if (Time::get_singleton()) {
         last_mix_time = Time::get_singleton()->get_ticks_usec();
     }
 
-    if (!initialized || output_buffer.size() == 0) {
+    if (!initialized || output_left_channel.buffer == NULL || output_right_channel.buffer == NULL) {
         for (int frame = 0; frame < p_frames; frame++) {
             p_buffer[frame].left = 0;
             p_buffer[frame].right = 0;
         }
     } else {
-        int buffer_index = 0;
-        for (int i = 0; i < p_frames; i++) {
-            p_buffer[i].left = output_buffer[buffer_index++];
-            p_buffer[i].right = output_buffer[buffer_index++];
+        csoundReadCircularBuffer(csound->GetCsound(), output_left_channel.buffer, temp_buffer, p_frames);
+        for (int i = 0; i < read; i++) {
+            p_buffer[i].left = temp_buffer[i];
+        }
+
+        csoundReadCircularBuffer(csound->GetCsound(), output_right_channel.buffer, temp_buffer, p_frames);
+        for (int i = 0; i < read; i++) {
+            p_buffer[i].right = temp_buffer[i];
         }
     }
+
     unlock();
+
+    semaphore->post();
 
     return p_frames;
 }
@@ -282,8 +315,6 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
 }
 
 int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
-    MYFLT temp_buffer[BUFFER_FRAME_SIZE];
-
     bool has_left_channel = left >= 0 && left < output_channels.size();
     bool has_right_channel = right >= 0 && right < output_channels.size();
 
@@ -353,8 +384,6 @@ int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, in
     if (finished) {
         return 0;
     }
-
-    MYFLT temp_buffer[BUFFER_FRAME_SIZE];
 
     bool has_left_channel = named_channels.has(left);
     bool has_right_channel = named_channels.has(right);
@@ -521,24 +550,16 @@ void CsoundGodot::thread_func() {
 
         last_mix_frames = p_frames;
 
-        if (previous_next_mix != last_mix_time) {
             lock();
 
             // TODO: enable after fixing memory leak
             // update_named_channels(p_frames);
 
-            int buffer_index = 0;
             int to_fill = p_frames;
 
             MYFLT *spin = csound->GetSpin();
             const MYFLT *spout = csound->GetSpout();
             MYFLT scale = csound->Get0dBFS();
-
-            if (temp_buffer.size() != csound->GetKsmps()) {
-                temp_buffer.resize(csound->GetKsmps());
-            }
-
-            int ksmps_buffer_index = 0;
 
             float volume = godot::UtilityFunctions::db_to_linear(volume_db);
 
@@ -565,29 +586,29 @@ void CsoundGodot::thread_func() {
 
             while (to_fill > 0) {
                 for (int channel = 0; channel < csound->GetChannels(0); channel++) {
-                    csoundReadCircularBuffer(csound->GetCsound(), input_channels[channel], temp_buffer.ptrw(),
+                    csoundReadCircularBuffer(csound->GetCsound(), input_channels[channel], ksmps_temp_buffer.ptrw(),
                                              csound->GetKsmps());
                     for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                        temp_buffer.write[frame] = temp_buffer[frame] * scale;
-                        spin[frame * csound->GetChannels(0) + channel] = temp_buffer[frame];
+                        ksmps_temp_buffer.write[frame] = ksmps_temp_buffer[frame] * scale;
+                        spin[frame * csound->GetChannels(0) + channel] = ksmps_temp_buffer[frame];
                     }
                     if (bypass) {
                         csoundWriteCircularBuffer(csound->GetCsound(), output_channels.write[channel].buffer,
-                                                  temp_buffer.ptr(), csound->GetKsmps());
+                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
                     }
                 }
 
                 for (KeyValue<String, void *> &E : input_named_channels_buffer) {
                     csoundReadCircularBuffer(csound->GetCsound(), input_named_channels_buffer[E.key],
-                                             temp_buffer.ptrw(), csound->GetKsmps());
+                                             ksmps_temp_buffer.ptrw(), csound->GetKsmps());
                     for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                        temp_buffer.write[frame] = temp_buffer[frame] * scale;
+                        ksmps_temp_buffer.write[frame] = ksmps_temp_buffer[frame] * scale;
                     }
-                    csound->SetAudioChannel(E.key.utf8().get_data(), temp_buffer.ptrw());
+                    csound->SetAudioChannel(E.key.utf8().get_data(), ksmps_temp_buffer.ptrw());
                     if (bypass) {
                         csoundWriteCircularBuffer(csound->GetCsound(),
                                                   output_named_channels.write[named_channels[E.key]].buffer,
-                                                  temp_buffer.ptr(), csound->GetKsmps());
+                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
                     }
                 }
 
@@ -596,17 +617,25 @@ void CsoundGodot::thread_func() {
                     finished = true;
                 }
 
+                int buffer_index = 0;
                 for (int i = 0; i < csound->GetKsmps() * csound->GetChannels(0); i = i + csound->GetChannels(0)) {
                     if (bypass) {
-                        output_buffer.write[buffer_index++] = spin[i] * scale;
-                        output_buffer.write[buffer_index++] = spin[i + 1] * scale;
+                        ksmps_left_buffer.ptrw()[buffer_index] = spin[i] * scale;
+                        ksmps_right_buffer.ptrw()[buffer_index] = spin[i + 1] * scale;
                     } else {
-                        output_buffer.write[buffer_index++] = spout[i] / scale * volume;
-                        output_buffer.write[buffer_index++] = spout[i + 1] / scale * volume;
+                        ksmps_left_buffer.ptrw()[buffer_index] = spout[i] / scale * volume;
+                        ksmps_right_buffer.ptrw()[buffer_index] = spout[i + 1] / scale * volume;
                     }
 
                     to_fill = to_fill - 1;
+                    buffer_index++;
                 }
+
+                csoundWriteCircularBuffer(csound->GetCsound(), output_left_channel.buffer,
+                                          ksmps_left_buffer.ptr(), csound->GetKsmps());
+
+                csoundWriteCircularBuffer(csound->GetCsound(), output_right_channel.buffer,
+                                          ksmps_right_buffer.ptr(), csound->GetKsmps());
 
                 if (!bypass) {
                     for (int channel = 0; channel < csound->GetChannels(0); channel++) {
@@ -617,38 +646,36 @@ void CsoundGodot::thread_func() {
                             if (p > channel_peak[channel]) {
                                 channel_peak.write[channel] = p;
                             }
-                            temp_buffer.write[frame] = value;
+                            ksmps_temp_buffer.write[frame] = value;
                         }
                         csoundWriteCircularBuffer(csound->GetCsound(), output_channels.write[channel].buffer,
-                                                  temp_buffer.ptr(), csound->GetKsmps());
+                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
                     }
                 }
 
                 if (!bypass) {
                     for (int channel = 0; channel < output_named_channels.size(); channel++) {
                         csound->GetAudioChannel(output_named_channels[channel].name.utf8().get_data(),
-                                                temp_buffer.ptrw());
+                                                ksmps_temp_buffer.ptrw());
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                            float value = temp_buffer[frame] / scale * volume;
+                            float value = ksmps_temp_buffer[frame] / scale * volume;
                             float p = ABS(value);
                             if (p > named_channel_peak[channel]) {
                                 named_channel_peak.write[channel] = p;
                             }
-                            temp_buffer.write[frame] = value;
+                            ksmps_temp_buffer.write[frame] = value;
                         }
                         csoundWriteCircularBuffer(csound->GetCsound(), output_named_channels.write[channel].buffer,
-                                                  temp_buffer.ptr(), csound->GetKsmps());
+                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
 
                         // clear channel after reading
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
-                            temp_buffer.write[frame] = 0;
+                            ksmps_temp_buffer.write[frame] = 0;
                         }
                         csound->SetAudioChannel(output_named_channels[channel].name.utf8().get_data(),
-                                                temp_buffer.ptrw());
+                                                ksmps_temp_buffer.ptrw());
                     }
                 }
-
-                ksmps_buffer_index += csound->GetKsmps();
             }
 
             for (int i = 0; i < output_channels.size(); i++) {
@@ -673,15 +700,10 @@ void CsoundGodot::thread_func() {
                 }
             }
 
-            previous_next_mix = last_mix_time;
-            unlock();
 
-        } else {
-            int msdelay = 10;
-            OS::get_singleton()->delay_usec(msdelay);
-        }
 
         // TODO: can I remove this now that it's running on a thread?
+        /*
         if (!active && !channels_cleared) {
             for (int channel = 0; channel < input_channels.size(); channel++) {
                 for (int frame = 0; frame < last_mix_frames; frame++) {
@@ -700,6 +722,7 @@ void CsoundGodot::thread_func() {
 
             for (KeyValue<String, void *> &E : input_named_channels_buffer) {
                 for (int frame = 0; frame < csound->GetKsmps(); frame++) {
+                    String key = E.key;
                     // input_named_channels_buffer.get(E.key).write[frame] = 0;
                 }
             }
@@ -715,6 +738,11 @@ void CsoundGodot::thread_func() {
 
             channels_cleared = true;
         }
+        */
+
+        unlock();
+
+        semaphore->wait();
     }
 }
 
@@ -722,7 +750,7 @@ Error CsoundGodot::start_thread() {
     if (thread.is_null()) {
         thread.instantiate();
         exit_thread = false;
-        thread->start(callable_mp(this, &CsoundGodot::thread_func), Thread::PRIORITY_NORMAL);
+        thread->start(callable_mp(this, &CsoundGodot::thread_func), Thread::PRIORITY_HIGH);
     }
     return (Error)OK;
 }
@@ -730,6 +758,7 @@ Error CsoundGodot::start_thread() {
 void CsoundGodot::stop_thread() {
     if (thread.is_valid()) {
         exit_thread = true;
+        semaphore->post();
         thread->wait_to_finish();
         thread.unref();
     }
@@ -777,7 +806,7 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
         return 0;
     }
 
-    int bytesLeft = nbytes;
+    //int bytesLeft = nbytes;
     int bytesRead = 0;
 
     MidiEvent midi_event;
@@ -785,7 +814,7 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
     int32_t read = csoundReadCircularBuffer(csound, csound_godot->midi_buffer, &midi_event, 4);
 
     while (read > 0 && bytesRead < nbytes) {
-        int channel = midi_event.channel;
+        //int channel = midi_event.channel;
         int byte1 = midi_event.message << 4 | midi_event.channel % 16;
         int byte2 = 0x80 | midi_event.channel / 16;
         int byte3 = midi_event.note;
@@ -811,6 +840,7 @@ void CsoundGodot::set_message(CSOUND *, int attr, const char *format, va_list va
     vsnprintf(&message[0], len + 1, format, valist);
     message.resize(len);
     godot::UtilityFunctions::print(message.c_str());
+    va_end(valist_copy);
 }
 
 FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *mode) {
@@ -890,7 +920,8 @@ void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mod
             }
             handle = sf_open_virtual(vio, mode, info, file);
 
-            int error = sf_error(handle);
+            //int error =
+            sf_error(handle);
 
             if (mode == SFM_READ) {
                 sfinfo->samplerate = info->samplerate;

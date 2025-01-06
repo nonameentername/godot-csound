@@ -850,7 +850,10 @@ FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *m
         Ref<CsoundFileReader> csound_file = resource;
         if (csound_file != NULL) {
             FILE *fp = fmemopen(NULL, csound_file->get_array_size() + 1, "w+");
-            fprintf(fp, "%s\n", csound_file->get_array_data());
+            char *data = csound_file->get_array_data();
+            for (int i = 0; i < csound_file->get_array_size(); i++) {
+                fprintf(fp, "%c", data[i]);
+            }
             fflush(fp);
             rewind(fp);
             return fp;

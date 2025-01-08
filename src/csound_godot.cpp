@@ -85,9 +85,33 @@ void CsoundGodot::start() {
 
         bool csound_error = false;
 
+        String default_csd = R"(
+            <CsoundSynthesizer>
+            <CsOptions>
+            -+rtmidi=NULL -M0 -n
+            </CsOptions>
+            <CsInstruments>
+
+            sr = 44100
+            ksmps = 32
+            nchnls = 2
+            0dbfs = 1
+
+            </CsInstruments>
+            <CsScore>
+            f0 z
+
+            </CsScore>
+            </CsoundSynthesizer>
+        )";
+
         if (script.is_null()) {
-            godot::UtilityFunctions::push_error("csound script not specified.");
-            csound_error = true;
+            godot::UtilityFunctions::push_warning("csound script not specified. Using default csd");
+            int error = csound->CompileCSD(default_csd.ascii(), 1);
+            if (error != 0) {
+                godot::UtilityFunctions::push_error("Could not compile default csound script");
+                csound_error = true;
+            }
         } else if (script.is_valid()) {
             int error = csound->Compile(script->get_path().get_file().ascii());
             if (error != 0) {

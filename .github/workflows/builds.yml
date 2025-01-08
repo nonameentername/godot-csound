@@ -345,10 +345,40 @@ jobs:
           godot --headless --import
           godot --headless -s csound_run_scene.gd
 
+  verify-macos-build:
+    name: Verify MacOS build
+    runs-on: macos-latest
+    needs: macos-build
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Restore cached MacOS artifacts
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: macos-artifacts-${{github.run_id}}
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.3.0
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify godot-csound
+        run: |
+          godot --headless --import
+          godot --headless --import
+          godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
+
   publish_artifacts:
     name: Publish Artifacts
     runs-on: ubuntu-latest
-    needs: [verify-linux-build, windows-build, macos-build, ios-build, android-build, web-build]
+    needs: [verify-linux-build, windows-build, verify-macos-build, ios-build, android-build, web-build]
     steps:
       - name: Restore cached Linux artifacts
         uses: actions/cache/restore@v4

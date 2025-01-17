@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.ref }}
+
 jobs:
   linux-build:
     name: Linux/Ubuntu build
@@ -37,6 +40,25 @@ jobs:
         run: |
           docker load --input godot-csound-ubuntu-${{ env.VERSION }}.tar
           rm godot-csound-ubuntu-${{ env.VERSION }}.tar
+
+      - name: Update minor version
+        id: tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DRY_RUN: true
+
+      - name: echo new tag
+        env:
+          NEW_TAG: ${{ steps.tag.outputs.new_tag }}
+        run: |
+          echo "The next tag version will be: ${{ env.NEW_TAG }}"
+      - name: echo tag
+        env:
+          CURRENT_TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          echo "The current tag is: ${{ env.CURRENT_TAG }}"
 
       - name: Build Csound (Debug)
         uses: addnab/docker-run-action@v3

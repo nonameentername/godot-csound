@@ -13,6 +13,7 @@
 #include "godot_cpp/core/error_macros.hpp"
 #include "godot_cpp/core/memory.hpp"
 #include "godot_cpp/variant/callable_method_pointer.hpp"
+#include "version_generated.gen.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -742,8 +743,19 @@ void CsoundServer::open_web_midi_inputs() {
 #endif
 }
 
+String CsoundServer::get_version() {
+    return GODOT_CSOUND_VERSION;
+}
+
+String CsoundServer::get_build() {
+    return GODOT_CSOUND_BUILD;
+}
+
 void CsoundServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("initialize"), &CsoundServer::initialize);
+
+    ClassDB::bind_method(D_METHOD("get_version"), &CsoundServer::get_version);
+    ClassDB::bind_method(D_METHOD("get_build"), &CsoundServer::get_build);
 
     ClassDB::bind_method(D_METHOD("set_edited", "edited"), &CsoundServer::set_edited);
     ClassDB::bind_method(D_METHOD("get_edited"), &CsoundServer::get_edited);

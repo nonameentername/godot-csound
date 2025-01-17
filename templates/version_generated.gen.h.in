@@ -1,0 +1,2 @@
+#define GODOT_CSOUND_VERSION "${version}"
+#define GODOT_CSOUND_BUILD "${build}"

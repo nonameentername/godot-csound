@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo TAG_VERSION=$TAG_VERSION
+echo BUILD_SHA=$BUILD_SHA
+
 dir=$(realpath .)
 src_dir=$dir/modules/csound
 build_dir=$src_dir/build/linux/debug

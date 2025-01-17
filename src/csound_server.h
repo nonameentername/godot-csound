@@ -125,6 +125,9 @@ public:
     CsoundGodot *get_csound_(const Variant &p_name);
 
     void open_web_midi_inputs();
+
+    String get_version();
+    String get_build();
 };
 } // namespace godot
 

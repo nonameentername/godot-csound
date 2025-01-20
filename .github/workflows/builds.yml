@@ -523,7 +523,7 @@ jobs:
           godot --headless -s csound_run_scene.gd
 
   publish_artifacts:
-    #if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Publish Artifacts
     runs-on: ubuntu-latest
     needs: [verify-linux-build, verify-windows-build, verify-macos-build, ios-build, android-build, web-build]
@@ -570,9 +570,6 @@ jobs:
           path: addons/csound/bin
           key: web-artifacts-${{github.run_id}}
 
-      - name: List files
-        run: find addons
-
       - name: Update minor version
         id: tag
         uses: anothrNick/github-tag-action@1.36.0
@@ -581,21 +578,19 @@ jobs:
           WITH_V: true
           DRY_RUN: true
 
-      - name: echo tag version
-        env:
-          TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-        run: |
-          echo "The next tag version will be: ${{ env.TAG_VERSION }}"
-
       - name: Zip godot-csound artifact
         run: zip -r godot-csound_${{ env.TAG_VERSION }}.zip ./addons/csound
         env:
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
 
-      - name: Upload godot-csound artifact
-        uses: actions/upload-artifact@v4
+      - name: Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: godot-csound
-          path: godot-csound_${{ env.TAG_VERSION }}.zip
+          token: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+          tag_name: ${{ env.TAG_VERSION }}
+          generate_release_notes: true
+          make_latest: true
+          files:
+            godot-csound_${{ env.TAG_VERSION }}.zip
         env:
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}

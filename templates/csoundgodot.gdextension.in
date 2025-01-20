@@ -1,3 +1,7 @@
+[godot-csound]
+version = "${version}"
+build = "${build}"
+
 [configuration]
 
 entry_symbol = "csoundgodot_library_init"

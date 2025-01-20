@@ -13,6 +13,12 @@ changelog:
       labels:
         - Semver-Minor
         - enhancement
+    - title: Bugfixes
+      labels:
+        - bug
+    - title: Dependency Updates
+      authors:
+        - dependabot
     - title: Other Changes
       labels:
         - "*"

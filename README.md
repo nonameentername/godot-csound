@@ -14,8 +14,13 @@ Projects using godot-csound
 * [godot-csound-example](https://github.com/nonameentername/godot-csound-example) - Simple godot-csound example.
 * [godot-synths](https://github.com/nonameentername/godot-synths) - Music synths for Godot.  ([demo](https://nonameentername.github.io/godot-synths/godot-synths.html))
 
+
 How to Install
 --------------
+Download latest [release](https://github.com/nonameentername/godot-csound/releases/latest) and extract into Godot project.
+
+How to Build
+------------
 
 This project uses docker to build the project for different platforms.
 The build scripts were developed using Ubuntu (x86_64).

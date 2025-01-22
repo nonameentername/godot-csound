@@ -19,6 +19,11 @@ How to Install
 --------------
 Download latest [release](https://github.com/nonameentername/godot-csound/releases/latest) and extract into Godot project.
 
+On MacOS disable the check for unsigned binaries:
+```bash
+xattr -dr com.apple.quarantine addons/csound/bin/macos
+```
+
 How to Build
 ------------
 

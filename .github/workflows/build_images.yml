@@ -26,23 +26,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build -t godot-csound-ubuntu:${{ env.VERSION }} platform/ubuntu
-          docker save godot-csound-ubuntu:${{ env.VERSION }} > godot-csound-ubuntu-${{ env.VERSION }}.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-ubuntu-${{ env.VERSION }}
-          path: godot-csound-ubuntu-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/ubuntu
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-ubuntu:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-ubuntu:latest
 
   build-and-push-windows-image:
     name: Windows (MinGW)
@@ -61,23 +57,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build -t godot-csound-mingw:${{ env.VERSION }} platform/mingw
-          docker save godot-csound-mingw:${{ env.VERSION }} > godot-csound-mingw-${{ env.VERSION }}.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-mingw-${{ env.VERSION }}
-          path: godot-csound-mingw-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/mingw
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-mingw:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-mingw:latest
 
   build-and-push-macos-image:
     name: MacOS (osxcross)
@@ -96,23 +88,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build -t godot-csound-osxcross:${{ env.VERSION }} platform/osxcross
-          docker save godot-csound-osxcross:${{ env.VERSION }} > godot-csound-osxcross-${{ env.VERSION }}.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-osxcross-${{ env.VERSION }}
-          path: godot-csound-osxcross-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/osxcross
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-osxcross:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-osxcross:latest
 
   build-and-push-ios-image:
     name: iOS (ioscross)
@@ -131,27 +119,23 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          echo $IOSCROSS_PASSWORD > secret
-          docker build --build-arg="DOWNLOAD_URL=$IOSCROSS_DOWNLOAD_URL" --secret id=secret,src=secret -t godot-csound-ioscross:${{ env.VERSION }} platform/ioscross
-          docker save godot-csound-ioscross:${{ env.VERSION }} > godot-csound-ioscross-${{ env.VERSION }}.tar
-        env:
-          IOSCROSS_PASSWORD: ${{ secrets.IOSCROSS_PASSWORD }}
-          IOSCROSS_DOWNLOAD_URL: ${{ vars.IOSCROSS_DOWNLOAD_URL }}
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-ioscross-${{ env.VERSION }}
-          path: godot-csound-ioscross-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/ioscross
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-ioscross:latest
+          build-args: |
+            DOWNLOAD_URL=${{ vars.IOSCROSS_DOWNLOAD_URL }}
+          secrets: |
+            IOSCROSS_PASSWORD=${{ secrets.IOSCROSS_PASSWORD }}
 
   build-and-push-android-image:
     name: Android
@@ -170,23 +154,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build -t godot-csound-android:${{ env.VERSION }} platform/android
-          docker save godot-csound-android:${{ env.VERSION }} > godot-csound-android-${{ env.VERSION }}.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-android-${{ env.VERSION }}
-          path: godot-csound-android-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/android
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-android:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-android:latest
 
   build-and-push-wasm-image:
     name: Wasm (emscripten)
@@ -205,20 +185,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build -t godot-csound-wasm:${{ env.VERSION }} platform/web
-          docker save godot-csound-wasm:${{ env.VERSION }} > godot-csound-wasm-${{ env.VERSION }}.tar
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          name: godot-csound-wasm-${{ env.VERSION }}
-          path: godot-csound-wasm-${{ env.VERSION }}.tar
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Update workflow_run_id
-        if: ${{ success() }}
-        run: |
-          gh variable set GODOT_CSOUND_WASM_WORKFLOW_RUN_ID --body ${{ github.run_id }}
-        env:
-          GH_TOKEN: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: platform/web
+          push: true
+          tags: ghcr.io/nonameentername/godot-csound-wasm:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-wasm:latest

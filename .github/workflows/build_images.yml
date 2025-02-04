@@ -8,6 +8,9 @@ on:
     - cron:  '0 0 1 * *'
   workflow_dispatch:
 
+permissions:
+  packages: write
+
 jobs:
   build-and-push-linux-image:
     name: Linux (Ubuntu)

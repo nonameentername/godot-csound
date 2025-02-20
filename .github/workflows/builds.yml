@@ -15,7 +15,6 @@ concurrency:
 jobs:
   linux-build:
     name: Linux/Ubuntu build
-    if: vars.GODOT_CSOUND_UBUNTU_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -72,7 +71,6 @@ jobs:
 
   windows-build:
     name: Windows build
-    if: vars.GODOT_CSOUND_MINGW_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -129,7 +127,6 @@ jobs:
 
   macos-build:
     name: MacOS build
-    if: vars.GODOT_CSOUND_OSXCROSS_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -191,7 +188,6 @@ jobs:
 
   ios-build:
     name: iOS build
-    if: vars.GODOT_CSOUND_IOSCROSS_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -248,7 +244,6 @@ jobs:
 
   android-build:
     name: Android build
-    if: vars.GODOT_CSOUND_ANDROID_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1
@@ -305,7 +300,6 @@ jobs:
 
   web-build:
     name: Web build
-    if: vars.GODOT_CSOUND_WASM_WORKFLOW_RUN_ID
     runs-on: ubuntu-latest
     env:
       VERSION: v1

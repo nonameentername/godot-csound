@@ -26,7 +26,14 @@ done
 
 cd $dir
 
+scons -c platform=android arch=arm32 target=template_release android_api_level=23
 scons platform=android arch=arm32 target=template_release android_api_level=23
+
+scons -c platform=android arch=arm64 target=template_release android_api_level=23
 scons platform=android arch=arm64 target=template_release android_api_level=23
+
+scons -c platform=android arch=x86_32 target=template_release android_api_level=23
 scons platform=android arch=x86_32 target=template_release android_api_level=23
+
+scons -c platform=android arch=x86_64 target=template_release android_api_level=23
 scons platform=android arch=x86_64 target=template_release android_api_level=23

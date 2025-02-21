@@ -22,10 +22,16 @@ RUN apt install -y autoconf libtool \
     ninja-build
 
 ARG XCODE=Xcode_15.1.xip
-ARG DOWNLOAD_URL=http://172.17.0.1:8000/$XCODE.enc
+ARG DOWNLOAD_URL=http://172.17.0.1:8000/$XCODE
 
 WORKDIR /
-RUN --mount=type=secret,id=IOSCROSS_PASSWORD curl $DOWNLOAD_URL | openssl aes-256-cbc -pbkdf2 -d -a -pass pass:$(cat /run/secrets/IOSCROSS_PASSWORD) > $XCODE
+RUN --mount=type=secret,id=IOSCROSS_PASSWORD <<END
+if [ -f /run/secrets/IOSCROSS_PASSWORD ]; then
+    curl $DOWNLOAD_URL | openssl aes-256-cbc -pbkdf2 -d -a -pass pass:$(cat /run/secrets/IOSCROSS_PASSWORD) > $XCODE
+else
+    curl $DOWNLOAD_URL > $XCODE
+fi
+END
 
 RUN git clone https://github.com/mackyle/xar.git
 WORKDIR /xar

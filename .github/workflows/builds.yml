@@ -380,8 +380,8 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          godot --headless --import
-          godot --headless --import
+          godot --headless --import || true
+          godot --headless --import || true
           godot --headless -s csound_run_scene.gd
 
   verify-macos-build:

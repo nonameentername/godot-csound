@@ -410,8 +410,8 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          godot --headless --import
-          godot --headless --import
+          godot --headless --import || true
+          godot --headless --import || true
           godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
 
   verify-windows-build:

@@ -35,8 +35,6 @@ CsoundGodot::CsoundGodot() {
 
     mix_rate = AudioServer::get_singleton()->get_mix_rate();
 
-    midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
-
     for (int i = 0; i < BUFFER_FRAME_SIZE; i++) {
         temp_buffer[i] = 0;
     }
@@ -64,8 +62,6 @@ void CsoundGodot::configure_csound() {
 }
 
 CsoundGodot::~CsoundGodot() {
-    csoundDestroyCircularBuffer(csound->GetCsound(), midi_buffer);
-
     if (csound != NULL) {
         delete csound;
         csound = NULL;
@@ -122,6 +118,8 @@ void CsoundGodot::start() {
 
         if (!csound_error) {
             //int p_frames = 512;
+
+            midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
 
             csound->Start();
 
@@ -191,6 +189,10 @@ void CsoundGodot::reset() {
 }
 
 void CsoundGodot::cleanup_channels() {
+    if (midi_buffer) {
+        csoundDestroyCircularBuffer(csound->GetCsound(), midi_buffer);
+    }
+
     csoundDestroyCircularBuffer(csound->GetCsound(), output_left_channel.buffer);
     csoundDestroyCircularBuffer(csound->GetCsound(), output_right_channel.buffer);
 

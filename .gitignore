@@ -15,4 +15,6 @@ build
 build-log.txt
 compile_commands.json
 src/version_generated.gen.h
-src/gen/
+src/gen
+doc_classes/_build
+__pycache__

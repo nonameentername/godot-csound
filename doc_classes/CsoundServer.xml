@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="CsoundServer" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Csound Server
+	</brief_description>
+	<description>
+        Csound Server is server interface to control Csound instances.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_csound">
+			<return type="void" />
+			<param index="0" name="at_position" type="int" default="-1" />
+			<description>
+                Method to create a new Godot Csound instance.
+			</description>
+		</method>
+		<method name="add_csound_instrument">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="instrument" type="CsoundInstrument" />
+			<param index="2" name="at_position" type="int" default="-1" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="csound_ready">
+			<return type="void" />
+			<param index="0" name="csound_name" type="String" />
+			<description>
+                Method to allow Godot Csound instance to signal when it is ready.
+			</description>
+		</method>
+		<method name="generate_csound_layout" qualifiers="const">
+			<return type="CsoundLayout" />
+			<description>
+                Method to generate a new Csound laytout.
+			</description>
+		</method>
+		<method name="get_build">
+			<return type="String" />
+			<description>
+                Method to get the git sha used for this build.
+			</description>
+		</method>
+		<method name="get_csound">
+			<return type="CsoundGodot" />
+			<param index="0" name="csound_name" type="String" />
+			<description>
+                Method used to retrieve a Godot Csound instance by [param csound_name].
+			</description>
+		</method>
+		<method name="get_csound_channel_count" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to retrieve the number of channels for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_csound_channel_peak_volume_db" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="channel" type="int" />
+			<description>
+                Method used to retrieve the peak volume of a channel for a Csound instance by [param csound_idx] and [param channel].
+			</description>
+		</method>
+		<method name="get_csound_index" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="csound_name" type="StringName" />
+			<description>
+                Method used to retrieve the index of a Csound instance by [param csound_name].
+			</description>
+		</method>
+		<method name="get_csound_instrument">
+			<return type="CsoundInstrument" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="instrument_idx" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="get_csound_instrument_count">
+			<return type="int" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="get_csound_name" qualifiers="const">
+			<return type="String" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to retrieve the Csound instance name by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_csound_name_options" qualifiers="const">
+			<return type="String" />
+			<description>
+                Method used to retrieve the Csound name options.  Used to allow editor Csound instance selection.
+			</description>
+		</method>
+		<method name="get_csound_named_channel_count" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to retrieve the number of named channels for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_csound_named_channel_name" qualifiers="const">
+			<return type="String" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="channel" type="int" />
+			<description>
+                Method used to retrieve the name of a channel for a Csound instance by [param csound_idx] and [param channel].
+			</description>
+		</method>
+		<method name="get_csound_named_channel_peak_volume_db" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="channel" type="int" />
+			<description>
+                Method used to retrieve the peak volume of a channel for a Csound instance by [param csound_idx] and [param channel].
+			</description>
+		</method>
+		<method name="get_csound_script" qualifiers="const">
+			<return type="CsoundFileReader" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to get the script for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_csound_tab" qualifiers="const">
+			<return type="int" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to get the active tab for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_csound_volume_db" qualifiers="const">
+			<return type="float" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method used to get the volume for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="get_edited">
+			<return type="bool" />
+			<description>
+                Method used to get if a Csound instances have been edited.
+			</description>
+		</method>
+		<method name="get_version">
+			<return type="String" />
+			<description>
+                Method used to retrieve the build version.
+			</description>
+		</method>
+		<method name="initialize">
+			<return type="void" />
+			<description>
+                Method used to initialize Csound Server.
+			</description>
+		</method>
+		<method name="is_csound_bypassing" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method to retrieve bypass audio status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="is_csound_channel_active" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="channel" type="int" />
+			<description>
+                Method to retrieve channel active status of Csound instance by [param csound_idx] and [param channel].
+			</description>
+		</method>
+		<method name="is_csound_mute" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method to retrieve mute status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="is_csound_named_channel_active" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="channel" type="int" />
+			<description>
+                Method to retrieve named channel active status of Csound instance by [param csound_idx] and [param channel].
+			</description>
+		</method>
+		<method name="is_csound_solo" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="csound_idx" type="int" />
+			<description>
+                Method to retrieve solo status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="lock">
+			<return type="void" />
+			<description>
+                Method used to lock the Csound Server.
+			</description>
+		</method>
+		<method name="move_csound">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="to_index" type="int" />
+			<description>
+                Method used to move Csound instance from [param index] to [param to_index].
+			</description>
+		</method>
+		<method name="open_web_midi_inputs">
+			<return type="void" />
+			<description>
+                Method used to open web midi inputs.
+			</description>
+		</method>
+		<method name="remove_csound">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<description>
+                Method to remove Csound instance from [param index] position.
+			</description>
+		</method>
+		<method name="remove_csound_instrument">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="instrument_idx" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="set_csound_bypass">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="enable" type="bool" />
+			<description>
+                Method to set [param enable] audio status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_layout">
+			<return type="void" />
+			<param index="0" name="csound_layout" type="CsoundLayout" />
+			<description>
+                Method to set the current active layout.
+			</description>
+		</method>
+		<method name="set_csound_mute">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="enable" type="bool" />
+			<description>
+                Method to set [param enable] mute status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_name">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="name" type="String" />
+			<description>
+                Method used to set the Csound instance [param name] by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_script">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="script" type="CsoundFileReader" />
+			<description>
+                Method used to set the [param script] for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_solo">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="enable" type="bool" />
+			<description>
+                Method to set [param enable] solo status of Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_tab">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="tab" type="float" />
+			<description>
+                Method used to set the active [param tab] for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_csound_volume_db">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="volume_db" type="float" />
+			<description>
+                Method used to set the [param volume_db] of a channel for a Csound instance by [param csound_idx].
+			</description>
+		</method>
+		<method name="set_edited">
+			<return type="void" />
+			<param index="0" name="edited" type="bool" />
+			<description>
+                Method used to set [param edited] status of Csound instances.
+			</description>
+		</method>
+		<method name="swap_csound_instruments">
+			<return type="void" />
+			<param index="0" name="csound_idx" type="int" />
+			<param index="1" name="instrument_idx" type="int" />
+			<param index="2" name="by_instrument_idx" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="unlock">
+			<return type="void" />
+			<description>
+                Method used to unlock the Csound Server.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="csound_count" type="int" setter="set_csound_count" getter="get_csound_count" default="0">
+            Number of Csound instances.
+		</member>
+	</members>
+	<signals>
+		<signal name="csound_layout_changed">
+			<description>
+                Signal to notify when Csound layout has changed.
+			</description>
+		</signal>
+		<signal name="csound_ready">
+			<param index="0" name="csound_name" type="String" />
+			<description>
+                Signal to notify when Godot Csound instance is ready.
+			</description>
+		</signal>
+	</signals>
+</class>

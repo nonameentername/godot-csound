@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="AudioStreamMyTone" inherits="AudioStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Audio Stream tone generator
+	</brief_description>
+	<description>
+        Audio Stream tone that can be used to test Csound integration with Godot.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_stream_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                The name assigned to this audio stream. Unused by the engine.
+			</description>
+		</method>
+		<method name="reset">
+			<return type="void" />
+			<description>
+                Resets the tones position.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="hz" type="float" setter="set_hz" getter="get_hz" default="639.0">
+            Sets the frequency (hz) of the generated tone.
+		</member>
+	</members>
+</class>

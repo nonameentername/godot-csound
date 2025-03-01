@@ -128,5 +128,5 @@ void AudioStreamCsound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &AudioStreamCsound::set_csound_name);
     ClassDB::bind_method(D_METHOD("get_csound_name"), &AudioStreamCsound::get_csound_name);
     ClassDB::bind_method(D_METHOD("csound_layout_changed"), &AudioStreamCsound::csound_layout_changed);
-    ClassDB::bind_method(D_METHOD("csound_ready"), &AudioStreamCsound::csound_ready);
+    ClassDB::bind_method(D_METHOD("csound_ready", "csound_name"), &AudioStreamCsound::csound_ready);
 }

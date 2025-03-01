@@ -511,12 +511,12 @@ double CsoundGodot::evaluate_code(String message) {
     return csound->EvalCode(message.ascii());
 }
 
-void CsoundGodot::compile_csd(String orchestra) {
+void CsoundGodot::compile_csd(String csd) {
     if (!initialized) {
         return;
     }
 
-    csound->CompileCSD(orchestra.ascii(), 1);
+    csound->CompileCSD(csd.ascii(), 1);
 }
 
 void CsoundGodot::compile_orchestra(String orchestra) {
@@ -1081,22 +1081,22 @@ const double CsoundGodot::get_value(double key) {
 
 void CsoundGodot::_bind_methods() {
     ClassDB::bind_method(D_METHOD("initialize"), &CsoundGodot::initialize);
-    ClassDB::bind_method(D_METHOD("program_select"), &CsoundGodot::program_select);
+    ClassDB::bind_method(D_METHOD("program_select", "chan", "bank_num", "preset_num"), &CsoundGodot::program_select);
     ClassDB::bind_method(D_METHOD("finish"), &CsoundGodot::finish);
 
-    ClassDB::bind_method(D_METHOD("note_on"), &CsoundGodot::note_on);
-    ClassDB::bind_method(D_METHOD("note_off"), &CsoundGodot::note_off);
+    ClassDB::bind_method(D_METHOD("note_on", "chan", "key", "vel"), &CsoundGodot::note_on);
+    ClassDB::bind_method(D_METHOD("note_off", "chan", "key"), &CsoundGodot::note_off);
 
     ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundGodot::event_string);
     ClassDB::bind_method(D_METHOD("evaluate_code", "message"), &CsoundGodot::evaluate_code);
     ClassDB::bind_method(D_METHOD("compile_csd", "orchestra"), &CsoundGodot::compile_csd);
     ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundGodot::compile_orchestra);
 
-    ClassDB::bind_method(D_METHOD("send_control_channel", "value"), &CsoundGodot::send_control_channel);
-    ClassDB::bind_method(D_METHOD("get_control_channel"), &CsoundGodot::get_control_channel);
+    ClassDB::bind_method(D_METHOD("send_control_channel", "channel", "value"), &CsoundGodot::send_control_channel);
+    ClassDB::bind_method(D_METHOD("get_control_channel", "channel"), &CsoundGodot::get_control_channel);
 
-    ClassDB::bind_method(D_METHOD("pitch_bend"), &CsoundGodot::pitch_bend);
-    ClassDB::bind_method(D_METHOD("play_midi"), &CsoundGodot::play_midi);
+    ClassDB::bind_method(D_METHOD("pitch_bend", "chan", "vel"), &CsoundGodot::pitch_bend);
+    ClassDB::bind_method(D_METHOD("play_midi", "midi_file"), &CsoundGodot::play_midi);
     ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundGodot::set_soundfont);
     ClassDB::bind_method(D_METHOD("get_soundfont"), &CsoundGodot::get_soundfont);
     ClassDB::add_property(

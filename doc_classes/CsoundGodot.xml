@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="CsoundGodot" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Godot Csound
+	</brief_description>
+	<description>
+        Godot Csound class used to integrate Godot with Csound.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="compile_csd">
+			<return type="void" />
+			<param index="0" name="csd" type="String" />
+			<description>
+                Method used to compile a Csound input file (.csd file) or a text string.
+			</description>
+		</method>
+		<method name="compile_orchestra">
+			<return type="void" />
+			<param index="0" name="orchestra" type="String" />
+			<description>
+                Method used to parse and compile the given [param orchestra] from a string.
+			</description>
+		</method>
+		<method name="evaluate_code">
+			<return type="float" />
+			<param index="0" name="message" type="String" />
+			<description>
+                Method used to evaluate Csound [param message].
+			</description>
+		</method>
+		<method name="event_string">
+			<return type="void" />
+			<param index="0" name="message" type="String" />
+			<description>
+                Method used to send a new event [param message] as a string.
+			</description>
+		</method>
+		<method name="finish">
+			<return type="void" />
+			<description>
+                Method used to finish and stop Csound processing.
+			</description>
+		</method>
+		<method name="get_control_channel">
+			<return type="float" />
+			<param index="0" name="channel" type="String" />
+			<description>
+                Method used to retrieve Csound control channel value by [param channel] name.
+			</description>
+		</method>
+		<method name="get_csound_script">
+			<return type="CsoundFileReader" />
+			<description>
+                Method used to retrieve Godot Csound script resource.
+			</description>
+		</method>
+		<method name="initialize">
+			<return type="void" />
+			<description>
+                Method used to initialize Godot Csound.
+			</description>
+		</method>
+		<method name="note_off">
+			<return type="void" />
+			<param index="0" name="chan" type="int" />
+			<param index="1" name="key" type="int" />
+			<description>
+                Method used to send a note off midi event to Csound instance.
+			</description>
+		</method>
+		<method name="note_on">
+			<return type="void" />
+			<param index="0" name="chan" type="int" />
+			<param index="1" name="key" type="int" />
+			<param index="2" name="vel" type="int" />
+			<description>
+                Method used to send a note on midi event to Csound instance.
+			</description>
+		</method>
+		<method name="pitch_bend">
+			<return type="void" />
+			<param index="0" name="chan" type="int" />
+			<param index="1" name="vel" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="play_midi">
+			<return type="void" />
+			<param index="0" name="midi_file" type="MidiFileReader" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="program_select">
+			<return type="void" />
+			<param index="0" name="chan" type="int" />
+			<param index="1" name="bank_num" type="int" />
+			<param index="2" name="preset_num" type="int" />
+			<description>
+                Not implemented yet.
+			</description>
+		</method>
+		<method name="send_control_channel">
+			<return type="void" />
+			<param index="0" name="channel" type="String" />
+			<param index="1" name="value" type="float" />
+			<description>
+                Method used to set Csound control [param channel] [param value].
+			</description>
+		</method>
+		<method name="set_csound_script">
+			<return type="void" />
+			<param index="0" name="script" type="CsoundFileReader" />
+			<description>
+                Method used to set Godot Csound script resource.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="csound_name" type="String" setter="set_csound_name" getter="get_csound_name" default="&quot;&quot;">
+            The name of the Csound instance.
+		</member>
+		<member name="midi_file" type="MidiFileReader" setter="set_midi_file" getter="get_midi_file">
+            The midi file resource.
+		</member>
+		<member name="soundfont" type="SoundFontFileReader" setter="set_soundfont" getter="get_soundfont">
+            The soundfont file resource.
+		</member>
+	</members>
+	<signals>
+		<signal name="csound_ready">
+			<param index="0" name="csound_name" type="String" />
+			<description>
+                Signal to notify when Godot Csound instance is ready.
+			</description>
+		</signal>
+	</signals>
+</class>

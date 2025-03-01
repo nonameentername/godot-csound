@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="AudioStreamCsound" inherits="AudioStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Audio stream Csound
+	</brief_description>
+	<description>
+        Audio stream that is used to drive the creation of audio in a Csound instance.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="csound_layout_changed">
+			<return type="void" />
+			<description>
+                Method to notify AudioStreamCsound when Csound layout has changed.  This is used internally to update the property list.
+			</description>
+		</method>
+		<method name="csound_ready">
+			<return type="void" />
+			<param index="0" name="csound_name" type="String" />
+			<description>
+                Method to notify when a Csound instance is ready.  The [param csound_name] specifies the name of the csound instance.
+			</description>
+		</method>
+		<method name="get_csound_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                Gets the name of the Csound instance that should be used to generate audio.
+			</description>
+		</method>
+		<method name="get_stream_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                The name assigned to this audio stream. Unused by the engine.
+			</description>
+		</method>
+		<method name="set_csound_name">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<description>
+                Sets the [param name] of the Csound instance that should be used to generate audio.
+			</description>
+		</method>
+	</methods>
+</class>

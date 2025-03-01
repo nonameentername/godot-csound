@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="AudioStreamCsoundChannel" inherits="AudioStream" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Audio stream Csound Channel
+	</brief_description>
+	<description>
+        Audio stream that can be used to get the output of numbered Csound channels.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="csound_layout_changed">
+			<return type="void" />
+			<description>
+                Method to notify AudioStreamCsoundChannel when Csound layout has changed.  This is used internally to update the property list.
+			</description>
+		</method>
+		<method name="get_csound_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                Gets the name of the Csound instance that should be used to get the channel audio.
+			</description>
+		</method>
+		<method name="get_stream_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                The name assigned to this audio stream. Unused by the engine.
+			</description>
+		</method>
+		<method name="set_csound_name">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<description>
+                Gets the [param name] of the Csound instance that should be used to get the channel audio.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="channel_left" type="int" setter="set_channel_left" getter="get_channel_left" default="0">
+            The Csound channel number that should be used to send the Audio Bus left channel.
+		</member>
+		<member name="channel_right" type="int" setter="set_channel_right" getter="get_channel_right" default="1">
+            The Csound channel number that should be used to send the Audio Bus right channel.
+		</member>
+	</members>
+</class>

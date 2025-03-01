@@ -24,7 +24,8 @@ RUN apt install -y autoconf libtool \
     pkg-config \
     ninja-build \
     python3 \
-    python3-pip
+    python3-pip \
+    libminizip-dev
 
 RUN pip3 install scons
 
@@ -47,15 +48,11 @@ RUN git clone https://github.com/zhlynn/zsign.git
 
 WORKDIR /zsign
 
-RUN mkdir build
-
-WORKDIR /zsign/build
-
-RUN cmake ..
+WORKDIR /zsign/build/linux
 
 RUN make
 
-RUN cp /zsign/build/zsign /usr/local/bin
+RUN cp /zsign/bin/zsign /usr/local/bin
 
 RUN rm -r /zsign
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="AudioEffectSetCsoundNamedChannel" inherits="AudioEffect" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+        Audio effect to set Csound named channels.
+	</brief_description>
+	<description>
+        Audio effect that allows sending Audio Bus output to Csound named channels.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="csound_layout_changed">
+			<return type="void" />
+			<description>
+                Method to notify AudioEffectSetCsoundNamedChannel when Csound layout has changed.  This is used internally to update the property list.
+			</description>
+		</method>
+		<method name="get_csound_name" qualifiers="const">
+			<return type="String" />
+			<description>
+                Gets the name of the Csound instance that should be used to send the Audio Bus output.
+			</description>
+		</method>
+		<method name="set_csound_name">
+			<return type="void" />
+			<param index="0" name="name" type="String" />
+			<description>
+                Sets the [param name] of the Csound instance that should be used to send the Audio Bus output.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="channel_left" type="String" setter="set_channel_left" getter="get_channel_left" default="&quot;&quot;">
+            The Csound channel name that should be used to recieve the Audio Bus left channel.
+		</member>
+		<member name="channel_right" type="String" setter="set_channel_right" getter="get_channel_right" default="&quot;&quot;">
+            The Csound channel name that should be used to recieve the Audio Bus right channel.
+		</member>
+		<member name="forward_audio" type="bool" setter="set_forward_audio" getter="get_forward_audio" default="true">
+            If [code]true[/code], the AudioEffectSetCsoundNamedChannel will forward the effect input to the next effect.
+		</member>
+	</members>
+</class>

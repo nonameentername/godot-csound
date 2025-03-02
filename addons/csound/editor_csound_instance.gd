@@ -413,6 +413,7 @@ func _update_theme():
 	add_intrument.set_editable(0, false)
 	add_intrument.set_selectable(0, false)
 	add_intrument.set_text(0, "Add Instrument")
+	add_intrument.visible = false
 
 	var add_button = get_theme_icon("Add", "EditorIcons")
 	add_intrument.add_button(0, add_button)

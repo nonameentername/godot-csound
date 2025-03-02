@@ -50,7 +50,7 @@ func _notification(what):
 
 
 func _has_main_screen():
-	return true
+	return false
 
 
 func _make_visible(visible):

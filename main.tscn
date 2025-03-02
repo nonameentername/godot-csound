@@ -59,6 +59,7 @@ offset_bottom = 231.0
 text = "G4"
 
 [node name="Button" type="Button" parent="."]
+visible = false
 offset_left = 600.0
 offset_top = 159.0
 offset_right = 737.0

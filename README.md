@@ -14,6 +14,14 @@ Projects using godot-csound
 * [godot-csound-example](https://github.com/nonameentername/godot-csound-example) - Simple godot-csound example.
 * [godot-synths](https://github.com/nonameentername/godot-synths) - Music synths for Godot.  ([demo](https://nonameentername.github.io/godot-synths/godot-synths.html))
 
+Documentation
+-------------
+
+The official documentation is hosted on [Github pages](https://nonameentername.github.io/godot-csound-docs/tutorials/csound/index.html).
+It is maintained in its own [GitHub repository](https://github.com/nonameentername/godot-csound-docs).
+
+The [class reference](https://nonameentername.github.io/godot-csound-docs/classes/)
+is also accessible from the Godot editor.
 
 How to Install
 --------------

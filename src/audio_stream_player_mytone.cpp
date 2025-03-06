@@ -26,7 +26,7 @@ void AudioStreamPlaybackMyTone::_seek(double p_time) {
     // base->set_position(uint64_t(p_time * base->mix_rate) << MIX_FRAC_BITS);
 }
 
-int AudioStreamPlaybackMyTone::_mix(AudioFrame *p_buffer, double p_rate, int p_frames) {
+int AudioStreamPlaybackMyTone::_mix(AudioFrame *p_buffer, float p_rate, int p_frames) {
     ERR_FAIL_COND_V(!active, 0);
     if (!active) {
         return 0;

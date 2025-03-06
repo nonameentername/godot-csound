@@ -37,7 +37,7 @@ public:
     virtual int _get_loop_count() const override; // times it looped
     virtual double _get_playback_position() const override;
     virtual void _seek(double p_time) override;
-    virtual int _mix(AudioFrame *p_buffer, double p_rate_scale, int p_frames) override;
+    virtual int _mix(AudioFrame *p_buffer, float p_rate_scale, int p_frames) override;
     virtual float _get_length() const; // if supported, otherwise return 0
     AudioStreamPlaybackMyTone();
     ~AudioStreamPlaybackMyTone();

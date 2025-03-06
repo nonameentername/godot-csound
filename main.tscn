@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_ob6y6"]
+[ext_resource type="Script" uid="uid://eeoyi4fsdafv" path="res://main.gd" id="1_ob6y6"]
 
 [sub_resource type="AudioStreamCsound" id="AudioStreamCsound_a6stl"]
 

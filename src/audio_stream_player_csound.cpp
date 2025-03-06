@@ -26,7 +26,7 @@ void AudioStreamPlaybackCsound::_seek(double p_time) {
     }
 }
 
-int AudioStreamPlaybackCsound::_mix(AudioFrame *p_buffer, double p_rate, int p_frames) {
+int AudioStreamPlaybackCsound::_mix(AudioFrame *p_buffer, float p_rate, int p_frames) {
     ERR_FAIL_COND_V(!active, 0);
     if (!active) {
         return 0;

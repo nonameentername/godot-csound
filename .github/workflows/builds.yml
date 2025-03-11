@@ -382,7 +382,7 @@ jobs:
         run: |
           godot --headless --import || true
           godot --headless --import || true
-          godot --headless -s csound_run_scene.gd
+          godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
 
   verify-macos-build:
     name: Verify MacOS build

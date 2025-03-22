@@ -31,6 +31,11 @@ RUN pip3 install scons
 
 RUN git clone https://github.com/tpoechtrager/osxcross.git
 
+WORKDIR /osxcross
+RUN git checkout 611675b5179c4a9a5e33eac6c376ed8f986bab21
+
+WORKDIR /
+
 RUN /osxcross/tools/get_dependencies.sh
 
 RUN curl -sSL "$OSX_SDK_URL" -o "/osxcross/tarballs/$OSX_SDK.tar.xz"
@@ -47,6 +52,7 @@ RUN rm -rf /osxcross/tarballs/$OSX_SDK.tar.xz
 RUN git clone https://github.com/zhlynn/zsign.git
 
 WORKDIR /zsign
+RUN git checkout 43caac5c0b3f94ed7b5847c2038c529181b0bf11
 
 WORKDIR /zsign/build/linux
 

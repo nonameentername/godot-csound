@@ -178,11 +178,14 @@ void CsoundGodot::finish() {
 }
 
 void CsoundGodot::reset() {
+    bool prev_initialized = initialized;
     initialized = false;
     stop_thread();
 
     if (csound != NULL) {
-        cleanup_channels();
+        if (prev_initialized) {
+            cleanup_channels();
+        }
         csound->Reset();
         configure_csound();
     }

@@ -163,12 +163,15 @@ void CsoundGodot::start() {
 }
 
 void CsoundGodot::stop() {
+    bool prev_initialized = initialized;
     initialized = false;
     stop_thread();
 
     if (csound != NULL) {
         // csound->Stop();
-        cleanup_channels();
+        if (prev_initialized) {
+            cleanup_channels();
+        }
     }
 }
 
@@ -812,15 +815,13 @@ void CsoundGodot::initialize() {
 }
 
 int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *dev) {
-    for (int i = 0; i < CsoundServer::get_singleton()->get_csound_count(); i++) {
-        CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound_by_index(i);
-        if (csound_godot->csound != NULL && csound_godot->csound->GetCsound() == csound) {
-            *userData = (void *)csound_godot;
-            return 0;
-        }
-    }
+    *userData = (void *) csoundGetHostData(csound);
 
-    return -1;
+    if (userData != NULL) {
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
@@ -831,7 +832,7 @@ int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned 
 int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
     CsoundGodot *csound_godot = (CsoundGodot *)userData;
 
-    if (!csound_godot->initialized) {
+    if (csound_godot == NULL || !csound_godot->initialized) {
         return 0;
     }
 

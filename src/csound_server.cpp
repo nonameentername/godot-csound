@@ -30,6 +30,7 @@ CsoundServer *CsoundServer::singleton = NULL;
 
 CsoundServer::CsoundServer() {
     initialized = false;
+    layout_loaded = false;
     edited = false;
     singleton = this;
     exit_thread = false;
@@ -512,6 +513,10 @@ bool CsoundServer::is_csound_named_channel_active(int p_csound, int p_channel) c
 }
 
 bool CsoundServer::load_default_csound_layout() {
+    if (layout_loaded) {
+        return true;
+    }
+
     String layout_path =
         ProjectSettings::get_singleton()->get_setting_with_override("audio/csound/default_csound_layout");
 
@@ -575,6 +580,7 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
         }
     }
     edited = false;
+    layout_loaded = true;
 }
 
 void CsoundServer::csound_ready(String csound_name) {

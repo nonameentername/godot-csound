@@ -9,7 +9,6 @@ EditorAudioMeterNotchesCsound::EditorAudioMeterNotchesCsound() {
         add_notch(_scaled_db_to_normalized_volume(db), db, renderNotch);
     }
     set_mouse_filter(MOUSE_FILTER_PASS);
-    _update_theme_item_cache();
 }
 
 float EditorAudioMeterNotchesCsound::_scaled_db_to_normalized_volume(float db) {

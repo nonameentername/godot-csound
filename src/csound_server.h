@@ -27,6 +27,7 @@ class CsoundServer : public Object {
 
 private:
     bool initialized;
+    bool layout_loaded;
     bool edited;
     int sfont_id;
     Ref<SoundFontFileReader> soundfont;

@@ -518,7 +518,7 @@ bool CsoundServer::load_default_csound_layout() {
     }
 
     String layout_path =
-        ProjectSettings::get_singleton()->get_setting_with_override("audio/csound/default_csound_layout");
+        ProjectSettings::get_singleton()->get_setting("audio/csound/default_csound_layout");
 
     if (layout_path.is_empty() || layout_path.get_file() == "<null>") {
         layout_path = "res://default_csound_layout.tres";

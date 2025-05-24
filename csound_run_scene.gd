@@ -1,7 +1,7 @@
 extends SceneTree
 
-var main_csound: CsoundGodot
-var csound: CsoundGodot
+var main_csound: CsoundInstance
+var csound: CsoundInstance
 
 
 func _init():

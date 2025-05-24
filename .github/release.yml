@@ -17,8 +17,8 @@ changelog:
       labels:
         - bug
     - title: Dependency Updates
-      authors:
-        - dependabot
+      labels:
+        - dependencies
     - title: Other Changes
       labels:
         - "*"

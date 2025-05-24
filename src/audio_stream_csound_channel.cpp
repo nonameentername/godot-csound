@@ -1,6 +1,6 @@
 #include "audio_stream_csound_channel.h"
 #include "audio_stream_player_csound_channel.h"
-#include "csound_godot.h"
+#include "csound_instance.h"
 #include "csound_server.h"
 #include "godot_cpp/core/property_info.hpp"
 #include "godot_cpp/variant/string_name.hpp"
@@ -52,9 +52,9 @@ Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const
 }
 
 int AudioStreamCsoundChannel::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
-    CsoundGodot *csound_godot = CsoundServer::get_singleton()->get_csound(get_csound_name());
-    if (csound_godot != NULL && csound_godot->is_active()) {
-        return csound_godot->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right);
+    CsoundInstance *csound_instance = CsoundServer::get_singleton()->get_csound(get_csound_name());
+    if (csound_instance != NULL && csound_instance->is_active()) {
+        return csound_instance->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right);
     }
 
     for (int frame = 0; frame < p_frames; frame += 1) {

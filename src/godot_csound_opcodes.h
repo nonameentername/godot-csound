@@ -1,5 +1,5 @@
-#ifndef CSOUND_GODOT_OPCODES_H
-#define CSOUND_GODOT_OPCODES_H
+#ifndef GODOT_CSOUND_OPCODES_H
+#define GODOT_CSOUND_OPCODES_H
 
 #include <plugin.h>
 

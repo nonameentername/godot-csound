@@ -14,7 +14,7 @@
 #include <godot_cpp/templates/hash_map.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
-#include "csound_godot.h"
+#include "csound_instance.h"
 #include "csound_instrument.h"
 #include "csound_layout.h"
 #include "godot_cpp/classes/mutex.hpp"
@@ -33,7 +33,7 @@ private:
     Ref<SoundFontFileReader> soundfont;
     Ref<MidiFileReader> midi_file;
 
-    HashMap<String, CsoundGodot *> csound_map;
+    HashMap<String, CsoundInstance *> csound_map;
 
     bool thread_exited;
     mutable bool exit_thread;
@@ -45,7 +45,7 @@ private:
 
 protected:
     bool solo_mode;
-    Vector<CsoundGodot *> csound_instances;
+    Vector<CsoundInstance *> csound_instances;
     static void _bind_methods();
     static CsoundServer *singleton;
 
@@ -121,9 +121,9 @@ public:
     void unlock();
     void finish();
 
-    CsoundGodot *get_csound(const String &p_name);
-    CsoundGodot *get_csound_by_index(int p_index);
-    CsoundGodot *get_csound_(const Variant &p_name);
+    CsoundInstance *get_csound(const String &p_name);
+    CsoundInstance *get_csound_by_index(int p_index);
+    CsoundInstance *get_csound_(const Variant &p_name);
 
     void open_web_midi_inputs();
 

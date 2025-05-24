@@ -1,4 +1,4 @@
-#include "csound_godot.h"
+#include "csound_instance.h"
 #include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
@@ -8,7 +8,7 @@
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
-#include "csound_godot_opcodes.h"
+#include "godot_csound_opcodes.h"
 #include <cstdio>
 #include <cstdlib>
 #ifdef MINGW
@@ -19,7 +19,7 @@
 
 using namespace godot;
 
-CsoundGodot::CsoundGodot() {
+CsoundInstance::CsoundInstance() {
     csound = NULL;
     initialized = false;
     active = false;
@@ -40,7 +40,7 @@ CsoundGodot::CsoundGodot() {
     }
 }
 
-void CsoundGodot::configure_csound() {
+void CsoundInstance::configure_csound() {
     // csound->CreateMessageBuffer(0);
     csound->SetDebug(false);
     csound->SetHostAudioIO();
@@ -61,14 +61,14 @@ void CsoundGodot::configure_csound() {
     csnd::DictionarySetValue::load_plugin((csnd::Csound *)csound->GetCsound());
 }
 
-CsoundGodot::~CsoundGodot() {
+CsoundInstance::~CsoundInstance() {
     if (csound != NULL) {
         delete csound;
         csound = NULL;
     }
 }
 
-void CsoundGodot::start() {
+void CsoundInstance::start() {
     if (csound != NULL) {
         //int processor_count = OS::get_singleton()->get_processor_count();
         // csound->SetOption(vformat("-j%d", processor_count).ascii());
@@ -162,7 +162,7 @@ void CsoundGodot::start() {
     }
 }
 
-void CsoundGodot::stop() {
+void CsoundInstance::stop() {
     bool prev_initialized = initialized;
     initialized = false;
     stop_thread();
@@ -175,12 +175,12 @@ void CsoundGodot::stop() {
     }
 }
 
-void CsoundGodot::finish() {
+void CsoundInstance::finish() {
     stop();
     finished = true;
 }
 
-void CsoundGodot::reset() {
+void CsoundInstance::reset() {
     bool prev_initialized = initialized;
     initialized = false;
     stop_thread();
@@ -194,7 +194,7 @@ void CsoundGodot::reset() {
     }
 }
 
-void CsoundGodot::cleanup_channels() {
+void CsoundInstance::cleanup_channels() {
     if (midi_buffer) {
         csoundDestroyCircularBuffer(csound->GetCsound(), midi_buffer);
     }
@@ -225,7 +225,7 @@ void CsoundGodot::cleanup_channels() {
     named_channels.clear();
 }
 
-void CsoundGodot::set_soundfont(Ref<SoundFontFileReader> p_soundfont) {
+void CsoundInstance::set_soundfont(Ref<SoundFontFileReader> p_soundfont) {
     soundfont = p_soundfont;
 
     /*
@@ -238,19 +238,19 @@ void CsoundGodot::set_soundfont(Ref<SoundFontFileReader> p_soundfont) {
     */
 }
 
-Ref<SoundFontFileReader> CsoundGodot::get_soundfont() {
+Ref<SoundFontFileReader> CsoundInstance::get_soundfont() {
     return soundfont;
 }
 
-void CsoundGodot::set_midi_file(Ref<MidiFileReader> p_midi_file) {
+void CsoundInstance::set_midi_file(Ref<MidiFileReader> p_midi_file) {
     midi_file = p_midi_file;
 }
 
-Ref<MidiFileReader> CsoundGodot::get_midi_file() {
+Ref<MidiFileReader> CsoundInstance::get_midi_file() {
     return midi_file;
 }
 
-void CsoundGodot::add_named_channel(String name) {
+void CsoundInstance::add_named_channel(String name) {
     if (!input_named_channels_buffer.has(name)) {
         input_named_channels_buffer.insert(name, csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT)));
     }
@@ -265,7 +265,7 @@ void CsoundGodot::add_named_channel(String name) {
     }
 }
 
-void CsoundGodot::update_named_channels(int p_frames) {
+void CsoundInstance::update_named_channels(int p_frames) {
     if (!initialized) {
         return;
     }
@@ -288,7 +288,7 @@ void CsoundGodot::update_named_channels(int p_frames) {
     csound->DeleteChannelList(tmp);
 }
 
-int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+int CsoundInstance::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
     if (finished) {
         return 0;
     }
@@ -325,7 +325,7 @@ int CsoundGodot::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames
     return p_frames;
 }
 
-void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
+void CsoundInstance::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
     bool has_left_channel = left >= 0 && left < input_channels.size();
     bool has_right_channel = right >= 0 && right < input_channels.size();
 
@@ -346,7 +346,7 @@ void CsoundGodot::set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_f
     unlock();
 }
 
-int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
+int CsoundInstance::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
     bool has_left_channel = left >= 0 && left < output_channels.size();
     bool has_right_channel = right >= 0 && right < output_channels.size();
 
@@ -380,7 +380,7 @@ int CsoundGodot::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_fr
     return p_frames;
 }
 
-void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left,
+void CsoundInstance::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left,
                                            String right) {
     bool has_left_channel = input_named_channels_buffer.has(left);
     bool has_right_channel = input_named_channels_buffer.has(right);
@@ -412,7 +412,7 @@ void CsoundGodot::set_named_channel_sample(AudioFrame *p_buffer, float p_rate, i
     unlock();
 }
 
-int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
+int CsoundInstance::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
     if (finished) {
         return 0;
     }
@@ -457,10 +457,10 @@ int CsoundGodot::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, in
     return p_frames;
 }
 
-void CsoundGodot::program_select(int chan, int bank_num, int preset_num) {
+void CsoundInstance::program_select(int chan, int bank_num, int preset_num) {
 }
 
-void CsoundGodot::note_on(int chan, int key, int vel) {
+void CsoundInstance::note_on(int chan, int key, int vel) {
     if (!initialized) {
         return;
     }
@@ -483,7 +483,7 @@ void CsoundGodot::note_on(int chan, int key, int vel) {
     // csound->EventString(note_on.ascii().get_data(), 0);
 }
 
-void CsoundGodot::note_off(int chan, int key) {
+void CsoundInstance::note_off(int chan, int key) {
     if (!initialized) {
         return;
     }
@@ -501,7 +501,7 @@ void CsoundGodot::note_off(int chan, int key) {
     // csound->EventString(note_off.ascii().get_data(), 0);
 }
 
-void CsoundGodot::event_string(String message) {
+void CsoundInstance::event_string(String message) {
     if (!initialized) {
         return;
     }
@@ -509,7 +509,7 @@ void CsoundGodot::event_string(String message) {
     csound->EventString(message.ascii());
 }
 
-double CsoundGodot::evaluate_code(String message) {
+double CsoundInstance::evaluate_code(String message) {
     if (!initialized) {
         return 0;
     }
@@ -517,7 +517,7 @@ double CsoundGodot::evaluate_code(String message) {
     return csound->EvalCode(message.ascii());
 }
 
-void CsoundGodot::compile_csd(String csd) {
+void CsoundInstance::compile_csd(String csd) {
     if (!initialized) {
         return;
     }
@@ -525,7 +525,7 @@ void CsoundGodot::compile_csd(String csd) {
     csound->CompileCSD(csd.ascii(), 1);
 }
 
-void CsoundGodot::compile_orchestra(String orchestra) {
+void CsoundInstance::compile_orchestra(String orchestra) {
     if (!initialized) {
         return;
     }
@@ -533,7 +533,7 @@ void CsoundGodot::compile_orchestra(String orchestra) {
     csound->CompileOrc(orchestra.ascii(), 1);
 }
 
-void CsoundGodot::send_control_channel(String channel, float value) {
+void CsoundInstance::send_control_channel(String channel, float value) {
     if (!initialized) {
         return;
     }
@@ -541,7 +541,7 @@ void CsoundGodot::send_control_channel(String channel, float value) {
     csound->SetControlChannel(channel.ascii().get_data(), value);
 }
 
-float CsoundGodot::get_control_channel(String channel) {
+float CsoundInstance::get_control_channel(String channel) {
     if (!initialized) {
         return 0;
     }
@@ -549,10 +549,10 @@ float CsoundGodot::get_control_channel(String channel) {
     return csound->GetControlChannel(channel.ascii().get_data());
 }
 
-void CsoundGodot::pitch_bend(int chan, int val) {
+void CsoundInstance::pitch_bend(int chan, int val) {
 }
 
-void CsoundGodot::play_midi(Ref<MidiFileReader> p_midi_file) {
+void CsoundInstance::play_midi(Ref<MidiFileReader> p_midi_file) {
     Ref<MidiFileReader> local_midi_file;
 
     if (p_midi_file != NULL) {
@@ -571,8 +571,8 @@ void CsoundGodot::play_midi(Ref<MidiFileReader> p_midi_file) {
     }
 }
 
-// void CsoundGodot::process(double delta) {
-void CsoundGodot::thread_func() {
+// void CsoundInstance::process(double delta) {
+void CsoundInstance::thread_func() {
     int p_frames = 512;
 
     while (!exit_thread) {
@@ -778,16 +778,16 @@ void CsoundGodot::thread_func() {
     }
 }
 
-Error CsoundGodot::start_thread() {
+Error CsoundInstance::start_thread() {
     if (thread.is_null()) {
         thread.instantiate();
         exit_thread = false;
-        thread->start(callable_mp(this, &CsoundGodot::thread_func), Thread::PRIORITY_HIGH);
+        thread->start(callable_mp(this, &CsoundInstance::thread_func), Thread::PRIORITY_HIGH);
     }
     return (Error)OK;
 }
 
-void CsoundGodot::stop_thread() {
+void CsoundInstance::stop_thread() {
     if (thread.is_valid()) {
         exit_thread = true;
         semaphore->post();
@@ -796,25 +796,25 @@ void CsoundGodot::stop_thread() {
     }
 }
 
-void CsoundGodot::lock() {
+void CsoundInstance::lock() {
     if (thread.is_null() || mutex.is_null()) {
         return;
     }
     mutex->lock();
 }
 
-void CsoundGodot::unlock() {
+void CsoundInstance::unlock() {
     if (thread.is_null() || mutex.is_null()) {
         return;
     }
     mutex->unlock();
 }
 
-void CsoundGodot::initialize() {
+void CsoundInstance::initialize() {
     start();
 }
 
-int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *dev) {
+int CsoundInstance::open_midi_device(CSOUND *csound, void **userData, const char *dev) {
     *userData = (void *) csoundGetHostData(csound);
 
     if (userData != NULL) {
@@ -824,15 +824,15 @@ int CsoundGodot::open_midi_device(CSOUND *csound, void **userData, const char *d
     }
 }
 
-int CsoundGodot::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
+int CsoundInstance::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
 
     return 0;
 }
 
-int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
-    CsoundGodot *csound_godot = (CsoundGodot *)userData;
+int CsoundInstance::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
+    CsoundInstance *csound_instance = (CsoundInstance *)userData;
 
-    if (csound_godot == NULL || !csound_godot->initialized) {
+    if (csound_instance == NULL || !csound_instance->initialized) {
         return 0;
     }
 
@@ -841,7 +841,7 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
 
     MidiEvent midi_event;
 
-    int32_t read = csoundReadCircularBuffer(csound, csound_godot->midi_buffer, &midi_event, 4);
+    int32_t read = csoundReadCircularBuffer(csound, csound_instance->midi_buffer, &midi_event, 4);
 
     while (read > 0 && bytesRead < nbytes) {
         //int channel = midi_event.channel;
@@ -855,13 +855,13 @@ int CsoundGodot::read_midi_data(CSOUND *csound, void *userData, unsigned char *m
         mbuf[bytesRead++] = byte3;
         mbuf[bytesRead++] = byte4;
 
-        read = csoundReadCircularBuffer(csound, csound_godot->midi_buffer, &midi_event, 4);
+        read = csoundReadCircularBuffer(csound, csound_instance->midi_buffer, &midi_event, 4);
     }
 
     return bytesRead;
 }
 
-void CsoundGodot::set_message(CSOUND *, int attr, const char *format, va_list valist) {
+void CsoundInstance::set_message(CSOUND *, int attr, const char *format, va_list valist) {
     std::string message;
     va_list valist_copy;
     va_copy(valist_copy, valist);
@@ -873,7 +873,7 @@ void CsoundGodot::set_message(CSOUND *, int attr, const char *format, va_list va
     va_end(valist_copy);
 }
 
-FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *mode) {
+FILE *CsoundInstance::open_file(CSOUND *csound, const char *filename, const char *mode) {
     String node_path = filename;
     if (ResourceLoader::get_singleton()->exists(node_path)) {
         Variant resource = ResourceLoader::get_singleton()->load(node_path);
@@ -917,7 +917,7 @@ FILE *CsoundGodot::open_file(CSOUND *csound, const char *filename, const char *m
     return NULL;
 }
 
-void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mode, void *userdata) {
+void *CsoundInstance::open_sound_file(CSOUND *csound, const char *filename, int mode, void *userdata) {
     String node_path = filename;
     SFLIB_INFO *sfinfo = (SFLIB_INFO *)userdata;
 
@@ -970,25 +970,25 @@ void *CsoundGodot::open_sound_file(CSOUND *csound, const char *filename, int mod
     return NULL;
 }
 
-void CsoundGodot::set_csound_name(const String &name) {
+void CsoundInstance::set_csound_name(const String &name) {
     csound_name = name;
 }
 
-const String &CsoundGodot::get_csound_name() {
+const String &CsoundInstance::get_csound_name() {
     return csound_name;
 }
 
-void CsoundGodot::set_csound_script(Ref<CsoundFileReader> p_script) {
+void CsoundInstance::set_csound_script(Ref<CsoundFileReader> p_script) {
     reset();
     script = p_script;
     start();
 }
 
-Ref<CsoundFileReader> CsoundGodot::get_csound_script() {
+Ref<CsoundFileReader> CsoundInstance::get_csound_script() {
     return script;
 }
 
-int CsoundGodot::get_channel_count() {
+int CsoundInstance::get_channel_count() {
     if (csound != NULL) {
         return csound->GetChannels(0);
     } else {
@@ -996,7 +996,7 @@ int CsoundGodot::get_channel_count() {
     }
 }
 
-int CsoundGodot::get_named_channel_count() {
+int CsoundInstance::get_named_channel_count() {
     if (csound != NULL) {
         return output_named_channels.size();
     } else {
@@ -1004,28 +1004,28 @@ int CsoundGodot::get_named_channel_count() {
     }
 }
 
-String CsoundGodot::get_named_channel_name(int p_channel) {
+String CsoundInstance::get_named_channel_name(int p_channel) {
     ERR_FAIL_INDEX_V(p_channel, output_named_channels.size(), "");
 
     return output_named_channels[p_channel].name;
 }
 
-double CsoundGodot::get_time_since_last_mix() {
+double CsoundInstance::get_time_since_last_mix() {
     return (Time::get_singleton()->get_ticks_usec() - last_mix_time) / 1000000.0;
 }
 
-double CsoundGodot::get_time_to_next_mix() {
+double CsoundInstance::get_time_to_next_mix() {
     double total = get_time_since_last_mix();
     double mix_buffer = last_mix_frames / AudioServer::get_singleton()->get_mix_rate();
     return mix_buffer - total;
 }
 
-sf_count_t CsoundGodot::vio_get_filelen(void *user_data) {
+sf_count_t CsoundInstance::vio_get_filelen(void *user_data) {
     MemoryFile *file = (MemoryFile *)user_data;
     return file->length;
 }
 
-sf_count_t CsoundGodot::vio_seek(sf_count_t offset, int whence, void *user_data) {
+sf_count_t CsoundInstance::vio_seek(sf_count_t offset, int whence, void *user_data) {
     MemoryFile *file = (MemoryFile *)user_data;
     sf_count_t newpos = 0;
     switch (whence) {
@@ -1045,7 +1045,7 @@ sf_count_t CsoundGodot::vio_seek(sf_count_t offset, int whence, void *user_data)
     return file->curpos;
 }
 
-sf_count_t CsoundGodot::vio_read(void *ptr, sf_count_t count, void *user_data) {
+sf_count_t CsoundInstance::vio_read(void *ptr, sf_count_t count, void *user_data) {
     MemoryFile *file = (MemoryFile *)user_data;
     if (count + file->curpos > file->length) {
         count = file->length - file->curpos;
@@ -1057,67 +1057,67 @@ sf_count_t CsoundGodot::vio_read(void *ptr, sf_count_t count, void *user_data) {
     return count;
 }
 
-sf_count_t CsoundGodot::vio_write(const void *ptr, sf_count_t count, void *user_data) {
+sf_count_t CsoundInstance::vio_write(const void *ptr, sf_count_t count, void *user_data) {
     return 0;
 }
 
-sf_count_t CsoundGodot::vio_tell(void *user_data) {
+sf_count_t CsoundInstance::vio_tell(void *user_data) {
     MemoryFile *file = (MemoryFile *)user_data;
     return file->curpos;
 }
 
-void CsoundGodot::set_active(bool p_active) {
+void CsoundInstance::set_active(bool p_active) {
     active = p_active;
     channels_cleared = false;
 }
 
-bool CsoundGodot::is_active() {
+bool CsoundInstance::is_active() {
     return active;
 }
 
-void CsoundGodot::set_value(double key, double value) {
+void CsoundInstance::set_value(double key, double value) {
     csound_data[key] = value;
 }
 
-const double CsoundGodot::get_value(double key) {
+const double CsoundInstance::get_value(double key) {
     return csound_data[key];
 }
 
-void CsoundGodot::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("initialize"), &CsoundGodot::initialize);
-    ClassDB::bind_method(D_METHOD("program_select", "chan", "bank_num", "preset_num"), &CsoundGodot::program_select);
-    ClassDB::bind_method(D_METHOD("finish"), &CsoundGodot::finish);
+void CsoundInstance::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("initialize"), &CsoundInstance::initialize);
+    ClassDB::bind_method(D_METHOD("program_select", "chan", "bank_num", "preset_num"), &CsoundInstance::program_select);
+    ClassDB::bind_method(D_METHOD("finish"), &CsoundInstance::finish);
 
-    ClassDB::bind_method(D_METHOD("note_on", "chan", "key", "vel"), &CsoundGodot::note_on);
-    ClassDB::bind_method(D_METHOD("note_off", "chan", "key"), &CsoundGodot::note_off);
+    ClassDB::bind_method(D_METHOD("note_on", "chan", "key", "vel"), &CsoundInstance::note_on);
+    ClassDB::bind_method(D_METHOD("note_off", "chan", "key"), &CsoundInstance::note_off);
 
-    ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundGodot::event_string);
-    ClassDB::bind_method(D_METHOD("evaluate_code", "message"), &CsoundGodot::evaluate_code);
-    ClassDB::bind_method(D_METHOD("compile_csd", "orchestra"), &CsoundGodot::compile_csd);
-    ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundGodot::compile_orchestra);
+    ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundInstance::event_string);
+    ClassDB::bind_method(D_METHOD("evaluate_code", "message"), &CsoundInstance::evaluate_code);
+    ClassDB::bind_method(D_METHOD("compile_csd", "orchestra"), &CsoundInstance::compile_csd);
+    ClassDB::bind_method(D_METHOD("compile_orchestra", "orchestra"), &CsoundInstance::compile_orchestra);
 
-    ClassDB::bind_method(D_METHOD("send_control_channel", "channel", "value"), &CsoundGodot::send_control_channel);
-    ClassDB::bind_method(D_METHOD("get_control_channel", "channel"), &CsoundGodot::get_control_channel);
+    ClassDB::bind_method(D_METHOD("send_control_channel", "channel", "value"), &CsoundInstance::send_control_channel);
+    ClassDB::bind_method(D_METHOD("get_control_channel", "channel"), &CsoundInstance::get_control_channel);
 
-    ClassDB::bind_method(D_METHOD("pitch_bend", "chan", "vel"), &CsoundGodot::pitch_bend);
-    ClassDB::bind_method(D_METHOD("play_midi", "midi_file"), &CsoundGodot::play_midi);
-    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundGodot::set_soundfont);
-    ClassDB::bind_method(D_METHOD("get_soundfont"), &CsoundGodot::get_soundfont);
+    ClassDB::bind_method(D_METHOD("pitch_bend", "chan", "vel"), &CsoundInstance::pitch_bend);
+    ClassDB::bind_method(D_METHOD("play_midi", "midi_file"), &CsoundInstance::play_midi);
+    ClassDB::bind_method(D_METHOD("set_soundfont", "soundfont"), &CsoundInstance::set_soundfont);
+    ClassDB::bind_method(D_METHOD("get_soundfont"), &CsoundInstance::get_soundfont);
     ClassDB::add_property(
-        "CsoundGodot", PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFontFileReader"),
+        "CsoundInstance", PropertyInfo(Variant::OBJECT, "soundfont", PROPERTY_HINT_RESOURCE_TYPE, "SoundFontFileReader"),
         "set_soundfont", "get_soundfont");
-    ClassDB::bind_method(D_METHOD("set_midi_file", "midi_file"), &CsoundGodot::set_midi_file);
-    ClassDB::bind_method(D_METHOD("get_midi_file"), &CsoundGodot::get_midi_file);
-    ClassDB::add_property("CsoundGodot",
+    ClassDB::bind_method(D_METHOD("set_midi_file", "midi_file"), &CsoundInstance::set_midi_file);
+    ClassDB::bind_method(D_METHOD("get_midi_file"), &CsoundInstance::get_midi_file);
+    ClassDB::add_property("CsoundInstance",
                           PropertyInfo(Variant::OBJECT, "midi_file", PROPERTY_HINT_RESOURCE_TYPE, "MidiFileReader"),
                           "set_midi_file", "get_midi_file");
-    ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &CsoundGodot::set_csound_name);
-    ClassDB::bind_method(D_METHOD("get_csound_name"), &CsoundGodot::get_csound_name);
+    ClassDB::bind_method(D_METHOD("set_csound_name", "name"), &CsoundInstance::set_csound_name);
+    ClassDB::bind_method(D_METHOD("get_csound_name"), &CsoundInstance::get_csound_name);
 
-    ClassDB::bind_method(D_METHOD("set_csound_script", "script"), &CsoundGodot::set_csound_script);
-    ClassDB::bind_method(D_METHOD("get_csound_script"), &CsoundGodot::get_csound_script);
+    ClassDB::bind_method(D_METHOD("set_csound_script", "script"), &CsoundInstance::set_csound_script);
+    ClassDB::bind_method(D_METHOD("get_csound_script"), &CsoundInstance::get_csound_script);
 
-    ClassDB::add_property("CsoundGodot", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
+    ClassDB::add_property("CsoundInstance", PropertyInfo(Variant::STRING, "csound_name"), "set_csound_name",
                           "get_csound_name");
 
     ADD_SIGNAL(MethodInfo("csound_ready", PropertyInfo(Variant::STRING, "csound_name")));

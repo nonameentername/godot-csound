@@ -1,7 +1,7 @@
-#ifndef CSOUNDGODOT_H
-#define CSOUNDGODOT_H
+#ifndef CSOUND_INSTANCE_H
+#define CSOUND_INSTANCE_H
 
-#include "csound_godot_data.h"
+#include "godot_csound_data.h"
 #define USE_LIBSNDFILE 1
 // #include <sndfile.h>
 #include <csound.hpp>
@@ -39,8 +39,8 @@ static const int CIRCULAR_BUFFER_SIZE = BUFFER_FRAME_SIZE * 2 + 10;
 
 namespace godot {
 
-class CsoundGodot : public Object {
-    GDCLASS(CsoundGodot, Object);
+class CsoundInstance : public Object {
+    GDCLASS(CsoundInstance, Object);
     friend class CsoundServer;
 
 public:
@@ -139,8 +139,8 @@ protected:
     static void _bind_methods();
 
 public:
-    CsoundGodot();
-    ~CsoundGodot();
+    CsoundInstance();
+    ~CsoundInstance();
 
     void start();
     void stop();

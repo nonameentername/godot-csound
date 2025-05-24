@@ -25,16 +25,16 @@ Ref<AudioStreamPlayback> AudioStreamCsound::_instantiate_playback() const {
 void AudioStreamCsound::set_active(bool p_active) {
     active = p_active;
 
-    CsoundGodot *csound_godot = get_csound_godot();
-    if (csound_godot != NULL) {
-        csound_godot->set_active(active);
+    CsoundInstance *csound_instance = get_csound_instance();
+    if (csound_instance != NULL) {
+        csound_instance->set_active(active);
     }
 }
 
 bool AudioStreamCsound::is_active() {
-    CsoundGodot *csound_godot = get_csound_godot();
-    if (csound_godot != NULL) {
-        return csound_godot->is_active();
+    CsoundInstance *csound_instance = get_csound_instance();
+    if (csound_instance != NULL) {
+        return csound_instance->is_active();
     }
     return false;
 }
@@ -88,26 +88,26 @@ void AudioStreamCsound::csound_layout_changed() {
 
 void AudioStreamCsound::csound_ready(String p_csound_name) {
     if (get_csound_name() == p_csound_name) {
-        CsoundGodot *csound_godot = get_csound_godot();
-        if (csound_godot != NULL) {
-            csound_godot->set_active(active);
+        CsoundInstance *csound_instance = get_csound_instance();
+        if (csound_instance != NULL) {
+            csound_instance->set_active(active);
         }
     }
 }
 
-CsoundGodot *AudioStreamCsound::get_csound_godot() {
+CsoundInstance *AudioStreamCsound::get_csound_instance() {
     CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
     if (csound_server != NULL) {
-        CsoundGodot *csound_godot = csound_server->get_csound(get_csound_name());
-        return csound_godot;
+        CsoundInstance *csound_instance = csound_server->get_csound(get_csound_name());
+        return csound_instance;
     }
     return NULL;
 }
 
 int AudioStreamCsound::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
-    CsoundGodot *csound_godot = get_csound_godot();
-    if (csound_godot != NULL) {
-        return csound_godot->process_sample(p_buffer, p_rate, p_frames);
+    CsoundInstance *csound_instance = get_csound_instance();
+    if (csound_instance != NULL) {
+        return csound_instance->process_sample(p_buffer, p_rate, p_frames);
     }
 
     for (int frame = 0; frame < p_frames; frame += 1) {

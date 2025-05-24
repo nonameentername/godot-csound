@@ -1,12 +1,12 @@
-#include "csound_godot.h"
-#include <csound_godot_opcodes.h>
+#include "csound_instance.h"
+#include <godot_csound_opcodes.h>
 #include <fstream>
 #include <modload.h>
 #include <plugin.h>
 #include <string>
 
 namespace godot {
-class CsoundGodot;
+class CsoundInstance;
 }
 
 namespace csnd {
@@ -20,8 +20,8 @@ int DictionarySetValue::kperf() {
     MYFLT value = inargs[-1];
     MYFLT key = inargs[0];
 
-    godot::CsoundGodot *csound_godot = (godot::CsoundGodot *)csound->host_data();
-    csound_godot->set_value(key, value);
+    godot::CsoundInstance *csound_instance = (godot::CsoundInstance *)csound->host_data();
+    csound_instance->set_value(key, value);
 
     return OK;
 }

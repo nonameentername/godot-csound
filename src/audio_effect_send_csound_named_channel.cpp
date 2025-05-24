@@ -127,11 +127,11 @@ void AudioEffectSetCsoundNamedChannelInstance::_process(const void *p_src_frames
 
     CsoundServer *csound_server = (CsoundServer *)Engine::get_singleton()->get_singleton("CsoundServer");
     if (csound_server != NULL) {
-        CsoundGodot *csound_godot = csound_server->get_csound(base->get_csound_name());
-        if (csound_godot != NULL) {
+        CsoundInstance *csound_instance = csound_server->get_csound(base->get_csound_name());
+        if (csound_instance != NULL) {
             int p_rate = 1;
-            csound_godot->set_named_channel_sample(src_frames, p_rate, p_frame_count, base->channel_left,
-                                                   base->channel_right);
+            csound_instance->set_named_channel_sample(src_frames, p_rate, p_frame_count, base->channel_left,
+                                                      base->channel_right);
         }
     }
 }

@@ -1,6 +1,6 @@
 extends Node2D
 
-var csound: CsoundGodot
+var csound: CsoundInstance
 
 @export var midi_file: Resource
 

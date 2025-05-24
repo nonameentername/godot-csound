@@ -7,7 +7,7 @@
 #include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/godot.hpp>
 
-#include "csound_godot.h"
+#include "csound_instance.h"
 
 namespace godot {
 

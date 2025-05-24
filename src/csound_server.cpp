@@ -153,7 +153,7 @@ void CsoundServer::set_csound_count(int p_count) {
             attempt = "Main";
         }
 
-        csound_instances.write[i] = memnew(CsoundGodot);
+        csound_instances.write[i] = memnew(CsoundInstance);
         csound_instances[i]->csound_name = attempt;
         csound_instances[i]->solo = false;
         csound_instances[i]->mute = false;
@@ -221,21 +221,21 @@ void CsoundServer::add_csound(int p_at_pos) {
         }
     }
 
-    CsoundGodot *csound_godot = memnew(CsoundGodot);
-    csound_godot->csound_name = attempt;
-    csound_godot->solo = false;
-    csound_godot->mute = false;
-    csound_godot->bypass = false;
-    csound_godot->volume_db = 0;
-    csound_godot->tab = 0;
-    csound_godot->script = Ref<CsoundFileReader>();
+    CsoundInstance *csound_instance = memnew(CsoundInstance);
+    csound_instance->csound_name = attempt;
+    csound_instance->solo = false;
+    csound_instance->mute = false;
+    csound_instance->bypass = false;
+    csound_instance->volume_db = 0;
+    csound_instance->tab = 0;
+    csound_instance->script = Ref<CsoundFileReader>();
 
-    csound_map[attempt] = csound_godot;
+    csound_map[attempt] = csound_instance;
 
     if (p_at_pos == -1) {
-        csound_instances.push_back(csound_godot);
+        csound_instances.push_back(csound_instance);
     } else {
-        csound_instances.insert(p_at_pos, csound_godot);
+        csound_instances.insert(p_at_pos, csound_instance);
     }
 
     emit_signal("csound_layout_changed");
@@ -251,15 +251,15 @@ void CsoundServer::move_csound(int p_csound, int p_to_pos) {
         return;
     }
 
-    CsoundGodot *csound_godot = csound_instances[p_csound];
+    CsoundInstance *csound_instance = csound_instances[p_csound];
     csound_instances.remove_at(p_csound);
 
     if (p_to_pos == -1) {
-        csound_instances.push_back(csound_godot);
+        csound_instances.push_back(csound_instance);
     } else if (p_to_pos < p_csound) {
-        csound_instances.insert(p_to_pos, csound_godot);
+        csound_instances.insert(p_to_pos, csound_instance);
     } else {
-        csound_instances.insert(p_to_pos - 1, csound_godot);
+        csound_instances.insert(p_to_pos - 1, csound_instance);
     }
 
     emit_signal("csound_layout_changed");
@@ -546,9 +546,9 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
     csound_instances.resize(p_csound_layout->csounds.size());
     csound_map.clear();
     for (int i = 0; i < p_csound_layout->csounds.size(); i++) {
-        CsoundGodot *csound;
+        CsoundInstance *csound;
         if (i >= prev_size) {
-            csound = memnew(CsoundGodot);
+            csound = memnew(CsoundInstance);
         } else {
             csound = csound_instances[i];
             csound->reset();
@@ -637,7 +637,7 @@ void CsoundServer::finish() {
     thread->wait_to_finish();
 }
 
-CsoundGodot *CsoundServer::get_csound(const String &p_name) {
+CsoundInstance *CsoundServer::get_csound(const String &p_name) {
     if (csound_map.has(p_name)) {
         return csound_map.get(p_name);
     }
@@ -645,11 +645,11 @@ CsoundGodot *CsoundServer::get_csound(const String &p_name) {
     return NULL;
 }
 
-CsoundGodot *CsoundServer::get_csound_by_index(int p_index) {
+CsoundInstance *CsoundServer::get_csound_by_index(int p_index) {
     return csound_instances.get(p_index);
 }
 
-CsoundGodot *CsoundServer::get_csound_(const Variant &p_variant) {
+CsoundInstance *CsoundServer::get_csound_(const Variant &p_variant) {
     if (p_variant.get_type() == Variant::STRING) {
         String str = p_variant;
         return csound_map.get(str);

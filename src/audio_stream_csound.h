@@ -1,7 +1,7 @@
 #ifndef AUDIOSTREAMCSOUND_H
 #define AUDIOSTREAMCSOUND_H
 
-#include "csound_godot.h"
+#include "csound_instance.h"
 
 #include <godot_cpp/classes/audio_frame.hpp>
 #include <godot_cpp/classes/audio_stream.hpp>
@@ -19,7 +19,7 @@ private:
     String csound_name;
     bool active;
 
-    CsoundGodot *get_csound_godot();
+    CsoundInstance *get_csound_instance();
     void csound_layout_changed();
     void csound_ready(String csound_name);
 

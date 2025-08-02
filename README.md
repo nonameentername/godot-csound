@@ -59,15 +59,7 @@ sudo usermod -a -G docker $USER
 git submodule update --init --recursive
 ```
 
-4. Download XCode 15.1 with the iOS SDK (you must be logged into an Apple ID to download Xcode).
-
-5. In the folder containing the Xcode_15.1.xip file start an HTTP server to host the file:
-
-```bash
-python -m http.server 8000
-```
-
-6. Build project using make:
+4. Build project using make:
 
 ```bash
 #build all platforms

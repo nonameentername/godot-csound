@@ -135,10 +135,6 @@ jobs:
           context: platform/ioscross
           push: true
           tags: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }},ghcr.io/nonameentername/godot-csound-ioscross:latest
-          build-args: |
-            DOWNLOAD_URL=${{ vars.IOSCROSS_DOWNLOAD_URL }}
-          secrets: |
-            IOSCROSS_PASSWORD=${{ secrets.IOSCROSS_PASSWORD }}
 
   build-and-push-android-image:
     name: Android

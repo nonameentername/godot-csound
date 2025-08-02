@@ -18,11 +18,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -49,11 +44,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -80,11 +70,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -111,11 +96,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -142,11 +122,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -173,11 +148,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout repository
         uses: actions/checkout@v4
 

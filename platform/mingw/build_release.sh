@@ -22,6 +22,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=$src_dir/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_CXX_COMPILER=/usr/bin/x86_64-w64-mingw32-g++ \
     -DCMAKE_C_COMPILER=/usr/bin/x86_64-w64-mingw32-gcc \
     -DUSE_VCPKG=1 \
+    -DUSE_JACK=0 \
     -DBUILD_JAVA_INTERFACE=OFF \
     -DINSTALL_PYTHON_INTERFACE=OFF \
     -DBUILD_UTILITIES=OFF \
@@ -34,8 +35,8 @@ make install
 
 cp $build_dir/csound64.dll $prefix/lib/
 cp $prefix/lib/libcsound64.dll.a $prefix/lib/libcsound64.a
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libstdc++-6.dll $prefix/lib/
-cp /usr/lib/gcc/x86_64-w64-mingw32/10-posix/libgcc_s_seh-1.dll $prefix/lib/
+cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libstdc++-6.dll $prefix/lib/
+cp /usr/lib/gcc/x86_64-w64-mingw32/*-posix/libgcc_s_seh-1.dll $prefix/lib/
 cp /usr/x86_64-w64-mingw32/lib/libwinpthread-1.dll $prefix/lib/
 
 cd $dir

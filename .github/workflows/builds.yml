@@ -373,7 +373,7 @@ jobs:
           key: linux-artifacts-${{github.run_id}}
 
       - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v1
+        uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.4.0
           use-dotnet: false
@@ -403,7 +403,7 @@ jobs:
           key: macos-artifacts-${{github.run_id}}
 
       - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v1
+        uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.4.0
           use-dotnet: false
@@ -437,7 +437,7 @@ jobs:
           enableCrossOsArchive: true
 
       - name: Setup Godot
-        uses: chickensoft-games/setup-godot@v1
+        uses: chickensoft-games/setup-godot@v2
         with:
           version: 4.4.0
           use-dotnet: false

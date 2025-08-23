@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: ${{ github.ref }}
 
@@ -20,7 +23,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -76,7 +79,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -138,7 +141,7 @@ jobs:
           docker-images: false
 
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -194,7 +197,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -250,7 +253,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -306,7 +309,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -361,7 +364,7 @@ jobs:
     needs: linux-build
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -391,7 +394,7 @@ jobs:
     needs: macos-build
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -424,7 +427,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -456,7 +459,7 @@ jobs:
     needs: [verify-linux-build, verify-windows-build, verify-macos-build, ios-build, android-build, web-build]
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
           submodules: recursive
@@ -514,11 +517,11 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.SERVICE_ACCOUNT_PAT }}
+          token: ${{ github.token }}
           tag_name: ${{ env.TAG_VERSION }}
           generate_release_notes: true
           make_latest: true
-          files:
+          files: |
             godot-csound_${{ env.TAG_VERSION }}.zip
         env:
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}

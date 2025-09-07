@@ -109,9 +109,10 @@ void CsoundInstance::start() {
                 csound_error = true;
             }
         } else if (script.is_valid()) {
-            int error = csound->Compile(script->get_path().get_file().ascii());
+            String path = script->get_path().replace("res://", "");
+            int error = csound->Compile(path.ascii());
             if (error != 0) {
-                godot::UtilityFunctions::push_error("Could not compile csound script: ", script->get_path().get_file());
+                godot::UtilityFunctions::push_error("Could not compile csound script: ", path);
                 csound_error = true;
             }
         }

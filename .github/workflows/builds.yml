@@ -23,7 +23,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -80,7 +80,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -143,7 +143,7 @@ jobs:
           docker-images: false
 
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -200,7 +200,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -257,7 +257,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -314,7 +314,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -370,7 +370,7 @@ jobs:
     needs: linux-build
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -400,7 +400,7 @@ jobs:
     needs: macos-build
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -433,7 +433,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive
@@ -452,10 +452,14 @@ jobs:
           use-dotnet: false
           include-templates: false
 
+      - name: Godot import
+        continue-on-error: true
+        run: |
+          godot --headless --import
+          godot --headless --import
+
       - name: Verify godot-csound
         run: |
-          godot --headless --import || true
-          godot --headless --import || true
           (godot --headless -s csound_run_scene.gd 2> NUL || true) | grep 'output result is 4'
 
   publish_artifacts:
@@ -465,7 +469,7 @@ jobs:
     needs: [verify-linux-build, verify-windows-build, verify-macos-build, ios-build, android-build, web-build]
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           submodules: recursive

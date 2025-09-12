@@ -646,7 +646,7 @@ void CsoundInstance::thread_func() {
                 }
 
                 int result = csound->PerformKsmps();
-                if (result == 1) {
+                if (result != 0) {
                     finished = true;
                 }
 
@@ -1070,6 +1070,11 @@ sf_count_t CsoundInstance::vio_tell(void *user_data) {
 void CsoundInstance::set_active(bool p_active) {
     active = p_active;
     channels_cleared = false;
+    if (finished && p_active) {
+        reset();
+        finished = false;
+        start();
+    }
 }
 
 bool CsoundInstance::is_active() {

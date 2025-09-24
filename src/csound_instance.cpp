@@ -502,6 +502,21 @@ void CsoundInstance::note_off(int chan, int key) {
     // csound->EventString(note_off.ascii().get_data(), 0);
 }
 
+
+void CsoundInstance::control_change(int chan, int control, int value) {
+    if (!initialized) {
+        return;
+    }
+
+    MidiEvent event;
+    event.message = MIDIMessage::MIDI_MESSAGE_CONTROL_CHANGE;
+    event.channel = chan;
+    event.note = control;
+    event.velocity = value;
+
+    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
+}
+
 void CsoundInstance::event_string(String message) {
     if (!initialized) {
         return;
@@ -1096,6 +1111,7 @@ void CsoundInstance::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("note_on", "chan", "key", "vel"), &CsoundInstance::note_on);
     ClassDB::bind_method(D_METHOD("note_off", "chan", "key"), &CsoundInstance::note_off);
+    ClassDB::bind_method(D_METHOD("control_change", "chan", "control", "key"), &CsoundInstance::control_change);
 
     ClassDB::bind_method(D_METHOD("event_string", "message"), &CsoundInstance::event_string);
     ClassDB::bind_method(D_METHOD("evaluate_code", "message"), &CsoundInstance::evaluate_code);

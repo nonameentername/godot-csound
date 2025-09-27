@@ -157,6 +157,7 @@ public:
 
     void note_on(int chan, int key, int vel);
     void note_off(int chan, int key);
+    void control_change(int chan, int control, int value);
 
     void event_string(String message);
     double evaluate_code(String message);

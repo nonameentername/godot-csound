@@ -961,7 +961,7 @@ void *CsoundInstance::open_sound_file(CSOUND *csound, const char *filename, int 
                 byte_array = wav_file->get_data();
             }
 
-            if (byte_array.empty()) {
+            if (byte_array.is_empty()) {
                 Ref<AudioStreamMP3> mp3_file = resource;
                 if (mp3_file != NULL) {
                     byte_array = mp3_file->get_data();

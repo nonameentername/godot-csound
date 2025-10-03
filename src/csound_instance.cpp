@@ -2,6 +2,7 @@
 #include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/classes/audio_stream_wav.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 //#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/project_settings.hpp"
@@ -917,11 +918,21 @@ FILE *CsoundInstance::open_file(CSOUND *csound, const char *filename, const char
             return fp;
         }
 
+        PackedByteArray byte_array;
         Ref<AudioStreamMP3> mp3_file = resource;
         if (mp3_file != NULL) {
-            FILE *fp = fmemopen(NULL, mp3_file->get_data().size(), "w+");
-            char *data = (char *)mp3_file->get_data().ptr();
-            for (int i = 0; i < mp3_file->get_data().size(); i++) {
+            byte_array = mp3_file->get_data();
+        } else {
+            Ref<AudioStreamWAV> wav_file = resource;
+            if (wav_file != NULL) {
+                byte_array = wav_file->get_data();
+            }
+        }
+        int size = byte_array.size();
+        if (size > 0) {
+            FILE *fp = fmemopen(NULL, size, "w+");
+            char *data = (char *)byte_array.ptr();
+            for (int i = 0; i < size; i++) {
                 fprintf(fp, "%c", data[i]);
             }
             fflush(fp);
@@ -940,11 +951,27 @@ void *CsoundInstance::open_sound_file(CSOUND *csound, const char *filename, int 
     if (ResourceLoader::get_singleton()->exists(node_path)) {
         Variant resource = ResourceLoader::get_singleton()->load(node_path);
 
-        Ref<AudioStreamMP3> mp3_file = resource;
+        Ref<AudioStream> audio_file = resource;
 
-        if (mp3_file != NULL) {
-            int size = mp3_file->get_data().size();
-            PackedByteArray byte_array = mp3_file->get_data();
+        if (audio_file != NULL) {
+            PackedByteArray byte_array;
+
+            Ref<AudioStreamWAV> wav_file = resource;
+            if (wav_file != NULL) {
+                byte_array = wav_file->get_data();
+            }
+
+            if (byte_array.is_empty()) {
+                Ref<AudioStreamMP3> mp3_file = resource;
+                if (mp3_file != NULL) {
+                    byte_array = mp3_file->get_data();
+                }
+            }
+
+            int size = byte_array.size();
+            if (size == 0) {
+                return NULL;
+            }
             char *txt = (char *)calloc(size, sizeof(char));
 
             for (int i = 0; i < size; i++) {

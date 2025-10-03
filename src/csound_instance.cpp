@@ -2,6 +2,7 @@
 #include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/classes/audio_stream_wav.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 //#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/project_settings.hpp"

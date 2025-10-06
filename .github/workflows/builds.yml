@@ -520,6 +520,9 @@ jobs:
           DRY_RUN: true
           RELEASE_BRANCHES: none
 
+      - name: Remove soundfonts
+        run: find addons | grep sf2 | xargs rm
+
       - name: Zip godot-csound artifact
         run: zip -r godot-csound_${{ env.TAG_VERSION }}.zip ./addons/csound
         env:

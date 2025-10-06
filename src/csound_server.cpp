@@ -576,7 +576,7 @@ void CsoundServer::set_csound_layout(const Ref<CsoundLayout> &p_csound_layout) {
 
         csound->call_deferred("initialize");
         if (!csound->is_connected("csound_ready", Callable(this, "on_csound_ready"))) {
-            csound->connect("csound_ready", Callable(this, "on_csound_ready"));
+            csound->connect("csound_ready", Callable(this, "on_csound_ready"), CONNECT_DEFERRED);
         }
     }
     edited = false;

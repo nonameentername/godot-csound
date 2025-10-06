@@ -2,11 +2,11 @@
 #include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
-#include "godot_cpp/classes/file_access.hpp"
 #include "godot_cpp/classes/audio_stream_wav.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 //#include "godot_cpp/classes/os.hpp"
 #include "godot_cpp/classes/project_settings.hpp"
+#include "godot_cpp/classes/resource_loader.hpp"
 #include "godot_cpp/classes/time.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "godot_cpp/variant/variant.hpp"
@@ -970,10 +970,12 @@ void *CsoundInstance::open_sound_file(CSOUND *csound, const char *filename, int 
     String node_path = filename;
     SFLIB_INFO *sfinfo = (SFLIB_INFO *)userdata;
 
-    if (ResourceLoader::get_singleton()->exists(node_path)) {
-        Ref<FileAccess> file = FileAccess::open(filename, FileAccess::READ);
-        if (file.is_valid()) {
-            PackedByteArray byte_array = file->get_buffer(file->get_length());
+    //TODO: use extension from resource loader instead of hard-coded value
+    if (node_path.get_extension() == "mp3") {
+        Ref<AudioStreamMP3> mp3_file = ResourceLoader::get_singleton()->load(node_path);
+
+        if (mp3_file != NULL) {
+            PackedByteArray byte_array = mp3_file->get_data();
 
             int size = byte_array.size();
             if (size == 0) {

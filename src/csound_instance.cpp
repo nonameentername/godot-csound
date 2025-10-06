@@ -131,13 +131,18 @@ void CsoundInstance::start() {
             output_left_channel.buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
             output_right_channel.buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
 
-            // TODO: check input and output channels separately
+            if (input_channels.size() != csound->GetChannels(1)) {
+                input_channels.resize(csound->GetChannels(1));
+
+                for (int j = 0; j < csound->GetChannels(1); j++) {
+                    input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
+                }
+            }
+
             if (output_channels.size() != csound->GetChannels(0)) {
-                input_channels.resize(csound->GetChannels(0));
                 output_channels.resize(csound->GetChannels(0));
 
                 for (int j = 0; j < csound->GetChannels(0); j++) {
-                    input_channels.write[j] = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
                     output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
                 }
             }
@@ -635,12 +640,12 @@ void CsoundInstance::thread_func() {
             }
 
             while (to_fill > 0) {
-                for (int channel = 0; channel < csound->GetChannels(0); channel++) {
+                for (int channel = 0; channel < csound->GetChannels(1); channel++) {
                     csoundReadCircularBuffer(csound->GetCsound(), input_channels[channel], ksmps_temp_buffer.ptrw(),
                                              csound->GetKsmps());
                     for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                         ksmps_temp_buffer.write[frame] = ksmps_temp_buffer[frame] * scale;
-                        spin[frame * csound->GetChannels(0) + channel] = ksmps_temp_buffer[frame];
+                        spin[frame * csound->GetChannels(1) + channel] = ksmps_temp_buffer[frame];
                     }
                     if (bypass) {
                         csoundWriteCircularBuffer(csound->GetCsound(), output_channels.write[channel].buffer,
@@ -668,17 +673,33 @@ void CsoundInstance::thread_func() {
                 }
 
                 int buffer_index = 0;
-                for (int i = 0; i < csound->GetKsmps() * csound->GetChannels(0); i = i + csound->GetChannels(0)) {
-                    if (bypass) {
-                        ksmps_left_buffer.ptrw()[buffer_index] = spin[i] * scale;
-                        ksmps_right_buffer.ptrw()[buffer_index] = spin[i + 1] * scale;
-                    } else {
-                        ksmps_left_buffer.ptrw()[buffer_index] = spout[i] / scale * volume;
-                        ksmps_right_buffer.ptrw()[buffer_index] = spout[i + 1] / scale * volume;
-                    }
 
-                    to_fill = to_fill - 1;
-                    buffer_index++;
+                if (bypass) {
+                    for (int i = 0; i < csound->GetKsmps() * csound->GetChannels(1); i = i + csound->GetChannels(1)) {
+                        ksmps_left_buffer.ptrw()[buffer_index] = spin[i] * scale;
+
+                        if (csound->GetChannels(1) == 1) {
+                            ksmps_right_buffer.ptrw()[buffer_index] = spin[i] * scale;
+                        } else {
+                            ksmps_right_buffer.ptrw()[buffer_index] = spin[i + 1] * scale;
+                        }
+
+                        to_fill = to_fill - 1;
+                        buffer_index++;
+                    }
+                } else {
+                    for (int i = 0; i < csound->GetKsmps() * csound->GetChannels(0); i = i + csound->GetChannels(0)) {
+                        ksmps_left_buffer.ptrw()[buffer_index] = spout[i] / scale * volume;
+
+                        if (csound->GetChannels(0) == 1) {
+                            ksmps_right_buffer.ptrw()[buffer_index] = spout[i] / scale * volume;
+                        } else {
+                            ksmps_right_buffer.ptrw()[buffer_index] = spout[i + 1] / scale * volume;
+                        }
+
+                        to_fill = to_fill - 1;
+                        buffer_index++;
+                    }
                 }
 
                 csoundWriteCircularBuffer(csound->GetCsound(), output_left_channel.buffer,

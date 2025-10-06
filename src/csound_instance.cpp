@@ -2,6 +2,7 @@
 #include "csound_files.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/audio_server.hpp"
+#include "godot_cpp/classes/file_access.hpp"
 #include "godot_cpp/classes/audio_stream_wav.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 //#include "godot_cpp/classes/os.hpp"
@@ -949,24 +950,9 @@ void *CsoundInstance::open_sound_file(CSOUND *csound, const char *filename, int 
     SFLIB_INFO *sfinfo = (SFLIB_INFO *)userdata;
 
     if (ResourceLoader::get_singleton()->exists(node_path)) {
-        Variant resource = ResourceLoader::get_singleton()->load(node_path);
-
-        Ref<AudioStream> audio_file = resource;
-
-        if (audio_file != NULL) {
-            PackedByteArray byte_array;
-
-            Ref<AudioStreamWAV> wav_file = resource;
-            if (wav_file != NULL) {
-                byte_array = wav_file->get_data();
-            }
-
-            if (byte_array.is_empty()) {
-                Ref<AudioStreamMP3> mp3_file = resource;
-                if (mp3_file != NULL) {
-                    byte_array = mp3_file->get_data();
-                }
-            }
+        Ref<FileAccess> file = FileAccess::open(filename, FileAccess::READ);
+        if (file.is_valid()) {
+            PackedByteArray byte_array = file->get_buffer(file->get_length());
 
             int size = byte_array.size();
             if (size == 0) {

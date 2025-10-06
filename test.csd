@@ -123,6 +123,23 @@ endin
 
 instr 8
 
+ktrans linseg 1, 5, 2, 10, -2
+a1, a2 diskin2 "assets/hello.wav", ktrans, 0, 1, 0, 32
+       outs a1, a2
+
+endin
+
+instr 9
+
+ktrans linseg 1, 5, 2, 10, -2
+a1, a2 diskin2 "assets/hello.ogg", ktrans, 0, 1, 0, 32
+       outs a1, a2
+
+endin
+
+
+instr 10
+
 kstatus, kchan, kdata1, kdata2 midiin
 
 prints "hello world\n"
@@ -138,7 +155,7 @@ massign 3, 3
 <CsScore>
 f0 z
 
-i8 0 -1
+i10 0 -1
 
 i1 1 1 60 100
 i1 + 1 62 <
@@ -152,7 +169,9 @@ i2 + 1 62 <
 i2 8 1 65 <
 i2 8 1 69 10
 
-i7 9 1 60 100
+i7 10 1 60 100
+i8 12 1 60 100
+i9 14 1 60 100
 
 ;i3 0 3600
 

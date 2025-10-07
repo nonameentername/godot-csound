@@ -5,7 +5,7 @@ build = "${build}"
 [configuration]
 
 entry_symbol = "csoundgodot_library_init"
-compatibility_minimum = 4.3
+compatibility_minimum = 4.5
 
 [libraries]
 

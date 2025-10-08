@@ -17,11 +17,15 @@ func _enter_tree():
 	csound_import_plugin = preload("import_csound_plugin.gd").new()
 	add_import_plugin(csound_import_plugin)
 
-	csound_plugin = preload("res://addons/csound/editor_csound_instances.tscn").instantiate()
-	csound_plugin.editor_interface = get_editor_interface()
-	csound_plugin.undo_redo = get_undo_redo()
+	if DisplayServer.get_name() != "headless":
+		csound_plugin = preload("res://addons/csound/editor_csound_instances.tscn").instantiate()
+		csound_plugin.editor_interface = get_editor_interface()
+		csound_plugin.undo_redo = get_undo_redo()
 
-	add_control_to_bottom_panel(csound_plugin, "Csound")
+		add_control_to_bottom_panel(csound_plugin, "Csound")
+	else:
+		ResourceLoader.add_resource_format_loader(CsoundDataLoader.new())
+		ResourceSaver.add_resource_format_saver(CsoundDataSaver.new())
 
 	resource_saved.connect(_resource_saved)
 
@@ -40,7 +44,9 @@ func _exit_tree():
 
 	remove_import_plugin(csound_import_plugin)
 
-	remove_control_from_bottom_panel(csound_plugin)
+	if DisplayServer.get_name() != "headless":
+		remove_control_from_bottom_panel(csound_plugin)
+
 	if csound_plugin:
 		csound_plugin.queue_free()
 

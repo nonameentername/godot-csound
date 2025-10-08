@@ -45,11 +45,9 @@ Vector2 EditorAudioMeterNotchesCsound::_get_minimum_size() const {
     float width = 0;
     float height = top_padding + btm_padding;
 
-    for (int i = 0; i < notches.size(); i++) {
-        if (notches[i].render_db_value) {
-            width = MAX(width, font->get_string_size(String::num(Math::abs(notches[i].db_value)) + "dB",
-                                                     HORIZONTAL_ALIGNMENT_LEFT, -1, font_size)
-                                   .x);
+    for (const EditorAudioMeterNotchesCsound::AudioNotch &notch : notches) { 
+        if (notch.render_db_value) {
+            width = MAX(width, font->get_string_size(String::num(Math::abs(notch.db_value)) + "dB", HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x);
             height += font_height;
         }
     }
@@ -88,8 +86,7 @@ void EditorAudioMeterNotchesCsound::_notification(int p_what) {
 void EditorAudioMeterNotchesCsound::_draw_audio_notches() {
     float font_height = theme_cache.font->get_height(theme_cache.font_size);
 
-    for (int i = 0; i < notches.size(); i++) {
-        AudioNotch n = notches[i];
+    for (const EditorAudioMeterNotchesCsound::AudioNotch &n : notches) { 
         draw_line(Vector2(0, (1.0f - n.relative_position) * (get_size().y - btm_padding - top_padding) + top_padding),
                   Vector2(line_length * editor_scale,
                           (1.0f - n.relative_position) * (get_size().y - btm_padding - top_padding) + top_padding),

@@ -384,14 +384,17 @@ jobs:
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.4.0
+          version: 4.5.0
           use-dotnet: false
           include-templates: false
 
+      - name: Godot import
+        continue-on-error: true
+        run: |
+          godot --headless --import
+
       - name: Verify godot-csound
         run: |
-          godot --headless --import || true
-          godot --headless --import || true
           godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
 
   verify-macos-build:
@@ -414,14 +417,17 @@ jobs:
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.4.0
+          version: 4.5.0
           use-dotnet: false
           include-templates: false
 
+      - name: Godot import
+        continue-on-error: true
+        run: |
+          godot --headless --import
+
       - name: Verify godot-csound
         run: |
-          godot --headless --import || true
-          godot --headless --import || true
           godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
 
   verify-windows-build:
@@ -448,14 +454,13 @@ jobs:
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
         with:
-          version: 4.4.0
+          version: 4.5.0
           use-dotnet: false
           include-templates: false
 
       - name: Godot import
         continue-on-error: true
         run: |
-          godot --headless --import
           godot --headless --import
 
       - name: Verify godot-csound

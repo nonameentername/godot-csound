@@ -713,7 +713,7 @@ void CsoundInstance::thread_func() {
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                             int index = (frame * csound->GetChannels(0)) + channel;
                             float value = spout[index] / scale * volume;
-                            float p = ABS(value);
+                            float p = Math::abs(value);
                             if (p > channel_peak[channel]) {
                                 channel_peak.write[channel] = p;
                             }
@@ -730,7 +730,7 @@ void CsoundInstance::thread_func() {
                                                 ksmps_temp_buffer.ptrw());
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {
                             float value = ksmps_temp_buffer[frame] / scale * volume;
-                            float p = ABS(value);
+                            float p = Math::abs(value);
                             if (p > named_channel_peak[channel]) {
                                 named_channel_peak.write[channel] = p;
                             }

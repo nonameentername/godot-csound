@@ -40,7 +40,6 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<CsoundLayout>();
         ClassDB::register_class<CsoundInstrument>();
         csound_module = memnew(CsoundServer);
-        csound_module->start();
         Engine::get_singleton()->register_singleton("CsoundServer", CsoundServer::get_singleton());
 
         ClassDB::register_class<MidiFileReader>();

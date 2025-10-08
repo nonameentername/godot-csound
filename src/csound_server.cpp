@@ -84,6 +84,7 @@ void CsoundServer::initialize() {
     }
 
     set_edited(false);
+    start();
     initialized = true;
 }
 

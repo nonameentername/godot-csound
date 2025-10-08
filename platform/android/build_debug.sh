@@ -3,7 +3,7 @@
 dir=$(realpath .)
 src_dir=$dir/modules/csound
 
-for ARCH in arm arm64 x86 x64; do
+for ARCH in arm64 x64; do
     build_dir=$src_dir/build/android-$ARCH/debug
     prefix=$dir/addons/csound/bin/android-$ARCH/debug
 
@@ -26,14 +26,8 @@ done
 
 cd $dir
 
-scons -c platform=android arch=arm32 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
-scons platform=android arch=arm32 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
-
 scons -c platform=android arch=arm64 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
 scons platform=android arch=arm64 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
-
-scons -c platform=android arch=x86_32 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
-scons platform=android arch=x86_32 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
 
 scons -c platform=android arch=x86_64 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23
 scons platform=android arch=x86_64 target=template_debug dev_build=yes debug_symbols=yes android_api_level=23

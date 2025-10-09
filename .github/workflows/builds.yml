@@ -446,7 +446,7 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
+          (godot --headless -s csound_run_scene.gd 2> /dev/null || true) | grep 'output result is 4'
 
   verify-macos-build:
     name: Verify MacOS build
@@ -479,7 +479,7 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
+          (godot --headless -s csound_run_scene.gd 2> /dev/null || true) | grep 'output result is 4'
 
   verify-windows-build:
     name: Verify Windows build

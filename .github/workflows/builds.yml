@@ -132,7 +132,7 @@ jobs:
           enableCrossOsArchive: true
 
   macos-build-deps:
-    name: MacOS build dependencies
+    name: MacOS build deps
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -167,7 +167,7 @@ jobs:
       - name: Create cache for build
         uses: actions/cache@v4
         with:
-          path: modules/csound/build
+          path: modules/csound
           key: macos-deps-artifacts-${{ matrix.environment }}-${{ matrix.arch }}-${{github.run_id}}
 
   macos-build:
@@ -212,13 +212,13 @@ jobs:
       - name: Restore cached MacOS artifacts (arm64)
         uses: actions/cache/restore@v4
         with:
-          path: modules/csound/build
+          path: modules/csound
           key: macos-deps-artifacts-${{ matrix.environment }}-arm64-${{github.run_id}}
 
       - name: Restore cached MacOS artifacts (x86_64)
         uses: actions/cache/restore@v4
         with:
-          path: modules/csound/build
+          path: modules/csound
           key: macos-deps-artifacts-${{ matrix.environment }}-x86_64-${{github.run_id}}
 
       - name: Build godot-csound

@@ -459,11 +459,17 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Restore cached MacOS artifacts
+      - name: Restore cached MacOS artifacts (debug)
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: macos-artifacts-${{github.run_id}}
+          key: macos-artifacts-debug-${{github.run_id}}
+
+      - name: Restore cached MacOS artifacts (release)
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: macos-artifacts-release-${{github.run_id}}
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2

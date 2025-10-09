@@ -167,7 +167,9 @@ jobs:
       - name: Create cache for build
         uses: actions/cache@v4
         with:
-          path: modules/csound
+          path: |
+            modules/csound/bin
+            modules/csound/build
           key: macos-deps-artifacts-${{ matrix.environment }}-${{ matrix.arch }}-${{github.run_id}}
 
   macos-build:
@@ -212,13 +214,17 @@ jobs:
       - name: Restore cached MacOS artifacts (arm64)
         uses: actions/cache/restore@v4
         with:
-          path: modules/csound
+          path: |
+            modules/csound/bin
+            modules/csound/build
           key: macos-deps-artifacts-${{ matrix.environment }}-arm64-${{github.run_id}}
 
       - name: Restore cached MacOS artifacts (x86_64)
         uses: actions/cache/restore@v4
         with:
-          path: modules/csound
+          path: |
+            modules/csound/bin
+            modules/csound/build
           key: macos-deps-artifacts-${{ matrix.environment }}-x86_64-${{github.run_id}}
 
       - name: Build godot-csound

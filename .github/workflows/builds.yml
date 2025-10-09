@@ -132,16 +132,17 @@ jobs:
           enableCrossOsArchive: true
 
   macos-build-deps:
-    name: MacOS build
+    name: MacOS build dependencies
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [arm64, x86_64]
         environment: [debug, release]
+        arch: [arm64, x86_64]
     env:
       VERSION: v1
     steps:
       - name: Free Disk Space
+        if: false
         uses: jlumbroso/free-disk-space@main
         with:
           docker-images: false
@@ -180,6 +181,7 @@ jobs:
       VERSION: v1
     steps:
       - name: Free Disk Space
+        if: false
         uses: jlumbroso/free-disk-space@main
         with:
           docker-images: false

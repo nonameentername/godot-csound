@@ -238,7 +238,7 @@ jobs:
     strategy:
       matrix:
         environment: [debug, release]
-        arch: [arm64, arm64_sim x86_64_sim]
+        arch: [arm64, arm64_sim, x86_64_sim]
     env:
       VERSION: v1
     steps:

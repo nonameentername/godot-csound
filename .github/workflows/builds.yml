@@ -273,6 +273,7 @@ jobs:
     strategy:
       matrix:
         environment: [debug, release]
+    needs: [ios-build-deps]
     env:
       VERSION: v1
     steps:

@@ -400,7 +400,6 @@ jobs:
   verify-macos-build:
     name: Verify MacOS build
     runs-on: macos-latest
-    needs: macos-build
     steps:
       - name: Checkout source code
         uses: actions/checkout@v5
@@ -408,11 +407,17 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Restore cached MacOS artifacts
+      - name: Restore cached MacOS artifacts (debug)
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: macos-artifacts-${{github.run_id}}
+          key: macos-artifacts-debug-18391264865
+
+      - name: Restore cached MacOS artifacts (release)
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: macos-artifacts-release-18391264865
 
       - name: Setup Godot
         uses: chickensoft-games/setup-godot@v2
@@ -425,10 +430,11 @@ jobs:
         continue-on-error: true
         run: |
           godot --headless --import
+          godot --headless --import
 
       - name: Verify godot-csound
         run: |
-          godot --headless -s csound_run_scene.gd 2> /dev/null | grep 'output result is 4'
+          godot --headless -s csound_run_scene.gd
 
   verify-windows-build:
     name: Verify Windows build

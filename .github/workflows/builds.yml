@@ -141,12 +141,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        if: false
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout source code
         uses: actions/checkout@v5
         with:
@@ -182,12 +176,6 @@ jobs:
     env:
       VERSION: v1
     steps:
-      - name: Free Disk Space
-        if: false
-        uses: jlumbroso/free-disk-space@main
-        with:
-          docker-images: false
-
       - name: Checkout source code
         uses: actions/checkout@v5
         with:
@@ -244,9 +232,48 @@ jobs:
           path: addons/csound/bin
           key: macos-artifacts-${{ matrix.environment }}-${{github.run_id}}
 
+  ios-build-deps:
+    name: iOS build deps
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [debug, release]
+        arch: [arm64, arm64_sim, x86_64_sim]
+    env:
+      VERSION: v1
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Bootstrap VCPKG
+        run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
+
+      - name: Build csound
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          run: |
+            ARCH=${{ matrix.arch }} ./platform/ioscross/build_deps_${{ matrix.environment }}.sh
+
+      - name: Create cache for build
+        uses: actions/cache@v4
+        with:
+          path: |
+            modules/csound/bin
+            modules/csound/build
+          key: ios-deps-artifacts-${{ matrix.environment }}-${{ matrix.arch }}-${{github.run_id}}
+
   ios-build:
     name: iOS build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [debug, release]
+    needs: [ios-build-deps]
     env:
       VERSION: v1
     steps:
@@ -273,24 +300,37 @@ jobs:
         with:
           length: 6
 
-      - name: Build godot-csound (Debug)
-        uses: addnab/docker-run-action@v3
+      - name: Restore cached iOS artifacts (arm64)
+        uses: actions/cache/restore@v4
         with:
-          image: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
-          run: |
-            ./platform/ioscross/build_debug.sh
-        env:
-          BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
-          TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          path: |
+            modules/csound/bin
+            modules/csound/build
+          key: ios-deps-artifacts-${{ matrix.environment }}-arm64-${{github.run_id}}
 
-      - name: Build godot-csound (Release)
+      - name: Restore cached iOS artifacts (arm64_sim)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            modules/csound/bin
+            modules/csound/build
+          key: ios-deps-artifacts-${{ matrix.environment }}-arm64_sim-${{github.run_id}}
+
+      - name: Restore cached iOS artifacts (x86_64_sim)
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            modules/csound/bin
+            modules/csound/build
+          key: ios-deps-artifacts-${{ matrix.environment }}-x86_64_sim-${{github.run_id}}
+
+      - name: Build godot-csound
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }}
           options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
           run: |
-            ./platform/ioscross/build_release.sh
+            ./platform/ioscross/build_lib_${{ matrix.environment }}.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
@@ -299,7 +339,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: addons/csound/bin
-          key: ios-artifacts-${{github.run_id}}
+          key: ios-artifacts-${{ matrix.environment }}-${{github.run_id}}
 
   android-build:
     name: Android build
@@ -446,7 +486,7 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          (godot --headless -s csound_run_scene.gd 2> /dev/null || true) | grep 'output result is 4'
+          godot --headless -s csound_run_scene.gd --quit-after 300 2> /dev/null | grep 'output result is 4'
 
   verify-macos-build:
     name: Verify MacOS build
@@ -484,13 +524,8 @@ jobs:
           godot --headless --import
 
       - name: Verify godot-csound
-        continue-on-error: true
         run: |
-          godot --headless -s csound_run_scene.gd
-
-      - name: Verify godot-csound
-        run: |
-          (godot --headless -s csound_run_scene.gd 2> /dev/null || true) | grep 'output result is 4'
+          godot --headless -s csound_run_scene.gd --quit-after 300 2> /dev/null | grep 'output result is 4'
 
   verify-windows-build:
     name: Verify Windows build
@@ -527,7 +562,7 @@ jobs:
 
       - name: Verify godot-csound
         run: |
-          (godot --headless -s csound_run_scene.gd 2> NUL || true) | grep 'output result is 4'
+          godot --headless -s csound_run_scene.gd --quit-after 300 2> NUL | grep 'output result is 4'
 
   publish_artifacts:
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -566,11 +601,17 @@ jobs:
           path: addons/csound/bin
           key: macos-artifacts-release-${{github.run_id}}
 
-      - name: Restore cached iOS artifacts
+      - name: Restore cached iOS artifacts (debug)
         uses: actions/cache/restore@v4
         with:
           path: addons/csound/bin
-          key: ios-artifacts-${{github.run_id}}
+          key: ios-artifacts-debug-${{github.run_id}}
+
+      - name: Restore cached iOS artifacts (release)
+        uses: actions/cache/restore@v4
+        with:
+          path: addons/csound/bin
+          key: ios-artifacts-release-${{github.run_id}}
 
       - name: Restore cached Android artifacts
         uses: actions/cache/restore@v4

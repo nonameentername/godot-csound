@@ -484,6 +484,11 @@ jobs:
           godot --headless --import
 
       - name: Verify godot-csound
+        continue-on-error: true
+        run: |
+          godot --headless -s csound_run_scene.gd
+
+      - name: Verify godot-csound
         run: |
           (godot --headless -s csound_run_scene.gd 2> /dev/null || true) | grep 'output result is 4'
 

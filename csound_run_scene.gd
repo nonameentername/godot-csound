@@ -18,12 +18,6 @@ func _init():
 
 	print("output result is ", result)
 
-	main_csound.finish()
-	csound.finish()
-
-	unload_current_scene()
-	quit()
-
 
 func csound_layout_changed():
 	main_csound = CsoundServer.get_csound("Main")

@@ -58,8 +58,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
@@ -72,8 +72,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -121,8 +121,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
@@ -134,8 +134,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -171,8 +171,8 @@ jobs:
           run: |
             ARCH=${{ matrix.arch }} ./platform/osxcross/build_deps_${{ matrix.environment }}.sh
         env:
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
 
       - name: Create cache for build
@@ -276,8 +276,8 @@ jobs:
           run: |
             ARCH=${{ matrix.arch }} ./platform/ioscross/build_deps_${{ matrix.environment }}.sh
         env:
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -400,8 +400,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
@@ -413,8 +413,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -461,8 +461,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
@@ -474,8 +474,8 @@ jobs:
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
-          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
-          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+          ACTIONS_CACHE_URL: ${{ env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4

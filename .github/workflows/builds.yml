@@ -31,13 +31,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -59,23 +52,28 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-ubuntu:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/ubuntu/build_debug.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-ubuntu:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
+
           run: |
             ./platform/ubuntu/build_release.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -95,13 +93,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -123,23 +114,28 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-mingw:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
+
           run: |
             ./platform/mingw/build_debug.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-mingw:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/mingw/build_release.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -164,13 +160,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -178,9 +167,13 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-osxcross:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ARCH=${{ matrix.arch }} ./platform/osxcross/build_deps_${{ matrix.environment }}.sh
+        env:
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
+
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -205,13 +198,6 @@ jobs:
         with:
           fetch-depth: 1
           submodules: recursive
-
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
@@ -279,13 +265,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -293,9 +272,12 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-ioscross:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }}
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ARCH=${{ matrix.arch }} ./platform/ioscross/build_deps_${{ matrix.environment }}.sh
+        env:
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -320,13 +302,6 @@ jobs:
         with:
           fetch-depth: 1
           submodules: recursive
-
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
@@ -398,13 +373,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -426,23 +394,27 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-android:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/android/build_debug.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-android:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/android/build_release.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4
@@ -462,13 +434,6 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
-      - name: Export GitHub Actions cache environment variables
-        uses: actions/github-script@v7
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
       - name: Bootstrap VCPKG
         run: ./modules/csound/vcpkg/bootstrap-vcpkg.sh
 
@@ -490,23 +455,27 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-wasm:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/web/build_debug.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Build godot-csound (Release)
         uses: addnab/docker-run-action@v3
         with:
           image: ghcr.io/nonameentername/godot-csound-wasm:${{ env.VERSION }}
-          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION
+          options: -v ${{ github.workspace }}:${{ github.workspace }} --workdir ${{ github.workspace }} -e BUILD_SHA -e TAG_VERSION -e ACTIONS_CACHE_URL -e ACTIONS_RUNTIME_TOKEN
           run: |
             ./platform/web/build_release.sh
         env:
           BUILD_SHA: ${{ steps.short-sha.outputs.sha }}
           TAG_VERSION: ${{ steps.tag.outputs.new_tag }}
+          ACTIONS_CACHE_URL: ${{ process.env.ACTIONS_CACHE_URL || '' }}
+          ACTIONS_RUNTIME_TOKEN: ${{ process.env.ACTIONS_RUNTIME_TOKEN || '' }}
 
       - name: Create cache for build
         uses: actions/cache@v4

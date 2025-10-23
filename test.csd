@@ -25,7 +25,8 @@ isf1 sfload "assets/000-003-Honky_Tonk.sf2"
 
 
 instr update_tempo
-    iTempo = 60
+    iTempo = p4
+    prints "changing tempo to %d \n", iTempo
     tempo iTempo, 60
 endin
 
@@ -158,13 +159,19 @@ massign 1, 1
 massign 2, 2
 massign 3, 3
 
+iTempo = 60
+tempo iTempo, 60
+
 </CsInstruments>
 <CsScore>
-f0 z
-
-i"update_tempo" 0 -1
-
 i10 0 -1
+
+r10
+i1 0.00 0.25 60 100
+i1 0.25 0.25 62 <
+i1 0.50 0.25 65 <
+i1 0.75 0.25 69 10
+s
 
 i1 1 1 60 100
 i1 + 1 62 <
@@ -187,6 +194,6 @@ i9 14 1 60 100
 i4 0 3600
 i5 0 3600
 
-
+f0 z
 </CsScore>
 </CsoundSynthesizer>

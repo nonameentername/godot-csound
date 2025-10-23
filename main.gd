@@ -40,8 +40,12 @@ func _on_check_button_3_toggled(toggled_on: bool):
 		csound.note_off(2, 67)
 
 
-func _on_v_slider_value_changed(value: float):
+func _on_v_slider_volume_value_changed(value: float):
 	csound.send_control_channel("cutoff", value)
+
+
+func _on_v_slider_tempo_value_changed(value: float):
+	csound.event_string('i "update_tempo" 0 -1 %d' % value)
 
 
 func _on_button_pressed():

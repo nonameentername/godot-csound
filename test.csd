@@ -1,6 +1,6 @@
 <CsoundSynthesizer>
 <CsOptions>
--+rtmidi=NULL -M0 --midi-key=5 --midi-velocity=6 -n
+-+rtmidi=NULL -M0 --midi-key=5 --midi-velocity=6 -n -t 60
 </CsOptions>
 <CsInstruments>
 
@@ -23,6 +23,13 @@ isf1 sfload "assets/000-001-Bright_Yamaha_Grand.sf2"
 isf1 sfload "assets/000-003-Honky_Tonk.sf2"
 	sfpassign	3, isf1
 
+
+instr update_tempo
+    iTempo = p4
+    prints "changing tempo to %d \n", iTempo
+    tempo iTempo, 60
+endin
+
 instr 1	; play guitar from score and midi keyboard - preset index = 0
     DictionarySetValue 1, 2
     prints "hello world\n"
@@ -42,6 +49,7 @@ a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 0			;preset index = 0
     chnset a2, "instr_1_right"
 	outs	a1, a2
 	
+
 endin
 	
 instr 2	; play harpsichord from score and midi keyboard - preset index = 1
@@ -151,11 +159,19 @@ massign 1, 1
 massign 2, 2
 massign 3, 3
 
+iTempo = 60
+tempo iTempo, 60
+
 </CsInstruments>
 <CsScore>
-f0 z
-
 i10 0 -1
+
+r10
+i1 0.00 0.25 60 100
+i1 0.25 0.25 62 <
+i1 0.50 0.25 65 <
+i1 0.75 0.25 69 10
+s
 
 i1 1 1 60 100
 i1 + 1 62 <
@@ -178,6 +194,6 @@ i9 14 1 60 100
 i4 0 3600
 i5 0 3600
 
-
+f0 z
 </CsScore>
 </CsoundSynthesizer>

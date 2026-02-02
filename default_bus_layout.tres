@@ -1,4 +1,4 @@
-[gd_resource type="AudioBusLayout" load_steps=4 format=3 uid="uid://cc243iilhwo2w"]
+[gd_resource type="AudioBusLayout" format=3 uid="uid://cc243iilhwo2w"]
 
 [sub_resource type="AudioEffectSpectrumAnalyzer" id="AudioEffectSpectrumAnalyzer_3qteb"]
 resource_name = "SpectrumAnalyzer"

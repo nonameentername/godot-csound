@@ -147,16 +147,16 @@ elif env["platform"] == "linux":
         env.Append(RPATH=["addons/csound/bin/linux/release/lib64", "."])
 elif env["platform"] == "macos":
     if env["dev_build"]:
-        env.Append(LIBPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/univeral-osxcross/lib"])
-        env.Append(CPPPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/univeral-osxcross/include"])
+        env.Append(LIBPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/universal-osxcross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/osxcross/debug/vcpkg_installed/universal-osxcross/include"])
 
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/debug/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", "@loader_path/../debug/Library/Frameworks", "-rpath", "@executable_path/../Frameworks"])
         env.Append(CPPPATH=["addons/csound/bin/macos/debug/Library/Frameworks/CsoundLib64.framework/Headers"])
     else:
-        env.Append(LIBPATH=["modules/csound/build/osxcross/release/vcpkg_installed/univeral-osxcross/lib"])
-        env.Append(CPPPATH=["modules/csound/build/osxcross/release/vcpkg_installed/univeral-osxcross/include"])
+        env.Append(LIBPATH=["modules/csound/build/osxcross/release/vcpkg_installed/universal-osxcross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/osxcross/release/vcpkg_installed/universal-osxcross/include"])
 
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", "addons/csound/bin/macos/release/Library/Frameworks"])
@@ -166,16 +166,16 @@ elif env["platform"] == "ios":
     app_name = "csoundgodot.app"
     prefix = "sim_" if env["ios_simulator"] else ""
     if env["dev_build"]:
-        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/univeral-ioscross/lib"])
-        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/univeral-ioscross/include"])
+        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/universal-ioscross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/debug/vcpkg_installed/universal-ioscross/include"])
 
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks"])
         env.Append(LINKFLAGS=["-rpath", f"@loader_path/../{prefix}debug/Library/Frameworks", "-rpath", f"@executable_path/{app_name}/Frameworks"])
         env.Append(CPPPATH=[f"addons/csound/bin/ios/{prefix}debug/Library/Frameworks/CsoundLib.framework/Headers"])
     else:
-        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/univeral-ioscross/lib"])
-        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/univeral-ioscross/include"])
+        env.Append(LIBPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/universal-ioscross/lib"])
+        env.Append(CPPPATH=["modules/csound/build/ioscross-universal/release/vcpkg_installed/universal-ioscross/include"])
 
         env.Append(LINKFLAGS=["-framework", csound_library])
         env.Append(LINKFLAGS=["-F", f"addons/csound/bin/ios/{prefix}release/Library/Frameworks"])

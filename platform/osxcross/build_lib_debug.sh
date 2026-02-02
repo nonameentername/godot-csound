@@ -22,3 +22,5 @@ export OSXCROSS_ROOT=$OSXCROSS_BASE_DIR
 
 cd $dir
 scons platform=macos target=template_debug dev_build=yes debug_symbols=yes osxcross_sdk=$OSXCROSS_TARGET
+
+x86_64-apple-${OSXCROSS_TARGET}-dsymutil addons/csound/bin/macos/macos.framework/libcsoundgodot.macos.template_debug

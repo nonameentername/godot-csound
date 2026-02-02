@@ -12,11 +12,12 @@ config_version=5
 
 config/name="CsoundGodot"
 run/main_scene="res://main.tscn"
-config/features=PackedStringArray("4.5", "GL Compatibility")
+config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [audio]
 
+buses/default_bus_layout="uid://cc243iilhwo2w"
 general/ios/session_category=3
 csound/default_csound_layout="res://default_csound_layout.tres"
 csound/use_resource_files=false

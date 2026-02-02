@@ -29,22 +29,13 @@ compiledb: clean
 	scons platform=$(PLATFORM) target=template_debug dev_build=yes debug_symbols=yes | tee build-log.txt
 	compiledb --parse build-log.txt
 
-UNAME := $(shell uname)
-ifeq ($(UNAME), Windows)
-    UID=1000
-    GID=1000
-else
-    UID=`id -u`
-    GID=`id -g`
-endif
-
 SHELL_COMMAND = bash
 
 docker-ubuntu:
 	docker build -t godot-csound-ubuntu ./platform/ubuntu
 
 shell-ubuntu: docker-ubuntu
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-ubuntu ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-ubuntu ${SHELL_COMMAND}
 
 ubuntu:
 	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_release.sh'
@@ -60,7 +51,7 @@ docker-web:
 	docker build -t godot-csound-web ./platform/web
 
 shell-web: docker-web
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-web ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-web ${SHELL_COMMAND}
 
 web:
 	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_release.sh'
@@ -70,7 +61,7 @@ docker-mingw:
 	docker build -t godot-csound-mingw ./platform/mingw
 
 shell-mingw: docker-mingw
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-mingw ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-mingw ${SHELL_COMMAND}
 
 mingw:
 	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_release.sh'
@@ -80,7 +71,7 @@ docker-osxcross:
 	docker build -t godot-csound-osxcross ./platform/osxcross
 
 shell-osxcross: docker-osxcross
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-osxcross ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-osxcross ${SHELL_COMMAND}
 
 osxcross:
 	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_release.sh'
@@ -90,7 +81,7 @@ docker-ioscross:
 	docker build -t godot-csound-ioscross ./platform/ioscross
 
 shell-ioscross: docker-ioscross
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-ioscross ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-ioscross ${SHELL_COMMAND}
 
 ioscross:
 	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_release.sh'
@@ -100,7 +91,7 @@ docker-android:
 	docker build -t godot-csound-android ./platform/android
 
 shell-android: docker-android
-	docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-android ${SHELL_COMMAND}
+	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-android ${SHELL_COMMAND}
 
 .PHONY: android
 
@@ -118,7 +109,7 @@ docker-download:
 	@docker build -t godot-csound-download ./platform/download
 
 shell-download: docker-download
-	@docker run -it --rm -v ${CURDIR}:${CURDIR} --user ${UID}:${GID} -w ${CURDIR} godot-csound-download ${SHELL_COMMAND}
+	@docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-download ${SHELL_COMMAND}
 
 download: docker-download
 ifeq (,$(wildcard ./assets/FluidR3_GM.sf2))

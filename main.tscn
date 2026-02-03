@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://n6csjkhxjfm2"]
+[gd_scene format=3 uid="uid://n6csjkhxjfm2"]
 
 [ext_resource type="Script" uid="uid://eeoyi4fsdafv" path="res://main.gd" id="1_ob6y6"]
 
@@ -16,49 +16,49 @@ channel_right = "instr_4_right"
 
 [sub_resource type="AudioStreamMyTone" id="AudioStreamMyTone_31rl7"]
 
-[node name="main" type="Node2D"]
+[node name="main" type="Node2D" unique_id=1680019127]
 script = ExtResource("1_ob6y6")
 
-[node name="CheckButton" type="CheckButton" parent="."]
+[node name="CheckButton" type="CheckButton" parent="." unique_id=2049405128]
 offset_left = 229.0
 offset_top = 112.0
 offset_right = 305.0
 offset_bottom = 152.0
 
-[node name="CheckButton2" type="CheckButton" parent="."]
+[node name="CheckButton2" type="CheckButton" parent="." unique_id=858041426]
 offset_left = 228.0
 offset_top = 158.0
 offset_right = 304.0
 offset_bottom = 198.0
 
-[node name="CheckButton3" type="CheckButton" parent="."]
+[node name="CheckButton3" type="CheckButton" parent="." unique_id=1284756786]
 offset_left = 230.0
 offset_top = 204.0
 offset_right = 306.0
 offset_bottom = 244.0
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=770536581]
 offset_left = 194.0
 offset_top = 126.0
 offset_right = 234.0
 offset_bottom = 140.0
 text = "C4"
 
-[node name="Label2" type="Label" parent="."]
+[node name="Label2" type="Label" parent="." unique_id=1314271285]
 offset_left = 196.0
 offset_top = 172.0
 offset_right = 236.0
 offset_bottom = 186.0
 text = "E4"
 
-[node name="Label3" type="Label" parent="."]
+[node name="Label3" type="Label" parent="." unique_id=1849857174]
 offset_left = 195.0
 offset_top = 217.0
 offset_right = 235.0
 offset_bottom = 231.0
 text = "G4"
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=2053469172]
 visible = false
 offset_left = 600.0
 offset_top = 159.0
@@ -66,7 +66,7 @@ offset_right = 737.0
 offset_bottom = 209.0
 text = "PLAY MIDI"
 
-[node name="VSlider" type="VSlider" parent="."]
+[node name="VSlider" type="VSlider" parent="." unique_id=1098082311]
 offset_left = 378.0
 offset_top = 115.0
 offset_right = 413.0
@@ -75,25 +75,25 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="CsoundPlayer" type="AudioStreamPlayer" parent="."]
+[node name="CsoundPlayer" type="AudioStreamPlayer" parent="." unique_id=199167138]
 stream = SubResource("AudioStreamCsound_a6stl")
 autoplay = true
 
-[node name="CsoundChannelPlayer" type="AudioStreamPlayer" parent="."]
+[node name="CsoundChannelPlayer" type="AudioStreamPlayer" parent="." unique_id=748296053]
 stream = SubResource("AudioStreamCsoundChannel_kfyye")
 volume_db = -80.0
 autoplay = true
 
-[node name="CsoundNamedChannelPlayer" type="AudioStreamPlayer" parent="."]
+[node name="CsoundNamedChannelPlayer" type="AudioStreamPlayer" parent="." unique_id=690695566]
 stream = SubResource("AudioStreamCsoundNamedChannel_4tb6j")
 volume_db = -80.0
 autoplay = true
 
-[node name="CsoundNamedChannelPlayer2" type="AudioStreamPlayer" parent="."]
+[node name="CsoundNamedChannelPlayer2" type="AudioStreamPlayer" parent="." unique_id=2027735255]
 stream = SubResource("AudioStreamCsoundNamedChannel_ove8l")
 autoplay = true
 
-[node name="MyTonePlayer" type="AudioStreamPlayer" parent="."]
+[node name="MyTonePlayer" type="AudioStreamPlayer" parent="." unique_id=799395617]
 stream = SubResource("AudioStreamMyTone_31rl7")
 volume_db = -80.0
 autoplay = true

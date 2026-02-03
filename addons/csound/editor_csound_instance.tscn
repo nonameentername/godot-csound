@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://ddvn4r7mj3ayy"]
+[gd_scene format=3 uid="uid://ddvn4r7mj3ayy"]
 
 [ext_resource type="Script" uid="uid://bjjfvu8u6hcji" path="res://addons/csound/editor_csound_instance.gd" id="1_04gtk"]
 
@@ -26,7 +26,7 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[node name="Control" type="PanelContainer"]
+[node name="Control" type="PanelContainer" unique_id=2036358786]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -37,22 +37,22 @@ tooltip_text = "Drag & drop to rearrange."
 focus_mode = 1
 script = ExtResource("1_04gtk")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1985978310]
 layout_mode = 2
 tooltip_text = "Drag & drop to rearrange."
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer" unique_id=286828501]
 layout_mode = 2
 text = "Main"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1939683854]
 layout_mode = 2
 
-[node name="LeftHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="LeftHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=501683325]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="solo" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+[node name="solo" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox" unique_id=992935402]
 layout_mode = 2
 tooltip_text = "Solo"
 focus_mode = 0
@@ -61,7 +61,7 @@ toggle_mode = true
 icon = SubResource("ImageTexture_qpgwm")
 flat = true
 
-[node name="mute" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+[node name="mute" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox" unique_id=1026538787]
 layout_mode = 2
 tooltip_text = "Mute"
 focus_mode = 0
@@ -70,7 +70,7 @@ toggle_mode = true
 icon = SubResource("ImageTexture_qpgwm")
 flat = true
 
-[node name="bypass" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox"]
+[node name="bypass" type="Button" parent="VBoxContainer/HBoxContainer/LeftHBox" unique_id=1541045142]
 layout_mode = 2
 tooltip_text = "Bypass"
 focus_mode = 0
@@ -79,10 +79,10 @@ toggle_mode = true
 icon = SubResource("ImageTexture_qpgwm")
 flat = true
 
-[node name="RightHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="RightHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer" unique_id=442341841]
 layout_mode = 2
 
-[node name="options" type="MenuButton" parent="VBoxContainer/HBoxContainer/RightHBox" node_paths=PackedStringArray("shortcut_context")]
+[node name="options" type="MenuButton" parent="VBoxContainer/HBoxContainer/RightHBox" unique_id=1124497807 node_paths=PackedStringArray("shortcut_context")]
 layout_mode = 2
 size_flags_horizontal = 8
 tooltip_text = "Csound Options"
@@ -96,31 +96,31 @@ popup/item_1/id = 1
 popup/item_2/text = "Reset volume"
 popup/item_2/id = 2
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer" unique_id=1698886632]
 layout_mode = 2
 mouse_filter = 1
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer" unique_id=1401867973]
 layout_mode = 2
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer2"]
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer2" unique_id=551772853]
 custom_minimum_size = Vector2(150, 128)
 layout_mode = 2
 size_flags_horizontal = 3
 clip_tabs = false
 
-[node name="Channels" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer"]
+[node name="Channels" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer" unique_id=1239455169]
 custom_minimum_size = Vector2(150, 128)
 layout_mode = 2
 
-[node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels"]
+[node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels" unique_id=1183526066]
 layout_mode = 2
 tooltip_text = "0.0 dB"
 max_value = 1.0
 step = 0.0
 value = 0.729073
 
-[node name="AudioValuePreview" type="Panel" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider"]
+[node name="AudioValuePreview" type="Panel" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider" unique_id=2041600190]
 visible = false
 top_level = true
 layout_mode = 0
@@ -131,7 +131,7 @@ offset_bottom = 15.4581
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_558k6")
 
-[node name="AudioPreviewHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview"]
+[node name="AudioPreviewHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview" unique_id=963998621]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -139,7 +139,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AudioPreviewLabel" type="Label" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview/AudioPreviewHBox"]
+[node name="AudioPreviewLabel" type="Label" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels/Slider/AudioValuePreview/AudioPreviewHBox" unique_id=389522122]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
@@ -147,32 +147,32 @@ theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
 text = "0.0 dB"
 
-[node name="Named" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer"]
+[node name="Named" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer" unique_id=1960625296]
 visible = false
 custom_minimum_size = Vector2(150, 128)
 layout_mode = 2
 
-[node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer" unique_id=783164498]
 layout_mode = 2
 mouse_filter = 1
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer" unique_id=564861025]
 layout_mode = 2
 
-[node name="LeftHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer3"]
+[node name="LeftHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer3" unique_id=599278850]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="LineEdit" parent="VBoxContainer/HBoxContainer3/LeftHBox"]
+[node name="Label" type="LineEdit" parent="VBoxContainer/HBoxContainer3/LeftHBox" unique_id=1214426431]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "<empty>"
 editable = false
 
-[node name="RightHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer3"]
+[node name="RightHBox" type="HBoxContainer" parent="VBoxContainer/HBoxContainer3" unique_id=809147341]
 layout_mode = 2
 
-[node name="Tree" type="Tree" parent="VBoxContainer"]
+[node name="Tree" type="Tree" parent="VBoxContainer" unique_id=531214999]
 layout_mode = 2
 size_flags_vertical = 3
 focus_mode = 1
@@ -181,7 +181,7 @@ allow_rmb_select = true
 hide_folding = true
 hide_root = true
 
-[node name="Timer" type="Timer" parent="."]
+[node name="Timer" type="Timer" parent="." unique_id=105358539]
 wait_time = 0.8
 one_shot = true
 

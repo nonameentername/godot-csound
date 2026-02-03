@@ -8,7 +8,7 @@ def lipo_walker(arm64_basedir, x64_basedir, outputdir):
     for item in list(pathlib.Path(arm64_basedir).rglob("*")):
         fullpath = str(item)
         x64_fullpath = fullpath.replace(arm64_basedir, x64_basedir).replace("arm64", "x64")
-        outputfile = fullpath.replace(arm64_basedir, outputdir).replace("arm64", "univeral")
+        outputfile = fullpath.replace(arm64_basedir, outputdir).replace("arm64", "universal")
         outdir = os.path.dirname(outputfile)
         if not os.path.exists(outdir):
             os.makedirs(outdir)

@@ -72,7 +72,7 @@ func _notification(what):
 
 
 func _update_theme():
-	var stylebox: StyleBoxFlat = get_theme_stylebox("panel", "Tree")
+	var stylebox: StyleBoxEmpty = get_theme_stylebox("panel", "Tree")
 	$CsoundScroll.add_theme_stylebox_override("panel", stylebox)
 
 	for control in $CsoundScroll/CsoundHBox.get_children():

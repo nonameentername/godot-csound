@@ -13,6 +13,7 @@ Projects using godot-csound
 
 * [godot-csound-example](https://github.com/nonameentername/godot-csound-example) - Simple godot-csound example.
 * [godot-synths](https://github.com/nonameentername/godot-synths) - Music synths for Godot.  ([demo](https://nonameentername.github.io/godot-synths/godot-synths.html))
+* [geo icarus](https://geoicarus.net) - A flying game featuring live synths for the audio.
 
 Documentation
 -------------

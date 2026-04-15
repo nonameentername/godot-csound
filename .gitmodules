@@ -4,6 +4,7 @@
 [submodule "modules/csound"]
 	path = modules/csound
 	url = https://github.com/csound/csound.git
+    branch = develop
 [submodule "modules/godot"]
 	path = modules/godot
 	url = https://github.com/godotengine/godot.git

@@ -10,7 +10,7 @@ for ARCH in arm64 x64; do
     mkdir -p $build_dir
     cd $build_dir
 
-    cmake -DCUSTOM_CMAKE=$src_dir/platform/android/custom-android.cmake \
+    cmake -DCUSTOM_CMAKE=$dir/platform/android/custom-android.cmake \
         -DCMAKE_BUILD_TYPE=Debug \
         -DCMAKE_VERBOSE_MAKEFILE=1 \
         -DCMAKE_INSTALL_PREFIX:PATH=$prefix \

@@ -30,6 +30,7 @@ instr 1	; play guitar from score and midi keyboard - preset index = 0
 	mididefault	60, p3
 	midinoteonkey	p4, p5
 inum	init	p4
+iMidiVel init p5
 ivel	init	p5
 ivel	init	ivel/127					;make velocity dependent
 kamp	linsegr	1, 1, 1, .1, 0
@@ -41,7 +42,19 @@ a1,a2	sfplay3	ivel, inum, kamp*ivel*kCutoff, kfreq, 0			;preset index = 0
     chnset a1, "instr_1_left"
     chnset a2, "instr_1_right"
 	outs	a1, a2
-	
+
+kNoteOnSent init 0
+kNoteOffSent init 0
+
+midiout_i 144, 1, inum, iMidiVel
+
+if release() == 1 then
+    if kNoteOffSent == 0 then
+        midiout 128, 1, inum, iMidiVel
+        kNoteOffSent = 1
+    endif
+endif
+
 endin
 	
 instr 2	; play harpsichord from score and midi keyboard - preset index = 1

@@ -5,6 +5,7 @@
 #include "godot_cpp/classes/audio_stream_wav.hpp"
 #include "godot_cpp/classes/audio_stream_mp3.hpp"
 //#include "godot_cpp/classes/os.hpp"
+#include "godot_cpp/classes/global_constants.hpp"
 #include "godot_cpp/classes/project_settings.hpp"
 #include "godot_cpp/classes/resource_loader.hpp"
 #include "godot_cpp/classes/time.hpp"
@@ -55,9 +56,13 @@ void CsoundInstance::configure_csound() {
     csound->SetMessageCallback(set_message);
 
     csound->SetHostMIDIIO();
-    csound->SetExternalMidiInOpenCallback(open_midi_device);
+
+    csound->SetExternalMidiOutOpenCallback(open_midi_output_device);
     csound->SetExternalMidiWriteCallback(write_midi_data);
+
+    csound->SetExternalMidiInOpenCallback(open_midi_input_device);
     csound->SetExternalMidiReadCallback(read_midi_data);
+
     csound->SetHostData((void *)this);
 
     csnd::DictionarySetValue::load_plugin((csnd::Csound *)csound->GetCsound());
@@ -76,6 +81,7 @@ void CsoundInstance::start() {
         // csound->SetOption(vformat("-j%d", processor_count).ascii());
         csound->SetOption("-n");
         csound->SetOption("-d");
+        csound->SetOption("-Qm");
 
         if (ProjectSettings::get_singleton()->get_setting("audio/csound/hide_csound_logs", true)) {
             csound->SetOption("-m16");
@@ -122,7 +128,8 @@ void CsoundInstance::start() {
         if (!csound_error) {
             //int p_frames = 512;
 
-            midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
+            input_midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
+            output_midi_buffer = csoundCreateCircularBuffer(csound->GetCsound(), 2048, sizeof(int));
 
             csound->Start();
 
@@ -203,8 +210,12 @@ void CsoundInstance::reset() {
 }
 
 void CsoundInstance::cleanup_channels() {
-    if (midi_buffer) {
-        csoundDestroyCircularBuffer(csound->GetCsound(), midi_buffer);
+    if (input_midi_buffer) {
+        csoundDestroyCircularBuffer(csound->GetCsound(), input_midi_buffer);
+    }
+
+    if (output_midi_buffer) {
+        csoundDestroyCircularBuffer(csound->GetCsound(), output_midi_buffer);
     }
 
     csoundDestroyCircularBuffer(csound->GetCsound(), output_left_channel.buffer);
@@ -484,7 +495,7 @@ void CsoundInstance::note_on(int chan, int key, int vel) {
     event.note = key;
     event.velocity = vel;
 
-    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
+    csoundWriteCircularBuffer(csound->GetCsound(), input_midi_buffer, &event, 4);
 
     // float instrnum = chan + chan / 100.0 + key / 100000.0;
     // String note_on = vformat("i%f 0 -1 %d %d %d", instrnum, chan, key, vel);
@@ -502,7 +513,7 @@ void CsoundInstance::note_off(int chan, int key) {
     event.note = key;
     event.velocity = 0;
 
-    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
+    csoundWriteCircularBuffer(csound->GetCsound(), input_midi_buffer, &event, 4);
 
     // float instrnum = chan + chan / 100.0 + key / 100000.0;
     // String note_off = vformat("i-%f 0 %d 0 %d", chan, instrnum, key);
@@ -521,7 +532,7 @@ void CsoundInstance::control_change(int chan, int control, int value) {
     event.note = control;
     event.velocity = value;
 
-    csoundWriteCircularBuffer(csound->GetCsound(), midi_buffer, &event, 4);
+    csoundWriteCircularBuffer(csound->GetCsound(), input_midi_buffer, &event, 4);
 }
 
 void CsoundInstance::event_string(String message) {
@@ -594,7 +605,35 @@ void CsoundInstance::play_midi(Ref<MidiFileReader> p_midi_file) {
     }
 }
 
-// void CsoundInstance::process(double delta) {
+void CsoundInstance::process() {
+    MidiEvent midi_event;
+
+    int32_t read = csoundReadCircularBuffer(csound->GetCsound(), output_midi_buffer, &midi_event, 4);
+
+    while (read > 0) {
+
+		switch (midi_event.message) {
+			case MIDIMessage::MIDI_MESSAGE_NOTE_ON:
+				if (midi_event.velocity > 0) {
+					emit_signal("midi_note_on", midi_event.channel, midi_event.note, midi_event.velocity);
+				} else {
+					emit_signal("midi_note_off", midi_event.channel, midi_event.note);
+				}
+				break;
+			case MIDIMessage::MIDI_MESSAGE_NOTE_OFF:
+				emit_signal("midi_note_off", midi_event.channel, midi_event.note);
+				break;
+			case MIDIMessage::MIDI_MESSAGE_CONTROL_CHANGE:
+				emit_signal("midi_control_change", midi_event.channel, midi_event.note, midi_event.velocity);
+				break;
+			default:
+				break;
+
+		}
+        read = csoundReadCircularBuffer(csound->GetCsound(), output_midi_buffer, &midi_event, 4);
+    }
+}
+
 void CsoundInstance::thread_func() {
     int p_frames = 512;
 
@@ -853,7 +892,17 @@ void CsoundInstance::initialize() {
     start();
 }
 
-int CsoundInstance::open_midi_device(CSOUND *csound, void **userData, const char *dev) {
+int CsoundInstance::open_midi_input_device(CSOUND *csound, void **userData, const char *dev) {
+    *userData = (void *) csoundGetHostData(csound);
+
+    if (userData != NULL) {
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+int CsoundInstance::open_midi_output_device(CSOUND *csound, void **userData, const char *dev) {
     *userData = (void *) csoundGetHostData(csound);
 
     if (userData != NULL) {
@@ -864,8 +913,37 @@ int CsoundInstance::open_midi_device(CSOUND *csound, void **userData, const char
 }
 
 int CsoundInstance::write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes) {
+    CsoundInstance *csound_instance = (CsoundInstance *)userData;
 
-    return 0;
+    if (csound_instance == NULL || !csound_instance->initialized) {
+        return 0;
+    }
+
+    int offset = 0;
+    int bytesConsumed = 0;
+
+    while (offset + 2 < nbytes) {
+        unsigned char status = mbuf[offset++];
+        unsigned char data1  = mbuf[offset++];
+        unsigned char data2  = mbuf[offset++];
+
+        MidiEvent midi_event;
+
+        midi_event.message = (status >> 4) & 0x0F;
+        midi_event.channel = status & 0x0F;
+        midi_event.note = data1;
+        midi_event.velocity = data2;
+
+        int32_t written = csoundWriteCircularBuffer(csound, csound_instance->output_midi_buffer, &midi_event, 4);
+
+        if (written <= 0) {
+            break;
+        }
+
+        bytesConsumed += 3;
+    }
+
+    return bytesConsumed;
 }
 
 int CsoundInstance::read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes) {
@@ -880,7 +958,7 @@ int CsoundInstance::read_midi_data(CSOUND *csound, void *userData, unsigned char
 
     MidiEvent midi_event;
 
-    int32_t read = csoundReadCircularBuffer(csound, csound_instance->midi_buffer, &midi_event, 4);
+    int32_t read = csoundReadCircularBuffer(csound, csound_instance->input_midi_buffer, &midi_event, 4);
 
     while (read > 0 && bytesRead < nbytes) {
         //int channel = midi_event.channel;
@@ -894,7 +972,7 @@ int CsoundInstance::read_midi_data(CSOUND *csound, void *userData, unsigned char
         mbuf[bytesRead++] = byte3;
         mbuf[bytesRead++] = byte4;
 
-        read = csoundReadCircularBuffer(csound, csound_instance->midi_buffer, &midi_event, 4);
+        read = csoundReadCircularBuffer(csound, csound_instance->input_midi_buffer, &midi_event, 4);
     }
 
     return bytesRead;
@@ -1179,4 +1257,12 @@ void CsoundInstance::_bind_methods() {
                           "get_csound_name");
 
     ADD_SIGNAL(MethodInfo("csound_ready", PropertyInfo(Variant::STRING, "csound_name")));
+
+	ADD_SIGNAL(MethodInfo("midi_note_on", PropertyInfo(Variant::INT, "channel"), PropertyInfo(Variant::INT, "note"),
+				PropertyInfo(Variant::INT, "velocity")));
+
+	ADD_SIGNAL(MethodInfo("midi_note_off", PropertyInfo(Variant::INT, "channel"), PropertyInfo(Variant::INT, "note")));
+
+	ADD_SIGNAL(MethodInfo("midi_control_change", PropertyInfo(Variant::INT, "channel"), PropertyInfo(Variant::INT, "controller"),
+				PropertyInfo(Variant::INT, "value")));
 }

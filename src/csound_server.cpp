@@ -6,6 +6,7 @@
 #include <godot_cpp/variant/dictionary.hpp>
 
 #include "csound_layout.h"
+#include "csound_server_node.h"
 #include "csound_server.h"
 #include "godot_cpp/classes/engine.hpp"
 #include "godot_cpp/classes/input_event_midi.hpp"
@@ -38,6 +39,12 @@ CsoundServer::CsoundServer() {
 }
 
 CsoundServer::~CsoundServer() {
+    if (csound_server_node != NULL) {
+        csound_server_node->set_process(false);
+        SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+        tree->get_root()->remove_child(csound_server_node);
+        memfree(csound_server_node);
+    }
     singleton = NULL;
 }
 
@@ -84,6 +91,14 @@ void CsoundServer::initialize() {
     }
 
     set_edited(false);
+
+    if (csound_server_node == NULL) {
+        csound_server_node = memnew(CsoundServerNode);
+        SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+        tree->get_root()->add_child(csound_server_node);
+        csound_server_node->set_process(true);
+    }
+
     start();
     initialized = true;
 }
@@ -110,6 +125,12 @@ void CsoundServer::thread_func() {
 
         unlock();
         OS::get_singleton()->delay_usec(msdelay * 1000);
+    }
+}
+
+void CsoundServer::process() {
+    for (int i = 0; i < csound_instances.size(); i++) {
+        csound_instances[i]->process();
     }
 }
 

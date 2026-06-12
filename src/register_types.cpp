@@ -21,6 +21,7 @@
 #include "csound_instance.h"
 #include "csound_instrument.h"
 #include "csound_layout.h"
+#include "csound_server_node.h"
 #include "csound_server.h"
 #include "editor_audio_meter_notches_csound.h"
 #include "midi_file_reader.h"
@@ -36,6 +37,7 @@ void initialize_csoundgodot_module(ModuleInitializationLevel p_level) {
 
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         ClassDB::register_class<CsoundInstance>();
+        ClassDB::register_class<CsoundServerNode>();
         ClassDB::register_class<CsoundServer>();
         ClassDB::register_class<CsoundLayout>();
         ClassDB::register_class<CsoundInstrument>();

@@ -26,6 +26,7 @@ class CsoundServer : public Object {
     GDCLASS(CsoundServer, Object);
 
 private:
+    Node *csound_server_node = NULL;
     bool initialized;
     bool layout_loaded;
     bool edited;
@@ -61,6 +62,7 @@ public:
     static CsoundServer *get_singleton();
     void initialize();
     void thread_func();
+    void process();
 
     void set_csound_count(int p_count);
     int get_csound_count() const;

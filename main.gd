@@ -13,6 +13,16 @@ func _ready():
 func csound_layout_changed():
 	csound = CsoundServer.get_csound("Main")
 	csound.send_control_channel("cutoff", 1)
+	csound.midi_note_on.connect(_on_midi_note_on)
+	csound.midi_note_off.connect(_on_midi_note_off)
+
+
+func _on_midi_note_on(channel, note, velocity):
+	print("Note On: channel: ", channel, " note: ", note, " velocity: ", velocity)
+
+
+func _on_midi_note_off(channel, note):
+	print("Note Off: channel: ", channel, " note: ", note)
 
 
 func _process(_delta):

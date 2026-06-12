@@ -91,7 +91,8 @@ private:
         }
     };
 
-    void *midi_buffer;
+    void *input_midi_buffer;
+    void *output_midi_buffer;
 
     Vector<void *> input_channels;
     Vector<Channel> output_channels;
@@ -179,7 +180,8 @@ public:
     void set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
     int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
 
-    static int open_midi_device(CSOUND *csound, void **userData, const char *dev);
+    static int open_midi_input_device(CSOUND *csound, void **userData, const char *dev);
+    static int open_midi_output_device(CSOUND *csound, void **userData, const char *dev);
     static int write_midi_data(CSOUND *csound, void *userData, const unsigned char *mbuf, int nbytes);
     static int read_midi_data(CSOUND *csound, void *userData, unsigned char *mbuf, int nbytes);
     static void set_message(CSOUND *, int attr, const char *format, va_list valist);
@@ -202,6 +204,7 @@ public:
 
     static void csound_message_callback(CSOUND *csound, int attr, const char *format, va_list args);
 
+    void process();
     void thread_func();
     void initialize();
 

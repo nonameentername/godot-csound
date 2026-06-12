@@ -37,9 +37,7 @@ docker-ubuntu:
 shell-ubuntu: docker-ubuntu
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-ubuntu ${SHELL_COMMAND}
 
-ubuntu:
-	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_release.sh'
-	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
+ubuntu: ubuntu-debug ubuntu-release
 
 ubuntu-debug:
 	$(MAKE) shell-ubuntu SHELL_COMMAND='./platform/ubuntu/build_debug.sh'
@@ -53,9 +51,13 @@ docker-web:
 shell-web: docker-web
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-web ${SHELL_COMMAND}
 
-web:
-	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_release.sh'
+web: web-debug web-release
+
+web-debug:
 	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_debug.sh'
+
+web-release:
+	$(MAKE) shell-web SHELL_COMMAND='./platform/web/build_release.sh'
 
 docker-mingw:
 	docker build -t godot-csound-mingw ./platform/mingw
@@ -63,9 +65,13 @@ docker-mingw:
 shell-mingw: docker-mingw
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-mingw ${SHELL_COMMAND}
 
-mingw:
-	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_release.sh'
+mingw: mingw-debug mingw-release
+
+mingw-debug:
 	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_debug.sh'
+
+mingw-release:
+	$(MAKE) shell-mingw SHELL_COMMAND='./platform/mingw/build_release.sh'
 
 docker-osxcross:
 	docker build -t godot-csound-osxcross ./platform/osxcross
@@ -73,9 +79,13 @@ docker-osxcross:
 shell-osxcross: docker-osxcross
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-osxcross ${SHELL_COMMAND}
 
-osxcross:
-	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_release.sh'
+osxcross: oxcross-debug osxcross-release
+
+osxcross-debug:
 	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_debug.sh'
+
+osxcross-release:
+	$(MAKE) shell-osxcross SHELL_COMMAND='./platform/osxcross/build_release.sh'
 
 docker-ioscross:
 	docker build -t godot-csound-ioscross ./platform/ioscross
@@ -83,9 +93,13 @@ docker-ioscross:
 shell-ioscross: docker-ioscross
 	docker run -it --rm -v ${CURDIR}:${CURDIR} -w ${CURDIR} godot-csound-ioscross ${SHELL_COMMAND}
 
-ioscross:
-	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_release.sh'
+ioscross: ioscross-debug ioscross-release
+
+ioscross-debug:
 	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_debug.sh'
+
+ioscross-release:
+	$(MAKE) shell-ioscross SHELL_COMMAND='./platform/ioscross/build_release.sh'
 
 docker-android:
 	docker build -t godot-csound-android ./platform/android
@@ -95,9 +109,13 @@ shell-android: docker-android
 
 .PHONY: android
 
-android:
-	$(MAKE) shell-android SHELL_COMMAND='./platform/android/build_release.sh'
+android: android-debug android-release
+
+android-debug:
 	$(MAKE) shell-android SHELL_COMMAND='./platform/android/build_debug.sh'
+
+android-release:
+	$(MAKE) shell-android SHELL_COMMAND='./platform/android/build_release.sh'
 
 docker-windows:
 	docker build -t godot-csound-windows ./platform/windows

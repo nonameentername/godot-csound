@@ -4,7 +4,7 @@ godot-csound
 [![builds](https://github.com/nonameentername/godot-csound/actions/workflows/builds.yml/badge.svg)](https://github.com/nonameentername/godot-csound/actions/workflows/builds.yml)
 [![docker_builds](https://github.com/nonameentername/godot-csound/actions/workflows/build_images.yml/badge.svg)](https://github.com/nonameentername/godot-csound/actions/workflows/build_images.yml)
 
-Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.5 stable release.
+Godot gdextension csound library to allow playing music using csound.  Currently works with Godot v4.6 stable release.
 
 Project running in the browser [godot-csound](https://nonameentername.github.io/godot-csound/csoundgodot.html)
 
@@ -31,6 +31,13 @@ Download latest [release](https://github.com/nonameentername/godot-csound/releas
 On MacOS disable the check for unsigned binaries:
 ```bash
 xattr -dr com.apple.quarantine addons/csound/bin/macos
+```
+
+Before using godot-csound, import the project once so Godot can generate the required resource imports:
+
+Import godot resources:
+```bash
+godot --headless --import
 ```
 
 How to Build

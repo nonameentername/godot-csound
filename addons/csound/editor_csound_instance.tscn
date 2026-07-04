@@ -104,13 +104,13 @@ mouse_filter = 1
 layout_mode = 2
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer2" unique_id=551772853]
-custom_minimum_size = Vector2(150, 128)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 clip_tabs = false
 
 [node name="Channels" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer" unique_id=1239455169]
-custom_minimum_size = Vector2(150, 128)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
 [node name="Slider" type="VSlider" parent="VBoxContainer/HBoxContainer2/TabContainer/Channels" unique_id=1183526066]
@@ -149,7 +149,7 @@ text = "0.0 dB"
 
 [node name="Named" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/TabContainer" unique_id=1960625296]
 visible = false
-custom_minimum_size = Vector2(150, 128)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer" unique_id=783164498]

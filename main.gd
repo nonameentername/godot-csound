@@ -6,7 +6,9 @@ var csound: CsoundInstance
 
 
 func _ready():
-	print ("godot-csound version: ", CsoundServer.get_version(), " build: ", CsoundServer.get_build())
+	print(
+		"godot-csound version: ", CsoundServer.get_version(), " build: ", CsoundServer.get_build()
+	)
 	CsoundServer.connect("csound_layout_changed", csound_layout_changed)
 
 

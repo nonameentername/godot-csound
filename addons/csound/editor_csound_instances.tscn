@@ -63,7 +63,7 @@ text = "Create"
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gdx77")
-vertical_scroll_mode = 0
+vertical_scroll_mode = 1
 
 [node name="CsoundHBox" type="HBoxContainer" parent="CsoundScroll" unique_id=1750929244]
 layout_mode = 2

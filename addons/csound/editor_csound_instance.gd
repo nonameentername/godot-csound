@@ -20,8 +20,8 @@ var initialized = false
 var updating_csound: bool
 var csound_name: LineEdit
 var is_main: bool
-var enabled_vu: Texture2D
-var disabled_vu: Texture2D
+var enabled_vu: GradientTexture2D
+var disabled_vu: GradientTexture2D
 var active_bus_texture: Texture2D
 var hovering_drop: bool
 var editor_csound_instances: EditorCsoundInstances
@@ -138,7 +138,12 @@ func _create_channel_progress_bar():
 	channel_progress_bar.step = 0.1
 
 	channel_progress_bar.texture_under = enabled_vu
-	channel_progress_bar.tint_under = Color(0.75, 0.75, 0.75)
+	channel_progress_bar.tint_under = EditorInterface.get_editor_settings().get_setting(
+		"editors/audio_buses/tint_under_color"
+	)
+	channel_progress_bar.tint_over = EditorInterface.get_editor_settings().get_setting(
+		"editors/audio_buses/tint_over_color"
+	)
 	channel_progress_bar.texture_progress = enabled_vu
 
 	return channel_progress_bar
@@ -239,11 +244,17 @@ func _notification(what):
 
 		NOTIFICATION_DRAW:
 			if is_main:
-				draw_style_box(get_theme_stylebox("disabled", "Button"), Rect2(Vector2(), size))
+				draw_style_box(
+					get_theme_stylebox("master", "EditorAudioBus"), Rect2(Vector2(), size)
+				)
 			elif has_focus():
-				draw_style_box(get_theme_stylebox("focus", "Button"), Rect2(Vector2(), size))
+				draw_style_box(
+					get_theme_stylebox("focus", "EditorAudioBus"), Rect2(Vector2(), size)
+				)
 			else:
-				draw_style_box(get_theme_stylebox("panel", "TabContainer"), Rect2(Vector2(), size))
+				draw_style_box(
+					get_theme_stylebox("normal", "EditorAudioBus"), Rect2(Vector2(), size)
+				)
 
 			if get_index() != 0 && hovering_drop:
 				var accent: Color = get_theme_color("accent_color", "Editor")
@@ -389,7 +400,7 @@ func _update_theme():
 		"panel", get_theme_stylebox("panel", "TooltipPanel")
 	)
 
-	tree.custom_minimum_size = Vector2(0, 80) * EditorInterface.get_editor_scale()
+	tree.custom_minimum_size = Vector2.ZERO
 	tree.clear()
 
 	var root: TreeItem = tree.create_item()
@@ -418,8 +429,45 @@ func _update_theme():
 	var add_button = get_theme_icon("Add", "EditorIcons")
 	add_intrument.add_button(0, add_button)
 
-	enabled_vu = get_theme_icon("BusVuActive", "EditorIcons")
-	disabled_vu = get_theme_icon("BusVuFrozen", "EditorIcons")
+	var gradient_offsets = [0.0, 0.72, 0.74]
+
+	enabled_vu = GradientTexture2D.new()
+	enabled_vu.gradient = Gradient.new()
+	enabled_vu.gradient.offsets = gradient_offsets
+	enabled_vu.gradient.colors = [
+		EditorInterface.get_editor_settings().get_setting(
+			"editors/audio_buses/active_min_db_color"
+		),
+		EditorInterface.get_editor_settings().get_setting(
+			"editors/audio_buses/active_normalized_db_color"
+		),
+		EditorInterface.get_editor_settings().get_setting("editors/audio_buses/active_max_db_color")
+	]
+
+	enabled_vu.width = 16 * EditorInterface.get_editor_scale()
+	enabled_vu.height = 128 * EditorInterface.get_editor_scale()
+	enabled_vu.fill_from = Vector2(0.0, 1.0)
+	enabled_vu.fill_to = Vector2(0.0, 0.0)
+
+	disabled_vu = GradientTexture2D.new()
+	disabled_vu.gradient = Gradient.new()
+	disabled_vu.gradient.offsets = gradient_offsets
+	disabled_vu.gradient.colors = [
+		EditorInterface.get_editor_settings().get_setting(
+			"editors/audio_buses/inactive_min_db_color"
+		),
+		EditorInterface.get_editor_settings().get_setting(
+			"editors/audio_buses/inactive_normalized_db_color"
+		),
+		EditorInterface.get_editor_settings().get_setting(
+			"editors/audio_buses/inactive_max_db_color"
+		)
+	]
+
+	disabled_vu.width = 16 * EditorInterface.get_editor_scale()
+	disabled_vu.height = 128 * EditorInterface.get_editor_scale()
+	disabled_vu.fill_from = Vector2(0.0, 1.0)
+	disabled_vu.fill_to = Vector2(0.0, 0.0)
 
 	if not is_instance_valid(audio_meter):
 		audio_meter = EditorAudioMeterNotchesCsound.new()

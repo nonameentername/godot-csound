@@ -21,3 +21,5 @@ func _save(resource, path, flags):
 
 	f.store_buffer(resource.get_data())
 	f.close()
+
+	return OK

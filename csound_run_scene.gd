@@ -14,7 +14,7 @@ func _init():
 
 	await create_timer(2.0).timeout
 
-	var result = csound.evaluate_code('return 2 + 2')
+	var result = csound.evaluate_code("return 2 + 2")
 
 	print("output result is ", result)
 

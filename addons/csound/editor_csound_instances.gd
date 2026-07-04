@@ -74,6 +74,10 @@ func _notification(what):
 func _update_theme():
 	var stylebox: StyleBoxEmpty = get_theme_stylebox("panel", "Tree")
 	$CsoundScroll.add_theme_stylebox_override("panel", stylebox)
+	custom_minimum_size = Vector2(
+		0,
+		$TopBoxContainer.get_combined_minimum_size().y + (48 * EditorInterface.get_editor_scale())
+	)
 
 	for control in $CsoundScroll/CsoundHBox.get_children():
 		control.editor_interface = editor_interface

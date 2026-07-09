@@ -608,6 +608,10 @@ void CsoundInstance::play_midi(Ref<MidiFileReader> p_midi_file) {
 void CsoundInstance::process() {
     MidiEvent midi_event;
 
+    if (!initialized) {
+        return;
+    }
+
     int32_t read = csoundReadCircularBuffer(csound->GetCsound(), output_midi_buffer, &midi_event, 4);
 
     while (read > 0) {

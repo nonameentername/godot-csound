@@ -1,0 +1,71 @@
+name: Check Csound branch history
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+jobs:
+  check-csound-history:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+
+      - name: Detect rewritten Csound develop branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SUBMODULE_PATH="modules/csound"
+          UPSTREAM_URL="https://github.com/csound/csound.git"
+          UPSTREAM_BRANCH="develop"
+
+          recorded_commit="$(
+            git ls-tree HEAD "$SUBMODULE_PATH" |
+            awk '{print $3}'
+          )"
+
+          if [[ -z "$recorded_commit" ]]; then
+            echo "::error::Could not find the recorded $SUBMODULE_PATH commit."
+            exit 1
+          fi
+
+          git init --quiet /tmp/csound
+          git -C /tmp/csound remote add origin "$UPSTREAM_URL"
+
+          git -C /tmp/csound fetch --quiet --no-tags origin \
+            "$UPSTREAM_BRANCH:refs/remotes/origin/$UPSTREAM_BRANCH"
+
+          upstream_commit="$(
+            git -C /tmp/csound rev-parse "origin/$UPSTREAM_BRANCH"
+          )"
+
+          echo "Project commit:  $recorded_commit"
+          echo "Upstream commit: $upstream_commit"
+
+          if [[ "$recorded_commit" == "$upstream_commit" ]]; then
+            echo "Csound submodule is at the current develop tip."
+            exit 0
+          fi
+
+          if ! git -C /tmp/csound fetch --quiet --no-tags origin "$recorded_commit"; then
+            echo "::error::The recorded Csound commit is no longer fetchable."
+            echo "::error::The upstream develop branch may have been force-pushed."
+            exit 1
+          fi
+
+          if git -C /tmp/csound merge-base --is-ancestor \
+            "$recorded_commit" "$upstream_commit"; then
+            echo "Csound has newer commits, but develop history is intact."
+            exit 0
+          fi
+
+          echo "::error::Csound's develop branch no longer contains the commit recorded by godot-csound."
+          echo "::error::Upstream develop was likely rebased, reset, or force-pushed."
+          echo "::error::Dependabot may be unable to update the submodule until it is manually realigned."
+          exit 1

@@ -540,7 +540,10 @@ void CsoundInstance::event_string(String message) {
         return;
     }
 
-    csound->EventString(message.ascii());
+    CharString char_string = message.ascii();
+    lock();
+    csound->EventString(char_string.get_data());
+    unlock();
 }
 
 double CsoundInstance::evaluate_code(String message) {
@@ -548,7 +551,11 @@ double CsoundInstance::evaluate_code(String message) {
         return 0;
     }
 
-    return csound->EvalCode(message.ascii());
+    CharString char_string = message.ascii();
+    lock();
+    double result = csound->EvalCode(char_string.get_data());
+    unlock();
+    return result;
 }
 
 void CsoundInstance::compile_csd(String csd) {
@@ -556,7 +563,8 @@ void CsoundInstance::compile_csd(String csd) {
         return;
     }
 
-    csound->CompileCSD(csd.ascii(), 1);
+    CharString char_string = csd.ascii();
+    csound->CompileCSD(char_string.get_data(), 1);
 }
 
 void CsoundInstance::compile_orchestra(String orchestra) {
@@ -564,7 +572,8 @@ void CsoundInstance::compile_orchestra(String orchestra) {
         return;
     }
 
-    csound->CompileOrc(orchestra.ascii(), 1);
+    CharString char_string = orchestra.ascii();
+    csound->CompileOrc(char_string.get_data(), 1);
 }
 
 void CsoundInstance::send_control_channel(String channel, float value) {
@@ -572,7 +581,8 @@ void CsoundInstance::send_control_channel(String channel, float value) {
         return;
     }
 
-    csound->SetControlChannel(channel.ascii().get_data(), value);
+    CharString char_string = channel.ascii();
+    csound->SetControlChannel(char_string.get_data(), value);
 }
 
 float CsoundInstance::get_control_channel(String channel) {
@@ -580,7 +590,8 @@ float CsoundInstance::get_control_channel(String channel) {
         return 0;
     }
 
-    return csound->GetControlChannel(channel.ascii().get_data());
+    CharString char_string = channel.ascii();
+    return csound->GetControlChannel(char_string.get_data());
 }
 
 void CsoundInstance::pitch_bend(int chan, int val) {

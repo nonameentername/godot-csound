@@ -15,6 +15,7 @@ Projects using godot-csound
 * [godot-synths](https://github.com/nonameentername/godot-synths) - Music synths for Godot.  ([demo](https://nonameentername.github.io/godot-synths/godot-synths.html))
 * [geo icarus](https://geoicarus.net) - A flying game featuring live synths for the audio.
 * [Quetzalcoatl](https://github.com/nonameentername/quetzalcoatl) — A game created for VelociCode 2026, a month-long game jam. ([demo](https://nonameentername.github.io/quetzalcoatl/index.html))
+* [Melody Flow](https://store.steampowered.com/app/4748920/Melody_Flow/) — Catch the notes and save the melody in an infinite number of procedurally generated levels.
 
 Documentation
 -------------

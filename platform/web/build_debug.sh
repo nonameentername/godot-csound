@@ -10,7 +10,7 @@ prefix=$dir/addons/csound/bin/web/debug
 mkdir -p $build_dir
 cd $build_dir
 
-cmake -DCUSTOM_CMAKE=$src_dir/platform/wasm/Custom-wasm.cmake \
+cmake -DCUSTOM_CMAKE=$src_dir/platform/wasm-emscripten/Custom-wasm.cmake \
     -DCMAKE_BUILD_TYPE=Debug \
     -DCMAKE_VERBOSE_MAKEFILE=1 \
     -DCMAKE_INSTALL_PREFIX:PATH=$prefix \

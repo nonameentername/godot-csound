@@ -22,7 +22,9 @@ format:
 	gdformat $(shell find -name '*.gd' ! -path './godot-cpp/*' ! -path './modules/godot/*')
 
 clean:
-	rm -f src/*.os
+	rm -f src/*.os 
+	rm -rf modules/csound/build
+	rm -rf addons/csound/bin
 
 compiledb: clean
 	scons -c platform=$(PLATFORM) target=template_debug dev_build=yes debug_symbols=yes | tee build-log.txt

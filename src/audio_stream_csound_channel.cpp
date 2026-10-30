@@ -51,10 +51,12 @@ Ref<AudioStreamPlayback> AudioStreamCsoundChannel::_instantiate_playback() const
     return talking_tree;
 }
 
-int AudioStreamCsoundChannel::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames) {
+int AudioStreamCsoundChannel::process_sample(AudioFrame *p_buffer, float p_rate, int p_frames,
+                                             CsoundChannelReader &left_reader, CsoundChannelReader &right_reader) {
     CsoundInstance *csound_instance = CsoundServer::get_singleton()->get_csound(get_csound_name());
     if (csound_instance != NULL && csound_instance->is_active()) {
-        return csound_instance->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right);
+        return csound_instance->get_channel_sample(p_buffer, p_rate, p_frames, channel_left, channel_right, left_reader,
+                                                   right_reader);
     }
 
     for (int frame = 0; frame < p_frames; frame += 1) {

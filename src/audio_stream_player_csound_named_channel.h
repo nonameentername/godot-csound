@@ -18,6 +18,8 @@ class AudioStreamPlaybackCsoundNamedChannel : public AudioStreamPlayback {
 private:
     Ref<AudioStreamCsoundNamedChannel> base;
     bool active;
+    CsoundChannelReader left_reader;
+    CsoundChannelReader right_reader;
 
 public:
     static void _bind_methods();

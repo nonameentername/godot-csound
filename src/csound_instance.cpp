@@ -150,7 +150,7 @@ void CsoundInstance::start() {
                 output_channels.resize(csound->GetChannels(0));
 
                 for (int j = 0; j < csound->GetChannels(0); j++) {
-                    output_channels.write[j].buffer = csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
+                    output_channels.write[j].player_buffer = new CsoundChannelBuffer();
                 }
             }
 
@@ -226,7 +226,7 @@ void CsoundInstance::cleanup_channels() {
     }
 
     for (int channel = 0; channel < output_channels.size(); channel++) {
-        csoundDestroyCircularBuffer(csound->GetCsound(), output_channels[channel].buffer);
+        delete output_channels[channel].player_buffer;
     }
 
     for (KeyValue<String, void *> &E : input_named_channels_buffer) {
@@ -234,7 +234,7 @@ void CsoundInstance::cleanup_channels() {
     }
 
     for (int channel = 0; channel < output_named_channels.size(); channel++) {
-        csoundDestroyCircularBuffer(csound->GetCsound(), output_named_channels[channel].buffer);
+        delete output_named_channels[channel].player_buffer;
     }
 
     input_channels.clear();
@@ -277,8 +277,7 @@ void CsoundInstance::add_named_channel(String name) {
     if (!named_channels.has(name)) {
         int index = output_named_channels.size();
         output_named_channels.resize(index + 1);
-        output_named_channels.write[index].buffer =
-            csoundCreateCircularBuffer(csound->GetCsound(), CIRCULAR_BUFFER_SIZE, sizeof(MYFLT));
+        output_named_channels.write[index].player_buffer = new CsoundChannelBuffer();
         output_named_channels.write[index].name = name;
         named_channels.insert(name, index);
     }
@@ -365,7 +364,8 @@ void CsoundInstance::set_channel_sample(AudioFrame *p_buffer, float p_rate, int 
     unlock();
 }
 
-int CsoundInstance::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right) {
+int CsoundInstance::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right,
+                                       CsoundChannelReader &left_reader, CsoundChannelReader &right_reader) {
     bool has_left_channel = left >= 0 && left < output_channels.size();
     bool has_right_channel = right >= 0 && right < output_channels.size();
 
@@ -375,7 +375,7 @@ int CsoundInstance::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p
 
     lock();
     if (has_left_channel && active) {
-        csoundReadCircularBuffer(csound->GetCsound(), output_channels[left].buffer, temp_buffer, p_frames);
+        output_channels[left].player_buffer->read_or_silence(left_reader, temp_buffer, p_frames);
         for (int frame = 0; frame < p_frames; frame++) {
             p_buffer[frame].left = temp_buffer[frame];
         }
@@ -385,7 +385,7 @@ int CsoundInstance::get_channel_sample(AudioFrame *p_buffer, float p_rate, int p
         }
     }
     if (has_right_channel && active) {
-        csoundReadCircularBuffer(csound->GetCsound(), output_channels[right].buffer, temp_buffer, p_frames);
+        output_channels[right].player_buffer->read_or_silence(right_reader, temp_buffer, p_frames);
         for (int frame = 0; frame < p_frames; frame++) {
             p_buffer[frame].right = temp_buffer[frame];
         }
@@ -431,7 +431,8 @@ void CsoundInstance::set_named_channel_sample(AudioFrame *p_buffer, float p_rate
     unlock();
 }
 
-int CsoundInstance::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right) {
+int CsoundInstance::get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right,
+                                             CsoundChannelReader &left_reader, CsoundChannelReader &right_reader) {
     if (finished) {
         return 0;
     }
@@ -450,8 +451,7 @@ int CsoundInstance::get_named_channel_sample(AudioFrame *p_buffer, float p_rate,
     }
 
     if (has_left_channel && active) {
-        csoundReadCircularBuffer(csound->GetCsound(), output_named_channels[named_channels[left]].buffer, temp_buffer,
-                                 p_frames);
+        output_named_channels[named_channels[left]].player_buffer->read_or_silence(left_reader, temp_buffer, p_frames);
         for (int frame = 0; frame < p_frames; frame++) {
             p_buffer[frame].left = temp_buffer[frame];
         }
@@ -461,8 +461,7 @@ int CsoundInstance::get_named_channel_sample(AudioFrame *p_buffer, float p_rate,
         }
     }
     if (has_right_channel && active) {
-        csoundReadCircularBuffer(csound->GetCsound(), output_named_channels[named_channels[right]].buffer, temp_buffer,
-                                 p_frames);
+        output_named_channels[named_channels[right]].player_buffer->read_or_silence(right_reader, temp_buffer, p_frames);
         for (int frame = 0; frame < p_frames; frame++) {
             p_buffer[frame].right = temp_buffer[frame];
         }
@@ -702,8 +701,7 @@ void CsoundInstance::thread_func() {
                         spin[frame * csound->GetChannels(1) + channel] = ksmps_temp_buffer[frame];
                     }
                     if (bypass) {
-                        csoundWriteCircularBuffer(csound->GetCsound(), output_channels.write[channel].buffer,
-                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
+                        output_channels[channel].player_buffer->write(ksmps_temp_buffer.ptr(), csound->GetKsmps());
                     }
                 }
 
@@ -715,9 +713,8 @@ void CsoundInstance::thread_func() {
                     }
                     csound->SetAudioChannel(E.key.utf8().get_data(), ksmps_temp_buffer.ptrw());
                     if (bypass) {
-                        csoundWriteCircularBuffer(csound->GetCsound(),
-                                                  output_named_channels.write[named_channels[E.key]].buffer,
-                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
+                        output_named_channels[named_channels[E.key]].player_buffer->write(ksmps_temp_buffer.ptr(),
+                                                                                          csound->GetKsmps());
                     }
                 }
 
@@ -773,8 +770,7 @@ void CsoundInstance::thread_func() {
                             }
                             ksmps_temp_buffer.write[frame] = value;
                         }
-                        csoundWriteCircularBuffer(csound->GetCsound(), output_channels.write[channel].buffer,
-                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
+                        output_channels[channel].player_buffer->write(ksmps_temp_buffer.ptr(), csound->GetKsmps());
                     }
                 }
 
@@ -790,8 +786,7 @@ void CsoundInstance::thread_func() {
                             }
                             ksmps_temp_buffer.write[frame] = value;
                         }
-                        csoundWriteCircularBuffer(csound->GetCsound(), output_named_channels.write[channel].buffer,
-                                                  ksmps_temp_buffer.ptr(), csound->GetKsmps());
+                        output_named_channels[channel].player_buffer->write(ksmps_temp_buffer.ptr(), csound->GetKsmps());
 
                         // clear channel after reading
                         for (int frame = 0; frame < csound->GetKsmps(); frame++) {

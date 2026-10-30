@@ -14,6 +14,8 @@ void AudioStreamPlaybackCsoundChannel::_stop() {
 }
 
 void AudioStreamPlaybackCsoundChannel::_start(double p_from_pos) {
+    left_reader = CsoundChannelReader();
+    right_reader = CsoundChannelReader();
     active = true;
 }
 
@@ -29,7 +31,7 @@ int AudioStreamPlaybackCsoundChannel::_mix(AudioFrame *p_buffer, float p_rate, i
         return 0;
     }
 
-    return base->process_sample(p_buffer, p_rate, p_frames);
+    return base->process_sample(p_buffer, p_rate, p_frames, left_reader, right_reader);
 }
 
 int AudioStreamPlaybackCsoundChannel::_get_loop_count() const {

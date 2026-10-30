@@ -5,6 +5,8 @@
 #include <godot_cpp/classes/audio_stream.hpp>
 #include <godot_cpp/godot.hpp>
 
+#include "csound_channel_buffer.h"
+
 namespace godot {
 
 class AudioStreamCsoundChannel : public AudioStream {
@@ -18,7 +20,8 @@ private:
 
 public:
     virtual String get_stream_name() const;
-    virtual int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
+    virtual int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames, CsoundChannelReader &left_reader,
+                               CsoundChannelReader &right_reader);
     virtual float get_length() const;
     AudioStreamCsoundChannel();
     ~AudioStreamCsoundChannel();

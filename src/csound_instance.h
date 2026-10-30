@@ -26,6 +26,7 @@
 #include <godot_cpp/templates/vector.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
+#include "csound_channel_buffer.h"
 #include "csound_file_reader.h"
 #include "csound_instrument.h"
 #include "midi_file_reader.h"
@@ -87,6 +88,7 @@ private:
         bool active = false;
         float peak_volume = AUDIO_MIN_PEAK_DB;
         void *buffer;
+        CsoundChannelBuffer *player_buffer = nullptr;
         Channel() {
         }
     };
@@ -175,10 +177,12 @@ public:
     int process_sample(AudioFrame *p_buffer, float p_rate, int p_frames);
 
     void set_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
-    int get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right);
+    int get_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, int left, int right,
+                           CsoundChannelReader &left_reader, CsoundChannelReader &right_reader);
 
     void set_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
-    int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right);
+    int get_named_channel_sample(AudioFrame *p_buffer, float p_rate, int p_frames, String left, String right,
+                                 CsoundChannelReader &left_reader, CsoundChannelReader &right_reader);
 
     static int open_midi_input_device(CSOUND *csound, void **userData, const char *dev);
     static int open_midi_output_device(CSOUND *csound, void **userData, const char *dev);

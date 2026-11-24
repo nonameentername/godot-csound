@@ -110,7 +110,7 @@ elif env["platform"] == "android":
     csound_library = "csound"
     env.Append(LIBS=[csound_library])
 elif env["platform"] == "windows":
-    csound_library = "csound64"
+    csound_library = "csound7_64"
     env.Append(LIBS=[csound_library] + libraries + ["shlwapi", "ssp"])
 else:
     csound_library = "csound64"

@@ -45,19 +45,19 @@ linux.release.x86_64 = {
 "linux/release/lib64/libcsound64.so.7.0": ""
 }
 windows.editor.x86_64  = {
-"windows/release/lib/csound64.dll": "",
+"windows/release/lib/csound7_64.dll": "",
 "windows/release/lib/libstdc++-6.dll": "",
 "windows/release/lib/libgcc_s_seh-1.dll": "",
 "windows/release/lib/libwinpthread-1.dll": ""
 }
 windows.debug.x86_64  = {
-"windows/debug/lib/csound64.dll": "",
+"windows/debug/lib/csound7_64.dll": "",
 "windows/debug/lib/libstdc++-6.dll": "",
 "windows/debug/lib/libgcc_s_seh-1.dll": "",
 "windows/debug/lib/libwinpthread-1.dll": ""
 }
 windows.release.x86_64 = {
-"windows/release/lib/csound64.dll": "",
+"windows/release/lib/csound7_64.dll": "",
 "windows/release/lib/libstdc++-6.dll": "",
 "windows/release/lib/libgcc_s_seh-1.dll": "",
 "windows/release/lib/libwinpthread-1.dll": ""

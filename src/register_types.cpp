@@ -71,10 +71,11 @@ void uninitialize_csoundgodot_module(ModuleInitializationLevel p_level) {
         return;
     }
 
-    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
-        Engine::get_singleton()->unregister_singleton("Csound");
-        csound_module->finish();
+    if (csound_module != NULL) {
+        Engine::get_singleton()->unregister_singleton("CsoundServer");
+        csound_module->finalize();
         memdelete(csound_module);
+        csound_module = NULL;
     }
 }
 
@@ -87,7 +88,7 @@ GDExtensionBool GDE_EXPORT csoundgodot_library_init(GDExtensionInterfaceGetProcA
 
     init_obj.register_initializer(initialize_csoundgodot_module);
     init_obj.register_terminator(uninitialize_csoundgodot_module);
-    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_EDITOR);
+    init_obj.set_minimum_library_initialization_level(MODULE_INITIALIZATION_LEVEL_SCENE);
 
     return init_obj.init();
 }

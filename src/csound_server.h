@@ -60,7 +60,9 @@ public:
     bool get_edited();
 
     static CsoundServer *get_singleton();
+    void delete_server_node();
     void initialize();
+    void finalize();
     void thread_func();
     void process();
 

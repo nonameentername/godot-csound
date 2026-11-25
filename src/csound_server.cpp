@@ -39,12 +39,7 @@ CsoundServer::CsoundServer() {
 }
 
 CsoundServer::~CsoundServer() {
-    if (csound_server_node != NULL) {
-        csound_server_node->set_process(false);
-        SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
-        tree->get_root()->remove_child(csound_server_node);
-        memfree(csound_server_node);
-    }
+    finalize();
     singleton = NULL;
 }
 
@@ -95,7 +90,9 @@ void CsoundServer::initialize() {
     if (csound_server_node == NULL) {
         csound_server_node = memnew(CsoundServerNode);
         SceneTree *tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
-        tree->get_root()->add_child(csound_server_node);
+        if (tree != NULL && tree->get_root() != NULL) {
+            tree->get_root()->add_child(csound_server_node);
+        }
         csound_server_node->set_process(true);
     }
 
@@ -107,6 +104,7 @@ void CsoundServer::thread_func() {
     int msdelay = 1000;
     while (!exit_thread) {
         if (!initialized) {
+            OS::get_singleton()->delay_usec(10 * 1000);
             continue;
         }
 
@@ -124,7 +122,10 @@ void CsoundServer::thread_func() {
         }
 
         unlock();
-        OS::get_singleton()->delay_usec(msdelay * 1000);
+
+        for (int i = 0; i < 100 && !exit_thread; i++) {
+            OS::get_singleton()->delay_usec(10 * 1000);
+        }
     }
 }
 
@@ -654,9 +655,37 @@ void CsoundServer::unlock() {
     mutex->unlock();
 }
 
+void CsoundServer::delete_server_node() {
+    csound_server_node = NULL;
+}
+
+void CsoundServer::finalize() {
+    finish();
+    if (csound_server_node != NULL) {
+        csound_server_node->set_process(false);
+        Node *parent = csound_server_node->get_parent();
+        if (parent != NULL) {
+            parent->remove_child(csound_server_node);
+        }
+        Node *node = csound_server_node;
+        csound_server_node = NULL;
+        memdelete(node);
+    }
+    for (int i = 0; i < csound_instances.size(); i++) {
+        if (csound_instances[i] != NULL) {
+            csound_instances[i]->stop();
+            memdelete(csound_instances[i]);
+        }
+    }
+    csound_instances.clear();
+    csound_map.clear();
+}
+
 void CsoundServer::finish() {
     exit_thread = true;
-    thread->wait_to_finish();
+    if (thread.is_valid() && thread->is_started()) {
+        thread->wait_to_finish();
+    }
 }
 
 CsoundInstance *CsoundServer::get_csound(const String &p_name) {
